@@ -24,7 +24,7 @@ cd into function_name directory<br>
 command: maestro create function_name.json<br>
 <br>
 At the moment it is only functioning in the directory where the application code lives<br>
-To test the current model run it like this:
+To test the current model run it like this:<br>
 python maestro.py create test.json<br>
 python maestro.py update test.json<br>
 python maestro.py publish test.json<br>
