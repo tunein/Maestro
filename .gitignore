@@ -1,0 +1,5 @@
+test.json
+notes.txt
+*.pyc
+lambda/*
+setup.py
