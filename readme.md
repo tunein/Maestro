@@ -17,13 +17,18 @@ Created by M. Moon/We'reWolf Industries Copyright 2017<br>
 <b>Required Packages..</b><br>
 <br>
 AWS CLI Tools/Boto3<br>
-
+<br>
 <b>Steps will be...</b><br>
 <br>
 cd into function_name directory<br>
 command: maestro create function_name.json<br>
 <br>
 At the moment it is only functioning in the directory where the application code lives<br>
+To test the current model run it like this:
+python maestro.py create test.json<br>
+python maestro.py update test.json<br>
+python maestro.py publish test.json<br>
+python maestro.py delete test.json<br>
 <br>
 
 <b>Folder Hierarchy...</b><br>
