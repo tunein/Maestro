@@ -10,6 +10,7 @@ import datetime
 
 s3 = boto3.resource('s3')
 client = boto3.client('s3')
+accepted_prompt_actions = ['y', 'n']
 
 lambda_name = 'test'
 DOC = sys.argv[1]
