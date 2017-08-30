@@ -55,7 +55,7 @@ def create_bucket():
 
 def upload_file():
   '''
-  to do: figure out a way to show progress..
+  to do: figure out a way to show progress...
   '''
 	bucket_name = = json_parser()['backup']['bucket_name']
 	file = os.getcwd() + '/%s.zip' % lambda_name
@@ -65,7 +65,7 @@ def upload_file():
   	print "Uploading file"
 		return True
 	else:
-		print "Hmm.. I couldn't find the file"
+		print "Hmm... I couldn't find the file"
 		return False
 
 def check_upload_exists():
