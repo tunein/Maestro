@@ -3,3 +3,4 @@ notes.txt
 *.pyc
 lambda/*
 setup.py
+*.zip
