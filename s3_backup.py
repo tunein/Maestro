@@ -44,13 +44,35 @@ def check_s3():
         return False
     print "Not a valid response"
 
+#placeholder while testing check_s3 function
+check_s3()
+    
 def create_bucket():
+  '''
+  this function will create a bucket, driven by user input
+  '''
   return "create bucket"
 
 def upload_file():
+  '''
+  this function will upload the file, figure out a way to show progress..
+  '''
   return "upload object here"
 
-check_s3()
+def check_upload_exists():
+  '''
+  this will check to see if the file was uploaded successfully. Concerns: make sure it's checking file version
+  '''
+  return "checking upload status.."
+
+def main():
+  '''
+  this will be the main function that gets triggered to launch the rest
+  '''
+  return "main function!"
+  
+#if __name__ == "__main__":
+#  main()
 
 '''
 Keeping this around for later...
