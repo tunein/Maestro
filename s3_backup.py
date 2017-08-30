@@ -51,6 +51,18 @@ def create_bucket():
   '''
   this function will create a bucket, driven by user input
   '''
+	create = client.create_bucket(
+			ACL='private'|'public-read'|'public-read-write'|'authenticated-read',
+			Bucket='string',
+			CreateBucketConfiguration={
+					'LocationConstraint': 'EU'|'eu-west-1'|'us-west-1'|'us-west-2'|'ap-south-1'|'ap-southeast-1'|'ap-southeast-2'|'ap-northeast-1'|'sa-east-1'|'cn-north-1'|'eu-central-1'
+			},
+			GrantFullControl='string',
+			GrantRead='string',
+			GrantReadACP='string',
+			GrantWrite='string',
+			GrantWriteACP='string'
+	)
   return "create bucket"
 
 def upload_file():
