@@ -60,10 +60,15 @@ def upload_file():
   return "upload object here"
 
 def check_upload_exists():
-  '''
-  this will check to see if the file was uploaded successfully. Concerns: make sure it's checking file version
-  '''
-  return "checking upload status.."
+	bucket_name = json_parser()['backup']['bucket_name']
+	filename = '/%s.zip' % lambda_name
+	file = s3.Object(bucket_name, filename)
+	if file.key == filename:
+		print "File exists"
+		return True
+	else:
+		print "No file found in %s" % bucket_name
+		return False
 
 def main():
   '''
