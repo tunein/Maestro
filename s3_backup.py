@@ -21,11 +21,6 @@ def json_parser():
     return True
   print "No json document to read.. Please enter a valid json document"
 
-def datetime_handler(x):
-    if isinstance(x, datetime.datetime):
-        return x.isoformat()
-    raise TypeError("Unknown type")
-
 def check_file():
   file_path = os.getcwd() + '/%s.zip' % lambda_name
   if os.path.exists(file_path):
@@ -34,18 +29,19 @@ def check_file():
 
 def check_s3():
   bucket_name = json_parser()['backup']['bucket_name']
-  list_buckets = client.list_buckets()
-  response = json.dumps(list_buckets, default=datetime_handler, indent=4)
-  load_response = json.loads(response)
+  try:
+    s3.meta.client.head_bucket(Bucket=bucket_name)
+    return True
+  except ClientError:
+    prompt = raw_input("Bucket does not exist would you like to create? 'y/n': ")
+    if prompt in accepted_prompt_actions:
+      if prompt == 'y':
+        print "Attempting to create new bucket"
+        create_bucket()
+      else:
+        print "Exiting..."
+        return False
 
-  for buckets in load_response['Buckets']:
-    print buckets['Name']
-'''
-    if any(name in bucket_name for name in current_buckets):
-      return 
-    else:
-      raw_input("Bucket does not exist would you like to create? 'y/n': ")
-'''
 def create_bucket():
   return "create bucket"
 
@@ -53,3 +49,12 @@ def upload_file():
   return "upload object here"
 
 check_s3()
+
+'''
+Keeping this around for later...
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
+'''
