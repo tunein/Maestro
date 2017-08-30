@@ -42,6 +42,7 @@ def check_s3():
       else:
         print "Exiting..."
         return False
+    print "Not a valid response"
 
 def create_bucket():
   return "create bucket"
