@@ -102,12 +102,3 @@ def main():
   
 if __name__ == "__main__":
   main()
-
-'''
-Keeping this around for later...
-
-def datetime_handler(x):
-    if isinstance(x, datetime.datetime):
-        return x.isoformat()
-    raise TypeError("Unknown type")
-'''
