@@ -7,12 +7,13 @@ import json
 import zipfile
 import os
 import datetime
+from botocore.exceptions import ClientError
 
 s3 = boto3.resource('s3')
 client = boto3.client('s3')
 accepted_prompt_actions = ['y', 'n']
-
-lambda_name = 'test'
+REGIONS = lambda_config.REGIONS
+ACL_ANSWERS = lambda_config.ACL_ANSWERS
 DOC = sys.argv[1]
 
 def json_parser():
@@ -23,6 +24,7 @@ def json_parser():
   print "No json document to read.. Please enter a valid json document"
 
 def check_file():
+  lambda_name = json_parser()["initializers"]["name"]
   file_path = os.getcwd() + '/%s.zip' % lambda_name
   if os.path.exists(file_path):
     return True
@@ -34,71 +36,73 @@ def check_s3():
     s3.meta.client.head_bucket(Bucket=bucket_name)
     return True
   except ClientError:
-    prompt = raw_input("Bucket does not exist would you like to create? 'y/n': ")
+    prompt = raw_input("Bucket '%s' does not exist would you like to create? 'y/n': " % bucket_name)
     if prompt in accepted_prompt_actions:
       if prompt == 'y':
-        print "Attempting to create new bucket"
-        create_bucket()
+        if create_bucket():
+          return True
       else:
         print "Exiting..."
         return False
-    print "Not a valid response"
-
-#placeholder while testing check_s3 function
-check_s3()
     
 def create_bucket():
-  '''
-  this function will create a bucket, driven by user input
-  '''
-	create = client.create_bucket(
-			ACL='private'|'public-read'|'public-read-write'|'authenticated-read',
-			Bucket='string',
-			CreateBucketConfiguration={
-					'LocationConstraint': 'EU'|'eu-west-1'|'us-west-1'|'us-west-2'|'ap-south-1'|'ap-southeast-1'|'ap-southeast-2'|'ap-northeast-1'|'sa-east-1'|'cn-north-1'|'eu-central-1'
-			},
-			GrantFullControl='string',
-			GrantRead='string',
-			GrantReadACP='string',
-			GrantWrite='string',
-			GrantWriteACP='string'
-	)
-  return "create bucket"
+  bucket_name = json_parser()['backup']['bucket_name']
+  acl = raw_input("Give your bucket an ACL (Accepted answers: 'private', 'public-read', 'public-read-write', 'authenticated-read'): ")
+  
+  if acl in ACL_ANSWERS:
+    bucket_location = raw_input("What region would you like to put the bucket in? ")
+    if bucket_location.lower() in REGIONS:
+      role = json_parser()["initializers"]["role"]
+
+      create = client.create_bucket(
+        ACL=acl,
+        Bucket='%s' % bucket_name,
+        CreateBucketConfiguration={
+            'LocationConstraint': '%s' % bucket_location
+        }
+      )
+      return True
+      print "Creating bucket"
+    print "Invalid region"
+    return False
+  print "Invalid ACL"
+  return False
 
 def upload_file():
-  '''
-  to do: figure out a way to show progress...
-  '''
-	bucket_name = = json_parser()['backup']['bucket_name']
-	file = os.getcwd() + '/%s.zip' % lambda_name
-	filename = '/%s.zip' % lambda_name
-	if file.is_file():
-		upload = client.Object(bucket_name, filename).upload_file(file)
-  	print "Uploading file"
-		return True
-	else:
-		print "Hmm... I couldn't find the file"
-		return False
+  lambda_name = json_parser()["initializers"]["name"]
+  bucket_name = json_parser()['backup']['bucket_name']
+  file = os.getcwd() + '/%s.zip' % lambda_name
+  filename = '%s.zip' % lambda_name
+  if check_file():
+    upload = s3.Bucket(bucket_name).upload_file(file, filename)
+    print "Uploading file"
+    return True
+  else:
+    print "Hmm... I couldn't find the file"
+    return False
 
 def check_upload_exists():
-	bucket_name = json_parser()['backup']['bucket_name']
-	filename = '/%s.zip' % lambda_name
-	file = s3.Object(bucket_name, filename)
-	if file.key == filename:
-		print "File exists"
-		return True
-	else:
-		print "No file found in %s" % bucket_name
-		return False
+  lambda_name = json_parser()["initializers"]["name"]
+  bucket_name = json_parser()['backup']['bucket_name']
+  filename = '/%s.zip' % lambda_name
+  file = s3.Object(bucket_name, filename)
+  if file.key == filename:
+    print "File exists"
+    return True
+  else:
+    print "No file found in %s" % bucket_name
+    return False
 
 def main():
-  '''
-  this will be the main function that gets triggered to launch the rest
-  '''
-  return "main function!"
+  if json_parser():
+    if check_file():
+      if check_s3():
+        if upload_file():
+          if check_upload_exists():
+            print "Successfully backed up to s3"
   
-#if __name__ == "__main__":
-#  main()
+if __name__ == "__main__":
+  main()
 
 '''
 Keeping this around for later...
