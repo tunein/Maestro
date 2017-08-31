@@ -4,5 +4,4 @@ import boto3
 import lambda_config
 import sys
 import json
-import zipfile
 import os
