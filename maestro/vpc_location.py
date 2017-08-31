@@ -41,7 +41,7 @@ def get_subnets():
   for subnet in subnets:
     if subnet.id != 0:
       ids.append(subnet.id)
-  print ids
+  return ids
 
 def main():
   if get_vpc_id():
