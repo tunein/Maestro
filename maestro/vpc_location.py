@@ -34,7 +34,7 @@ def get_vpc_id():
     return False
 
 def get_subnets():
-  filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':['prod']}]
+  filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':[json_parser()['environment']['environment']]}]
   vpc = ec2.Vpc(get_vpc_id())
   subnets = list(vpc.subnets.filter(Filters=filters))
   ids = []

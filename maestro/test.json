@@ -1,0 +1,33 @@
+{
+ "initializers": {
+   "name": "test",
+   "description": "This is a description",
+   "region": "us-west-2",
+   "role": "lambda_role",
+   "version": "0.1"
+  },
+ "provisioners": {
+   "runtime": "python2.7",
+   "timeout": 150,
+   "mem_size": 128,
+   "publish": "True"
+ },
+ "vpcconfig": {
+  "vpc_name": "Stock_VPC",
+  "security_group_ids": ["secrurity_group"] 
+ },
+ "environment": {
+  "environment": "prod",
+  "variables": {
+    "string": "string",
+    "string2": "string2"
+  }
+ },
+ "tags": {
+  "string1": "string1",
+  "string2": "string2"
+ },
+ "backup": {
+  "bucket_name": "maxs-buckets-wild-time-28"
+ }
+}
