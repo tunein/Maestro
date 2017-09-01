@@ -284,6 +284,40 @@ def publish():
   except IOError, message:
     print message
     sys.exit(1)
+
+#Starting on this.. not tested yet
+def alias_creation():
+  lambda_name = json_parser()["initializers"]["name"]
+
+  get_alias_name = raw_input("What would you like this alias to be called? ")
+  alias_name = get_alias_name.downcase()
+
+  versions = client.list_versions_by_function(
+                    FunctionName='%s' % lambda_name,
+                  )
+
+  avail_versions = []
+
+  for version in versions:
+    if version != 0:
+      avail_versions.append(version)
+
+  print avail_versions
+  function_version = raw_input("What version would you like to create an alias for? ")
+  
+  if function_version in avail_versions: 
+    try:
+      add_alias = client.create_alias(
+        FunctionName='%s' % lambda_name,
+        Name='%s' % alias_name,
+        FunctionVersion='%s' % function_version,
+      )
+      return True
+    except ClientError, message:
+      print message
+  else:
+    print "I can't find that version, check list and find again"
+
 '''
 def is_event_source():
 
