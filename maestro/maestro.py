@@ -169,6 +169,7 @@ def create():
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
+        #This presently does not work without a VPC in the json file
         VpcConfig=vpc_config
       )
       return True
