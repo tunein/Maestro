@@ -6,6 +6,8 @@ import sys
 import json
 import zipfile
 import os
+import vpc_location
+import s3_backup
 
 USER_ACTION = sys.argv[1]
 DOC = sys.argv[2]
@@ -125,12 +127,14 @@ def check():
     else:
       return False
 
-#Add commnad line args for dry run
+#Add command line args for dry run
 #Add tags!
 def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
-#  lambda_config = ''
+  subnet_ids = vpc_location.main()
+  security_groups = ''
+  lambda_config = ''
 
   if zip_folder():
     print "Attempting to create lambda..."
@@ -145,8 +149,16 @@ def create():
         },
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
-        MemorySize=json_parser()["provisioners"]["mem_size"]
-        )
+        MemorySize=json_parser()["provisioners"]["mem_size"],
+        VpcConfig={
+          'SubnetIds': [
+            '%s' % ", ".join(subnet_ids),
+          ],
+          'SecurityGroupIds': [
+            '%s' % security_groups, 
+          ]
+        }
+      )
       return True
     except IOError, message:
       print message

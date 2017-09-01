@@ -6,7 +6,7 @@ import sys
 import json
 import os
 
-DOC = sys.argv[1]
+DOC = sys.argv[2]
 
 def json_parser():
   with open('%s' % DOC) as json_data:
@@ -34,7 +34,7 @@ def get_vpc_id():
     return False
 
 def get_subnets():
-  filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':[json_parser()['environment']['environment']]}]
+  filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':['%s' % json_parser()['environment']['environment']]}]
   vpc = ec2.Vpc(get_vpc_id())
   subnets = list(vpc.subnets.filter(Filters=filters))
   ids = []
@@ -45,8 +45,5 @@ def get_subnets():
 
 def main():
   if get_vpc_id():
-    get_subnets()
-
-if __name__ == "__main__":
-  main()
+    return get_subnets()
 
