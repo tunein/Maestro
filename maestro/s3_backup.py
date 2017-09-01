@@ -13,7 +13,7 @@ client = boto3.client('s3')
 accepted_prompt_actions = ['y', 'n']
 REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
-DOC = sys.argv[1]
+DOC = sys.argv[2]
 
 def json_parser():
   with open('%s' % DOC) as json_data:
@@ -99,6 +99,4 @@ def main():
         if upload_file():
           if check_upload_exists():
             print "Successfully backed up to s3"
-  
-if __name__ == "__main__":
-  main()
+            return True

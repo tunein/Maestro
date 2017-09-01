@@ -7,4 +7,6 @@ import json
 import os
 import vpc_location
 
-vpc_location.main()
+'''
+insert api gateway stuff here
+'''

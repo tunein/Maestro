@@ -20,6 +20,8 @@ roles = boto3.client('iam')
 AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
 AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
 
+yes_or_no = ['y', 'n']
+
 def file_type():
   print "validating file type..."
   if len(DOC)>0:
@@ -150,6 +152,7 @@ def create():
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
+        #Currently a bug here with multiple subnets not parsing correctly
         VpcConfig={
           'SubnetIds': [
             '%s' % ", ".join(subnet_ids),
@@ -164,19 +167,32 @@ def create():
       print message
       sys.exit(1)
 
-#Add command line args for dry run & publish
+#Add command line args for dry run
 def update():
   lambda_name = json_parser()["initializers"]["name"]
-  archive_name = os.getcwd() + '/%s.zip' % lambda_name
+  archive_name = os.getcwd() + '/%s.zip' % lambda_name  
 
   if zip_folder():
-    print "Attempting to update lambda..."  
+    print "Attempting to update lambda..."
+
+    publish_answer = raw_input("Would you like to publish this update? ('y/n'): ")
+
+    if publish_answer.lower() in yes_or_no:
+      if publish_answer == 'y':
+        answer = True
+        print "Publishing update"
+      if publish_answer == 'n':
+        answer = False
+        print "Updating lambda without publishing"
+    else:
+      print "Please respond with 'y' for yes or 'n' for no!"
+
     try:
       update = client.update_function_code(
         FunctionName='%s' % lambda_name,
         ZipFile= open(archive_name, 'rb').read(),
-#        Publish=True|False,
-#        DryRun=True|False
+        Publish=answer
+        #DryRun=True|False
       )
       return True
     except IOError, message:
@@ -227,6 +243,16 @@ def main():
           if create():
             if check():
               print "Lambda uploaded successfully"
+              if json_parser()['backup']['bucket_name'] != 0:
+                print "Backup option selected.. backing up to s3!"
+                if s3_backup.main():
+                  return True
+                else:
+                  print "Backup failed.."
+                  return False
+              else:
+                print "Backup option not selected, skipping..."
+                return False
             else:
               return "False"
               print "Something went wrong.. I checked for your lambda after upload and it isn't there"
@@ -237,6 +263,16 @@ def main():
         if check():
           if update():
             print "Lambda updated"
+            if json_parser()['backup']['bucket_name'] != 0:
+              print "Backup option selected.. backing up to s3!"
+              if s3_backup.main():
+                return True
+              else:
+                print "Backup failed.."
+                return False
+            else:
+              print "Backup option not selected, skipping..."
+              return False
         else:
           print "No lambda was found.. please create using action 'create'"
 

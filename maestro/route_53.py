@@ -5,7 +5,8 @@ import lambda_config
 import sys
 import json
 import os
+import vpc_location
 
 '''
-insert SSL stuff here using the letsencrypt api
+insert route 53 stuff here
 '''
