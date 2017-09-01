@@ -290,7 +290,7 @@ def alias_creation():
   lambda_name = json_parser()["initializers"]["name"]
 
   get_alias_name = raw_input("What would you like this alias to be called? ")
-  alias_name = get_alias_name.downcase()
+  alias_name = get_alias_name.lower()
 
   versions = client.list_versions_by_function(
                     FunctionName='%s' % lambda_name,
