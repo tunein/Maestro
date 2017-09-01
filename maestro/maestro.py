@@ -6,6 +6,8 @@ import sys
 import json
 import zipfile
 import os
+from botocore.exceptions import ClientError
+
 import vpc_location
 import s3_backup
 
@@ -209,6 +211,51 @@ def update():
       print message
       sys.exit(1)
 
+def update_config():
+  lambda_name = json_parser()["initializers"]["name"]
+
+  if 'vpc_name' in json_parser()['vpcconfig']:
+    subnet_ids = vpc_location.main()
+  else:
+    subnet_ids = ''
+
+  security_groups = ''
+
+  if len(subnet_ids)>0:
+    vpc_config = VpcConfig={
+                    'SubnetIds': [
+                      '%s' % ", ".join(subnet_ids),
+                    ],
+                    'SecurityGroupIds': [
+                      '%s' % security_groups, 
+                    ]
+                  }
+  else:
+    # Still investigating on how to remove "VpcConfig" from create_function if len == 0"
+    vpc_config = ''
+
+  try:
+    update_configuration = client.update_function_configuration(
+      FunctionName='%s' % lambda_name,
+      Role='%s' % get_arn(),
+      Handler='%s' % json_parser()["initializers"]["name"],
+      Description='%s' % json_parser()["initializers"]["description"],
+      Timeout=json_parser()["provisioners"]["timeout"],
+      MemorySize=json_parser()["provisioners"]["mem_size"],
+      #This presently does not work without a VPC in the json file
+      VpcConfig=vpc_config,
+      Runtime='%s' % json_parser()["provisioners"]["runtime"],
+      )
+    return True
+  except ClientError, message:
+    print message
+'''
+eventually update-code and update-config should be rolled into one
+
+the user should be able to use the arg "update"
+then maestro runs a diff on the config file and then updates config and/or code if necessary
+'''
+
 #Add command line args for dry run
 def delete():
   lambda_name = json_parser()["initializers"]["name"]
@@ -269,7 +316,7 @@ def main():
           return False
           print "Lambda creation failed.. Check your settings"
 
-      if ACTION == "update":
+      if ACTION == "update-code":
         if check():
           if update():
             print "Lambda updated"
@@ -285,6 +332,17 @@ def main():
               return False
         else:
           print "No lambda was found.. please create using action 'create'"
+
+      if ACTION == "update-config":
+        if check():
+          if update_config():
+            print "Lambda configuration updated!"
+            return True
+          else:
+            print "Lambda configuration not updated, please check your settings"
+            return False
+        print "Check failed, please check settings"
+        return False
 
       if ACTION == "delete":
         if check():
