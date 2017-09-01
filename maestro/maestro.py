@@ -134,9 +134,26 @@ def check():
 def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
-  subnet_ids = vpc_location.main()
+
+  if 'vpc_name' in json_parser()['vpcconfig']:
+    subnet_ids = vpc_location.main()
+  else:
+    subnet_ids = ''
+
   security_groups = ''
-  lambda_config = ''
+
+  if len(subnet_ids)>0:
+    vpc_config = VpcConfig={
+                    'SubnetIds': [
+                      '%s' % ", ".join(subnet_ids),
+                    ],
+                    'SecurityGroupIds': [
+                      '%s' % security_groups, 
+                    ]
+                  }
+  else:
+    # Still investigating on how to remove "VpcConfig" from create_function if len == 0"
+    vpc_config = ''
 
   if zip_folder():
     print "Attempting to create lambda..."
@@ -152,15 +169,7 @@ def create():
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
-        #Currently a bug here with multiple subnets not parsing correctly
-        VpcConfig={
-          'SubnetIds': [
-            '%s' % ", ".join(subnet_ids),
-          ],
-          'SecurityGroupIds': [
-            '%s' % security_groups, 
-          ]
-        }
+        VpcConfig=vpc_config
       )
       return True
     except IOError, message:

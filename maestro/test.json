@@ -14,7 +14,7 @@
  },
  "vpcconfig": {
   "vpc_name": "Stock_VPC",
-  "security_group_ids": ["secrurity_group"] 
+  "security_group_ids": ["security_group"] 
  },
  "environment": {
   "environment": "prod",
