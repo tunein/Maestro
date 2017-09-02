@@ -56,4 +56,50 @@ def alias_creation():
   else:
     print "I can't find that version, check list and find again"
 
-alias_creation()
+def alias_destroy():
+  lambda_name = json_parser()["initializers"]["name"]
+
+  alias = client.list_aliases(
+    FunctionName='%s' % lambda_name,
+    )
+
+  dump_json = json.dumps(alias, indent=4) 
+  load = json.loads(dump_json)
+
+  aliases = []
+
+  for names in load['Aliases']:
+    print "Function Version: '%s', Alias: '%s'" % (names['FunctionVersion'], names['Name'])
+    aliases.append(names['Name'])
+
+  if len(aliases) != 0:
+    alias_name = raw_input("What alias would you like to delete? ")
+
+    if alias_name in aliases:
+      try:
+        delete_alias = client.delete_alias(
+            FunctionName='%s' % lambda_name,
+            Name='%s' % alias_name
+        )
+        print "Alias successfully deleted"
+        return True
+      except ClientError, message:
+        print message
+    else:
+      print "That alias does not exist, please check the list of existing aliases and try again"
+  else:
+    print "No aliases found.."
+
+def alias_update():
+  lambda_name = json_parser()["initializers"]["name"]
+  print "alias update"
+  '''
+  needs to list avail alias' per version of the function
+
+  asks user for version, then alias
+
+  updates alias
+  '''
+
+
+alias_destroy()
