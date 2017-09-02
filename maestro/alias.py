@@ -49,6 +49,7 @@ def alias_creation():
         Name='%s' % alias_name,
         FunctionVersion='%s' % function_version,
       )
+      print "Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version)
       return True
     except ClientError, message:
       print message
