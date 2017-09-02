@@ -104,9 +104,13 @@ def alias_update():
   versions = []
 
   for names in load['Aliases']:
-    print "Function Version: '%s', Alias: '%s'" % (names['FunctionVersion'], names['Name'])
+    print "Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name'])     
     aliases.append(names['Name'])
     versions.append(names['FunctionVersion'])
+  print "\n"
+  print "Available Versions"
+  for version in versions:
+    print version
 
   if len(aliases) != 0:
     alias_name = raw_input("What alias would you like to update? ")
