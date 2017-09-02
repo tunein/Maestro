@@ -274,6 +274,7 @@ def delete():
     sys.exit(1)
 
 #Add command line args for dry run
+#Need to add return the version from AWS and printing that back to user
 def publish():
   lambda_name = json_parser()["initializers"]["name"]
   
