@@ -10,6 +10,7 @@ from botocore.exceptions import ClientError
 
 import vpc_location
 import s3_backup
+import alias
 
 USER_ACTION = sys.argv[1]
 DOC = sys.argv[2]
@@ -175,7 +176,7 @@ def create():
         VpcConfig=vpc_config
       )
       return True
-    except IOError, message:
+    except ClientError, message:
       print message
       sys.exit(1)
 
@@ -207,7 +208,7 @@ def update():
         #DryRun=True|False
       )
       return True
-    except IOError, message:
+    except ClientError, message:
       print message
       sys.exit(1)
 
@@ -268,7 +269,7 @@ def delete():
       return "Failed to delete Lambda"
     else:
       return True
-  except IOError, message:
+  except ClientError, message:
     print message
     sys.exit(1)
 
@@ -281,7 +282,7 @@ def publish():
       FunctionName='%s' % lambda_name,
       )
     return True
-  except IOError, message:
+  except ClientError, message:
     print message
     sys.exit(1)
 
@@ -349,6 +350,7 @@ def main():
         if check():
           if delete():
             print "Lamba deleted successfully"
+            return True
         else:
           print "No lambda was found.. looks like you have nothing to delete"
 
@@ -356,8 +358,32 @@ def main():
         if check():
           if publish():
             print "Lambda v%s successfully published" % json_parser()["initializers"]["version"]
+            return True
         else:
           print "No lambda was found.. Check your settings"
+
+      if ACTION == "create-alias":
+        if check():
+          if alias.alias_creation():
+            print "Alias added successfully"
+            return True
+          else:
+            print "Alias creation failed.."
+            return False
+
+      if ACTION == "delete-alias":
+        if check():
+          if alias.alias_destroy():
+            return True
+          else:
+            return False
+
+      if ACTION == "update-alias":
+        if check():
+          if alias.alias_update():
+            return True
+          else:
+            return False
 
 if __name__ == "__main__":
   main()
