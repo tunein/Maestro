@@ -1,5 +1,5 @@
 
-Created by M. Moon/We'reWolf Industries Copyright 2017<br>
+Created by M. Moon/Perilune Inc Copyright 2017<br>
 
 <b>Current State: v0.1</b><br>
 <br>
@@ -26,9 +26,13 @@ command: maestro create function_name.json<br>
 At the moment it is only functioning in the directory where the application code lives<br>
 To test the current model run it like this:<br>
 python maestro.py create test.json<br>
-python maestro.py update test.json<br>
+python maestro.py update-code test.json<br>
+python maestro.py update-config test.json<br>
 python maestro.py publish test.json<br>
 python maestro.py delete test.json<br>
+python maestro.py create-alias test.json<br>
+python maestro.py update-alias test.json<br>
+python maestro.py delete-alias test.json<br>
 <br>
 
 <b>Folder Hierarchy...</b><br>
