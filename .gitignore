@@ -1,8 +1,4 @@
 notes.txt
 *.pyc
 lambda/*
-setup.py
 *.zip
-maestro.egg-info/*
-build/*
-dist/*
