@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 
 import boto3
-import lambda_config
+import maestro.lambda_config as lambda_config
 import sys
 import json
 import os
@@ -13,7 +13,7 @@ def json_parser():
     read = json.load(json_data)
     return read
     return True
-  print "No json document to read.. Please enter a valid json document"
+  print("No json document to read.. Please enter a valid json document")
 
 ec2 = boto3.resource('ec2', region_name='%s' % json_parser()['initializers']['region'])
 client = boto3.client('ec2')
@@ -30,7 +30,7 @@ def get_vpc_id():
     vpc_id = response['Vpcs'][0]['VpcId']
     if len(vpc_id)!=0:
       return vpc_id
-    print "Couldn't find the ID for your vpc, check the name and try again"
+    print("Couldn't find the ID for your vpc, check the name and try again")
     return False
 
 def get_subnets():

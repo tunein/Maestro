@@ -1,5 +1,3 @@
-#!/usr/bin/env python2.7
-
 import boto3
 import lambda_config
 import sys
@@ -14,4 +12,4 @@ def json_parser():
     read = json.load(json_data)
     return read
     return True
-  print "No json document to read.. Please enter a valid json document"
+  print("No json document to read.. Please enter a valid json document")

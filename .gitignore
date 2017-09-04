@@ -3,3 +3,6 @@ notes.txt
 lambda/*
 setup.py
 *.zip
+maestro.egg-info/*
+build/*
+dist/*

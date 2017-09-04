@@ -1,7 +1,5 @@
-#!/usr/bin/env python2.7
-
 import boto3
-import lambda_config
+import maestro.lambda_config as lambda_config
 import sys
 import json
 import zipfile
@@ -18,12 +16,12 @@ def json_parser():
     read = json.load(json_data)
     return read
     return True
-  print "No json document to read.. Please enter a valid json document"
+  print("No json document to read.. Please enter a valid json document")
 
 def alias_creation():
   lambda_name = json_parser()["initializers"]["name"]
 
-  get_alias_name = raw_input("What would you like this alias to be called? ")
+  get_alias_name = input("What would you like this alias to be called? ")
   alias_name = get_alias_name.lower()
 
   versions = client.list_versions_by_function(
@@ -40,7 +38,7 @@ def alias_creation():
       print('version: %s' % version['Version'])
       avail_versions.append(version['Version'])
 
-  function_version = raw_input("What version would you like to create an alias for? ")
+  function_version = input("What version would you like to create an alias for? ")
   
   if function_version in avail_versions: 
     try:
@@ -49,12 +47,12 @@ def alias_creation():
         Name='%s' % alias_name,
         FunctionVersion='%s' % function_version,
       )
-      print "Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version)
+      print("Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version))
       return True
-    except ClientError, message:
-      print message
+    except ClientError:#, message:
+      print(message)
   else:
-    print "I can't find that version, check list and find again"
+    print("I can't find that version, check list and find again")
 
 def alias_destroy():
   lambda_name = json_parser()["initializers"]["name"]
@@ -69,11 +67,11 @@ def alias_destroy():
   aliases = []
 
   for names in load['Aliases']:
-    print "Function Version: '%s', Alias: '%s'" % (names['FunctionVersion'], names['Name'])
+    print("Function Version: '%s', Alias: '%s'" % (names['FunctionVersion'], names['Name']))
     aliases.append(names['Name'])
 
   if len(aliases) != 0:
-    alias_name = raw_input("What alias would you like to delete? ")
+    alias_name = input("What alias would you like to delete? ")
 
     if alias_name in aliases:
       try:
@@ -81,14 +79,14 @@ def alias_destroy():
             FunctionName='%s' % lambda_name,
             Name='%s' % alias_name
         )
-        print "Alias successfully deleted"
+        print("Alias successfully deleted")
         return True
-      except ClientError, message:
-        print message
+      except ClientError:#, message:
+        print(message)
     else:
-      print "That alias does not exist, please check the list of existing aliases and try again"
+      print("That alias does not exist, please check the list of existing aliases and try again")
   else:
-    print "No aliases found.."
+    print("No aliases found..")
 
 def alias_update():
   lambda_name = json_parser()["initializers"]["name"]
@@ -104,17 +102,17 @@ def alias_update():
   versions = []
 
   for names in load['Aliases']:
-    print "Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name'])     
+    print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
     aliases.append(names['Name'])
     versions.append(names['FunctionVersion'])
-  print "\n"
-  print "Available Versions"
+  print("\n")
+  print("Available Versions")
   for version in versions:
-    print version
+    print(version)
 
   if len(aliases) != 0:
-    alias_name = raw_input("What alias would you like to update? ")
-    version_update = raw_input("What version would you like to assign the update alias to? ")
+    alias_name = input("What alias would you like to update? ")
+    version_update = input("What version would you like to assign the update alias to? ")
 
     if alias_name in aliases:
       if version_update in versions:
@@ -124,10 +122,10 @@ def alias_update():
                           Name='%s' % alias_name,
                           FunctionVersion='%s' % version_update,
                         )
-          print "Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name)
-        except ClientError, message:
-          print message
+          print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
+        except ClientError:#, message:
+          print(message)
       else:
-        print "Version not found.."
+        print("Version not found..")
     else:
-      print "No aliases found..."
+      print("No aliases found...")
