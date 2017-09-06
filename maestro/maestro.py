@@ -182,7 +182,10 @@ def create():
         VpcConfig=vpc_config,
         Tags=tags
       )
-      return True
+      if create['ResponseMetadata']['HTTPStatusCode'] == 201:
+        return True
+      else:
+        return False
     except ClientError:
       print(message)
       sys.exit(1)
@@ -214,7 +217,10 @@ def update():
         Publish=answer
         #DryRun=True|False
       )
-      return True
+      if update['ResponseMetadata']['HTTPStatusCode'] == 200:
+        return True
+      else:
+        return False
     except ClientError:
       print(message)
       sys.exit(1)
@@ -283,7 +289,10 @@ def update_config():
       VpcConfig=vpc_config,
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
       )
-    return True
+    if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
+      return True
+    else:
+      return False
   except ClientError:
     print(message)
 
@@ -304,7 +313,6 @@ def delete():
     sys.exit(1)
 
 #Add command line args for dry run
-#Need to add return the version from AWS and printing that back to user
 def publish():
   lambda_name = json_parser()["initializers"]["name"]
   
@@ -312,7 +320,11 @@ def publish():
     publish = client.publish_version(
       FunctionName='%s' % lambda_name,
       )
-    return True
+    if publish['ResponseMetadata']['HTTPStatusCode'] == 201:
+      print("Successfully published %s version %s" % (lambda_name, publish['Version']))
+      return True 
+    else:
+      return False    
   except ClientError:
     print(message)
     sys.exit(1)
@@ -388,7 +400,6 @@ def main():
       if ACTION == "publish":
         if check():
           if publish():
-            print("Lambda v%s successfully published" % json_parser()["initializers"]["version"])
             return True
         else:
           print("No lambda was found.. Check your settings")

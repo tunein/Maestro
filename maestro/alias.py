@@ -47,8 +47,11 @@ def alias_creation():
         Name='%s' % alias_name,
         FunctionVersion='%s' % function_version,
       )
-      print("Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version))
-      return True
+      if add_alias['ResponseMetadata']['HTTPStatusCode'] == 201:
+        print("Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version))
+        return True
+      else:
+        return False
     except ClientError:
       print(message)
   else:
@@ -122,7 +125,11 @@ def alias_update():
                           Name='%s' % alias_name,
                           FunctionVersion='%s' % version_update,
                         )
-          print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
+          if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
+            return True
+          else:
+            return False
         except ClientError:
           print(message)
       else:
