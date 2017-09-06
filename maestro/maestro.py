@@ -144,6 +144,13 @@ def create():
 
   security_groups = ''
 
+  tags = {}
+
+  if 'tags' in json_parser():
+    tags.update(json_parser()['tags'])
+  else:
+    pass
+
   if len(subnet_ids)>0:
     vpc_config = {
                     'SubnetIds': [
@@ -171,10 +178,7 @@ def create():
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
         VpcConfig=vpc_config,
-        #Need to clean up the logic here
-        Tags={
-          "Name": '%s' % json_parser()['tags']['Name']
-        }
+        Tags=tags
       )
       return True
     except ClientError:#, message:
