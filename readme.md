@@ -8,19 +8,16 @@ Created by M. Moon/Perilune Inc Copyright 2017<br>
 -In the directory you're working in it looks for a directory called "lambda" and packages the contents into a zip<br>
 -Once complete it uploads your package into lambda with all of the settings you provided<br>
 <br>
-<br>
 <b>To install:</b><br>
 -Clone this directory<br>
 -CD into the main directory containing setup.py<br>
 -Issue the following command: "pip install ."<br>
-<br>
 <br>
 <b>Required Packages..</b><br>
 -python 3.*<br>
 -pip<br>
 -AWS CLI Tools<br>
 -Boto3<br>
-<br>
 <br>
 <b>Current Available actions</b><br>
 maestro create function_name.json<br>
@@ -32,11 +29,9 @@ maestro create-alias function_name.json<br>
 maestro update-alias function_name.json<br>
 maestro delete-alias function_name.json<br>
 <br>
-<br>
 <b>To use:</b>
 cd into the directory where your code is:<br>
 command: maestro create function_name.json<br>
-<br>
 <br>
 <b>Folder Hierarchy...</b><br>
 <br>
