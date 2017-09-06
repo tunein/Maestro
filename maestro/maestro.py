@@ -215,6 +215,23 @@ def update():
       print(message)
       sys.exit(1)
 
+def list_lambdas():
+  lambda_name = json_parser()["initializers"]["name"]
+  try:
+    response = client.list_functions(
+                FunctionVersion='ALL'
+              )
+    dump = json.dumps(response, indent=4)
+    load = json.loads(dump)
+    
+    for function in load['Functions']:
+      if lambda_name in function['FunctionName']:
+        splitter = function['FunctionArn'].split(':')[0:7]
+        joiner = ':'.join(map(str, splitter))
+        return joiner
+  except ClientError:
+    print(message)
+
 def update_config():
   lambda_name = json_parser()["initializers"]["name"]
 
@@ -229,6 +246,13 @@ def update_config():
 
   if 'tags' in json_parser():
     tags.update(json_parser()['tags'])
+    try:
+      generate_tags = client.tag_resource(
+                        Resource=list_lambdas(),
+                        Tags=tags
+                      )
+    except ClientError:
+      print(message)
   else:
     pass
 
@@ -254,17 +278,10 @@ def update_config():
       MemorySize=json_parser()["provisioners"]["mem_size"],
       VpcConfig=vpc_config,
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
-      Tags=tags
       )
     return True
   except ClientError:
     print(message)
-'''
-eventually update-code and update-config should be rolled into one
-
-the user should be able to use the arg "update"
-then maestro runs a diff on the config file and then updates config and/or code if necessary
-'''
 
 #Add command line args for dry run
 def delete():

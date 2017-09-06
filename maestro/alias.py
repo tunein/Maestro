@@ -49,7 +49,7 @@ def alias_creation():
       )
       print("Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version))
       return True
-    except ClientError:#, message:
+    except ClientError:
       print(message)
   else:
     print("I can't find that version, check list and find again")
@@ -81,7 +81,7 @@ def alias_destroy():
         )
         print("Alias successfully deleted")
         return True
-      except ClientError:#, message:
+      except ClientError:
         print(message)
     else:
       print("That alias does not exist, please check the list of existing aliases and try again")
@@ -123,7 +123,7 @@ def alias_update():
                           FunctionVersion='%s' % version_update,
                         )
           print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
-        except ClientError:#, message:
+        except ClientError:
           print(message)
       else:
         print("Version not found..")

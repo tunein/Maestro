@@ -44,3 +44,10 @@ parser.add_argument(
 parser.add_argument(
 	'config', )
 '''
+
+'''
+eventually update-code and update-config should be rolled into one
+
+the user should be able to use the arg "update"
+then maestro runs a diff on the config file and then updates config and/or code if necessary
+'''
