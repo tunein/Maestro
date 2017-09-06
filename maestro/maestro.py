@@ -349,7 +349,7 @@ def main():
       if ACTION == "delete":
         if check():
           if delete():
-            print("Lamba deleted successfully")
+            print("Lambda deleted successfully")
             return True
         else:
           print("No lambda was found.. looks like you have nothing to delete")
