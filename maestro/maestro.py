@@ -120,15 +120,19 @@ def check():
   proposed_function = json_parser()["initializers"]["name"]
   existing_functions = client.list_functions()
   parse = json.dumps(existing_functions)
-  load = json.loads(parse)
+  load = json.loads(parse) 
   functions = load["Functions"]
 
+  current_functions = []
+
   for function in functions:
-    names = function.get("FunctionName")
-    if any(name in proposed_function for name in names):
-      return True
-    else:
-      return False
+    names = function['FunctionName']
+    append = current_functions.append(names)
+
+  if proposed_function in current_functions:
+    return True
+  else:
+    return False
 
 #Add command line args for dry run
 def create():
