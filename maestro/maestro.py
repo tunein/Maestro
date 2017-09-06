@@ -9,6 +9,7 @@ import maestro.vpc_location as vpc_location
 import maestro.s3_backup as s3_backup
 import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
+import maestro.security_groups as security_groups_method
 
 USER_ACTION = sys.argv[1]
 DOC = sys.argv[2]
@@ -139,12 +140,21 @@ def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
 
-  if 'vpc_name' in json_parser()['vpcconfig']:
-    subnet_ids = vpc_location.main()
-  else:
-    subnet_ids = ''
+  subnet_ids = []
 
-  security_groups = ''
+  if 'vpc_name' in json_parser()['vpcconfig']:
+    subnets = vpc_location.main()
+    subnet_ids.extend(subnets)
+  else:
+    pass
+
+  security_group_id_list = []
+
+  if 'security_group_ids' in json_parser()['vpcconfig']:
+    groups = security_groups_method.main()
+    security_group_id_list.extend(groups)
+  else:
+    pass
 
   tags = {}
 
@@ -155,12 +165,8 @@ def create():
 
   if len(subnet_ids)>0:
     vpc_config = {
-                    'SubnetIds': [
-                      '%s' % ", ".join(subnet_ids),
-                    ],
-                    'SecurityGroupIds': [
-                      '%s' % security_groups, 
-                    ]
+                    'SubnetIds': subnet_ids,
+                    'SecurityGroupIds': security_group_id_list
                   }
   else:
     vpc_config = { }
@@ -245,12 +251,21 @@ def list_lambdas():
 def update_config():
   lambda_name = json_parser()["initializers"]["name"]
 
-  if 'vpc_name' in json_parser()['vpcconfig']:
-    subnet_ids = vpc_location.main()
-  else:
-    subnet_ids = ''
+  subnet_ids = []
 
-  security_groups = ''
+  if 'vpc_name' in json_parser()['vpcconfig']:
+    subnets = vpc_location.main()
+    subnet_ids.extend(subnets)
+  else:
+    pass
+
+  security_group_id_list = []
+
+  if 'security_group_ids' in json_parser()['vpcconfig']:
+    groups = security_groups_method.main()
+    security_group_id_list.extend(groups)
+  else:
+    pass
 
   tags = {}
 
@@ -267,14 +282,10 @@ def update_config():
     pass
 
   if len(subnet_ids)>0:
-    vpc_config = VpcConfig={
-                    'SubnetIds': [
-                      '%s' % ", ".join(subnet_ids),
-                    ],
-                    'SecurityGroupIds': [
-                      '%s' % security_groups, 
-                    ]
-                  }
+    vpc_config = {
+                  'SubnetIds': subnet_ids,
+                  'SecurityGroupIds': security_group_id_list
+                }
   else:
     vpc_config = { }
 

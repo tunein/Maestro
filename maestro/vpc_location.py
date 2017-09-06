@@ -47,3 +47,5 @@ def main():
   if get_vpc_id():
     return get_subnets()
 
+if __name__ == "__main__":
+  main()
