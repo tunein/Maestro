@@ -1,5 +1,6 @@
 exclude .gitignore
-exlude notes.txt
+exclude notes.txt
+recursive-exclude example/*
 recursive-exclude *.egg-info *
 
 include readme.md

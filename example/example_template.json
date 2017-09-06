@@ -1,0 +1,27 @@
+{
+ "initializers": {
+    "name": "",
+    "description": "",
+    "region": "",
+    "role": ""
+  },
+ "provisioners": {
+    "runtime": "",
+    "timeout": ,
+    "mem_size": ,
+    "publish": ""
+ },
+ "vpcconfig": {
+    "vpc_name": "",
+    "security_group_ids": [""] 
+ },
+ "environment": {
+    "environment": ""
+ },
+  "tags": {
+    "key": "value"
+ },
+ "backup": {
+    "bucket_name": ""
+ }
+}
