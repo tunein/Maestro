@@ -1,40 +1,43 @@
-
 Created by M. Moon/Perilune Inc Copyright 2017<br>
 
 <b>Current State: v0.1</b><br>
 <br>
--All actions work<br>
--Still working on packaging into a proper CLI tool<br>
-<br>
-
 <b>Maestro is a command line tool for creating, updating, deleting, and publishing Lambdas for Amazon Web Services</b><br>
 <br>
--It takes a json document as input to fill out all the information necessary for creating a lambda<br>
+-It takes a json document as an input to fill out all the information necessary for creating a lambda<br>
 -In the directory you're working in it looks for a directory called "lambda" and packages the contents into a zip<br>
 -Once complete it uploads your package into lambda with all of the settings you provided<br>
 <br>
-
+<br>
+<b>To install:</b><br>
+-Clone this directory<br>
+-CD into the main directory containing setup.py<br>
+-Issue the following command: "pip install ."<br>
+<br>
+<br>
 <b>Required Packages..</b><br>
+-python 3.*<br>
+-pip<br>
+-AWS CLI Tools<br>
+-Boto3<br>
 <br>
-AWS CLI Tools/Boto3<br>
 <br>
-<b>Steps will be...</b><br>
+<b>Current Available actions</b><br>
+maestro create function_name.json<br>
+maestro update-code function_name.json<br>
+maestro update-config function_name.json<br>
+maestro publish function_name.json<br>
+maestro delete function_name.json<br>
+maestro create-alias function_name.json<br>
+maestro update-alias function_name.json<br>
+maestro delete-alias function_name.json<br>
 <br>
-cd into function_name directory<br>
+<br>
+<b>To use:</b>
+cd into the directory where your code is:<br>
 command: maestro create function_name.json<br>
 <br>
-At the moment it is only functioning in the directory where the application code lives<br>
-To test the current model run it like this:<br>
-python maestro.py create test.json<br>
-python maestro.py update-code test.json<br>
-python maestro.py update-config test.json<br>
-python maestro.py publish test.json<br>
-python maestro.py delete test.json<br>
-python maestro.py create-alias test.json<br>
-python maestro.py update-alias test.json<br>
-python maestro.py delete-alias test.json<br>
 <br>
-
 <b>Folder Hierarchy...</b><br>
 <br>
 /function_name<br>
