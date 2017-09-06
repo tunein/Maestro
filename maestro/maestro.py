@@ -31,7 +31,6 @@ def file_type():
     return False
   print("Please enter a valid json document after your action")
 
-
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
@@ -105,13 +104,13 @@ def zip_folder():
         zipped_lambda.write(absolute_path, shortened_path)
     print("'%s' lambda packaged successfully." % lambda_name)
     return True
-  except IOError:#, message:
+  except IOError:
     print(message)
     sys.exit(1)
-  except OSError:#, message:
+  except OSError:
     print(message)
     sys.exit(1)
-  except zipfile.BadZipfile:#, message:
+  except zipfile.BadZipfile:
     print(message)
     sys.exit(1)
   finally:
@@ -132,7 +131,6 @@ def check():
       return False
 
 #Add command line args for dry run
-#Add tags!
 def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
@@ -181,7 +179,7 @@ def create():
         Tags=tags
       )
       return True
-    except ClientError:#, message:
+    except ClientError:
       print(message)
       sys.exit(1)
 
@@ -213,7 +211,7 @@ def update():
         #DryRun=True|False
       )
       return True
-    except ClientError:#, message:
+    except ClientError:
       print(message)
       sys.exit(1)
 
@@ -227,6 +225,13 @@ def update_config():
 
   security_groups = ''
 
+  tags = {}
+
+  if 'tags' in json_parser():
+    tags.update(json_parser()['tags'])
+  else:
+    pass
+
   if len(subnet_ids)>0:
     vpc_config = VpcConfig={
                     'SubnetIds': [
@@ -237,8 +242,7 @@ def update_config():
                     ]
                   }
   else:
-    # Still investigating on how to remove "VpcConfig" from create_function if len == 0"
-    vpc_config = ''
+    vpc_config = { }
 
   try:
     update_configuration = client.update_function_configuration(
@@ -248,12 +252,12 @@ def update_config():
       Description='%s' % json_parser()["initializers"]["description"],
       Timeout=json_parser()["provisioners"]["timeout"],
       MemorySize=json_parser()["provisioners"]["mem_size"],
-      #This presently does not work without a VPC in the json file
       VpcConfig=vpc_config,
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
+      Tags=tags
       )
     return True
-  except ClientError:#, message:
+  except ClientError:
     print(message)
 '''
 eventually update-code and update-config should be rolled into one
@@ -274,7 +278,7 @@ def delete():
       return "Failed to delete Lambda"
     else:
       return True
-  except ClientError:#, message:
+  except ClientError:
     print(message)
     sys.exit(1)
 
@@ -288,7 +292,7 @@ def publish():
       FunctionName='%s' % lambda_name,
       )
     return True
-  except ClientError:#, message:
+  except ClientError:
     print(message)
     sys.exit(1)
 
