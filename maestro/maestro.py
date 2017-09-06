@@ -145,7 +145,7 @@ def create():
   security_groups = ''
 
   if len(subnet_ids)>0:
-    vpc_config = VpcConfig={
+    vpc_config = {
                     'SubnetIds': [
                       '%s' % ", ".join(subnet_ids),
                     ],
@@ -154,8 +154,7 @@ def create():
                     ]
                   }
   else:
-    # Still investigating on how to remove "VpcConfig" from create_function if len == 0"
-    vpc_config = ''
+    vpc_config = { }
 
   if zip_folder():
     print("Attempting to create lambda...")
@@ -171,8 +170,11 @@ def create():
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
-        #This presently does not work without a VPC in the json file
-        VpcConfig=vpc_config
+        VpcConfig=vpc_config,
+        #Need to clean up the logic here
+        Tags={
+          "Name": '%s' % json_parser()['tags']['Name']
+        }
       )
       return True
     except ClientError:#, message:
