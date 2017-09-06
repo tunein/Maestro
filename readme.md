@@ -29,7 +29,7 @@ maestro create-alias function_name.json<br>
 maestro update-alias function_name.json<br>
 maestro delete-alias function_name.json<br>
 <br>
-<b>To use:</b>
+<b>To use:</b><br>
 cd into the directory where your code is:<br>
 command: maestro create function_name.json<br>
 <br>
