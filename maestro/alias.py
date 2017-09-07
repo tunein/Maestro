@@ -94,6 +94,15 @@ def alias_destroy():
 def alias_update():
   lambda_name = json_parser()["initializers"]["name"]
 
+  versions = client.list_versions_by_function(
+                    FunctionName='%s' % lambda_name,
+                  )
+
+  version_json = json.dumps(versions, indent=4)
+  load_json = json.loads(version_json)
+  versions = load_json['Versions']
+  avail_versions = []
+
   alias = client.list_aliases(
     FunctionName='%s' % lambda_name,
     )
@@ -102,23 +111,23 @@ def alias_update():
   load = json.loads(dump_json)
 
   aliases = []
-  versions = []
 
   for names in load['Aliases']:
     print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
     aliases.append(names['Name'])
-    versions.append(names['FunctionVersion'])
   print("\n")
   print("Available Versions")
   for version in versions:
-    print(version)
+    if version['Version'] != 0:
+      print('version: %s' % version['Version'])
+      avail_versions.append(version['Version'])
 
   if len(aliases) != 0:
     alias_name = input("What alias would you like to update? ")
     version_update = input("What version would you like to assign the update alias to? ")
 
     if alias_name in aliases:
-      if version_update in versions:
+      if version_update in avail_versions:
         try:
           update_alias = client.update_alias(
                           FunctionName='%s' % lambda_name,
