@@ -22,16 +22,20 @@ def get_vpc_id():
   filters = [{'Name': 'tag:Name', 'Values':['%s' % json_parser()['vpcconfig']['vpc_name']]}]
   vpcs = list(ec2.vpcs.filter(Filters=filters))
   for vpc in vpcs:
-    response = client.describe_vpcs(
-      VpcIds=[
-        vpc.id,
-      ]
-    )
-    vpc_id = response['Vpcs'][0]['VpcId']
-    if len(vpc_id)!=0:
-      return vpc_id
-    print("Couldn't find the ID for your vpc, check the name and try again")
-    return False
+    try:
+      response = client.describe_vpcs(
+        VpcIds=[
+          vpc.id,
+        ]
+      )
+      vpc_id = response['Vpcs'][0]['VpcId']
+      if len(vpc_id)!=0:
+        return vpc_id
+      else:
+        print("Couldn't find the ID for your vpc, check the name and try again")
+        return False
+    except ClientError as error:
+      print(error.response['Error']['Message'])  
 
 def get_subnets():
   filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':['%s' % json_parser()['environment']['environment']]}]
