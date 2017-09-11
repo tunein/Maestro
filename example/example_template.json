@@ -22,6 +22,6 @@
     "Name": "Maestro-Test"
  },
  "backup": {
-    "bucket_name": "mmoon-test-lambda-backup-bucket"
+    "bucket_name": "mmoon-test-lambda-backup-bucket-34"
  }
 }

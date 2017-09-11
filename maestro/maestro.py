@@ -192,8 +192,8 @@ def create():
         return True
       else:
         return False
-    except ClientError:
-      print(message)
+    except ClientError as error:
+      print(error.response['Error']['Message'])
       sys.exit(1)
 
 #Add command line args for dry run
@@ -227,8 +227,8 @@ def update():
         return True
       else:
         return False
-    except ClientError:
-      print(message)
+    except ClientError as error:
+      print(error.response['Error']['Message'])
       sys.exit(1)
 
 def list_lambdas():
@@ -245,8 +245,8 @@ def list_lambdas():
         splitter = function['FunctionArn'].split(':')[0:7]
         joiner = ':'.join(map(str, splitter))
         return joiner
-  except ClientError:
-    print(message)
+  except ClientError as error:
+    print(error.response['Error']['Message'])
 
 def update_config():
   lambda_name = json_parser()["initializers"]["name"]
@@ -276,8 +276,8 @@ def update_config():
                         Resource=list_lambdas(),
                         Tags=tags
                       )
-    except ClientError:
-      print(message)
+    except ClientError as error:
+      print(error.response['Error']['Message'])
   else:
     pass
 
@@ -304,8 +304,8 @@ def update_config():
       return True
     else:
       return False
-  except ClientError:
-    print(message)
+  except ClientError as error:
+    print(error.response['Error']['Message'])
 
 #Add command line args for dry run
 def delete():
@@ -319,8 +319,8 @@ def delete():
       return "Failed to delete Lambda"
     else:
       return True
-  except ClientError:
-    print(message)
+  except ClientError as error:
+    print(error.response['Error']['Message'])
     sys.exit(1)
 
 #Add command line args for dry run
@@ -336,8 +336,8 @@ def publish():
       return True 
     else:
       return False    
-  except ClientError:
-    print(message)
+  except ClientError as error:
+    print(error.response['Error']['Message'])
     sys.exit(1)
 
 '''
@@ -356,7 +356,7 @@ def main():
           if create():
             if check():
               print("Lambda uploaded successfully")
-              if json_parser()['backup']['bucket_name'] != 0:
+              if 'backup' in json_parser():
                 print("Backup option selected.. backing up to s3!")
                 if s3_backup.main():
                   return True
@@ -376,7 +376,7 @@ def main():
         if check():
           if update():
             print("Lambda updated")
-            if json_parser()['backup']['bucket_name'] != 0:
+            if 'backup' in json_parser():
               print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
                 return True
