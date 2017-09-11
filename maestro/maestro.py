@@ -10,10 +10,11 @@ import maestro.s3_backup as s3_backup
 import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
 import maestro.security_groups as security_groups_method
+from maestro.cli import ARGS
 
-USER_ACTION = sys.argv[1]
-DOC = sys.argv[2]
-ACTION = USER_ACTION.lower()
+#USER_ACTION = args
+DOC = ARGS.filename
+#ACTION = USER_ACTION.lower()
 
 client = boto3.client('lambda')
 iam = boto3.resource('iam')
@@ -41,7 +42,7 @@ def json_parser():
 
 def validate_action():
   if len(json_parser()["initializers"]["name"])>0:
-    if any(action in ACTION for action in AVAIL_ACTIONS):
+    if any(action in ARGS.action for action in AVAIL_ACTIONS):
       return True
     print("Not a valid action")
   print("Check your json document for the right syntax..")
@@ -348,7 +349,7 @@ def is_event_source():
 
 def main():
   if validation():
-      if ACTION == "create":
+      if ARGS.action == 'create':
         print("Checking to see if lambda already exists")
         if check():
           print("This function already exists, please use action 'update'")
@@ -372,7 +373,7 @@ def main():
           return False
           print("Lambda creation failed.. Check your settings")
 
-      if ACTION == "update-code":
+      if ARGS.action == 'update-code':
         if check():
           if update():
             print("Lambda updated")
@@ -389,7 +390,7 @@ def main():
         else:
           print("No lambda was found.. please create using action 'create'")
 
-      if ACTION == "update-config":
+      if ARGS.action == "update-config":
         if check():
           if update_config():
             print("Lambda configuration updated!")
@@ -400,7 +401,7 @@ def main():
         print("Check failed, please check settings")
         return False
 
-      if ACTION == "delete":
+      if ARGS.action == "delete":
         if check():
           if delete():
             print("Lambda deleted successfully")
@@ -408,14 +409,14 @@ def main():
         else:
           print("No lambda was found.. looks like you have nothing to delete")
 
-      if ACTION == "publish":
+      if ARGS.action == "publish":
         if check():
           if publish():
             return True
         else:
           print("No lambda was found.. Check your settings")
 
-      if ACTION == "create-alias":
+      if ARGS.action == "create-alias":
         if check():
           if alias.alias_creation():
             print("Alias added successfully")
@@ -424,14 +425,14 @@ def main():
             print("Alias creation failed..")
             return False
 
-      if ACTION == "delete-alias":
+      if ARGS.action == "delete-alias":
         if check():
           if alias.alias_destroy():
             return True
           else:
             return False
 
-      if ACTION == "update-alias":
+      if ARGS.action == "update-alias":
         if check():
           if alias.alias_update():
             return True

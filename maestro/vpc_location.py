@@ -3,8 +3,9 @@ import maestro.lambda_config as lambda_config
 import sys
 import json
 import os
+from maestro.cli import ARGS
 
-DOC = sys.argv[2]
+DOC = ARGS.filename
 
 def json_parser():
   with open('%s' % DOC) as json_data:

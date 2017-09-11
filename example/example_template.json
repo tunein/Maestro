@@ -13,7 +13,7 @@
  },
  "vpcconfig": {
     "vpc_name": "Stock_VPC",
-    "security_group_ids": ["MMTest"] 
+    "security_group_ids": ["MMTest", "mm-test-2"] 
  },
  "environment": {
     "environment": "prod"
