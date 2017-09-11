@@ -52,8 +52,8 @@ def alias_creation():
         return True
       else:
         return False
-    except ClientError:
-      print(message)
+    except ClientError as error:
+      print(error.response['Error']['Message'])
   else:
     print("I can't find that version, check list and find again")
 
@@ -84,8 +84,8 @@ def alias_destroy():
         )
         print("Alias successfully deleted")
         return True
-      except ClientError:
-        print(message)
+      except ClientError as error:
+        print(error.response['Error']['Message'])
     else:
       print("That alias does not exist, please check the list of existing aliases and try again")
   else:
@@ -139,8 +139,8 @@ def alias_update():
             return True
           else:
             return False
-        except ClientError:
-          print(message)
+        except ClientError as error:
+          print(error.response['Error']['Message'])
       else:
         print("Version not found..")
     else:
