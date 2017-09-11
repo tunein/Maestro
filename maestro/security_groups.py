@@ -5,11 +5,12 @@ import json
 import os
 import datetime
 from botocore.exceptions import ClientError
+from maestro.cli import ARGS
 
 ec2 = boto3.resource('ec2')
 client = boto3.client('ec2')
 
-DOC = sys.argv[2]
+DOC = ARGS.filename
 
 def json_parser():
   with open('%s' % DOC) as json_data:

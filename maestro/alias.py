@@ -5,11 +5,12 @@ import json
 import zipfile
 import os
 from botocore.exceptions import ClientError
+from maestro.cli import ARGS
 
-DOC = sys.argv[2]
 client = boto3.client('lambda')
 iam = boto3.resource('iam')
 roles = boto3.client('iam')
+DOC = ARGS.filename
 
 def json_parser():
   with open('%s' % DOC) as json_data:

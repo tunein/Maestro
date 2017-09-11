@@ -5,13 +5,14 @@ import json
 import os
 import datetime
 from botocore.exceptions import ClientError
+from maestro.cli import ARGS
 
 s3 = boto3.resource('s3')
 client = boto3.client('s3')
 accepted_prompt_actions = ['y', 'n']
 REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
-DOC = sys.argv[2]
+DOC = ARGS.filename
 
 def json_parser():
   with open('%s' % DOC) as json_data:
