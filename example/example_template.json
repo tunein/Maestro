@@ -1,27 +1,27 @@
 {
  "initializers": {
-    "name": "",
-    "description": "",
-    "region": "",
-    "role": ""
+    "name": "example",
+    "description": "example description",
+    "region": "us-west-2",
+    "role": "lambda_role"
   },
  "provisioners": {
-    "runtime": "",
-    "timeout": ,
-    "mem_size": ,
-    "publish": ""
+    "runtime": "python3.6",
+    "timeout": 250,
+    "mem_size": 128,
+    "publish": "yes"
  },
  "vpcconfig": {
-    "vpc_name": "",
-    "security_group_ids": [""] 
+    "vpc_name": "Stock_VPC",
+    "security_group_ids": ["MMTest"] 
  },
  "environment": {
-    "environment": ""
+    "environment": "prod"
  },
   "tags": {
-    "key": "value"
+    "Name": "Maestro-Test"
  },
  "backup": {
-    "bucket_name": ""
+    "bucket_name": "mmoon-test-lambda-backup-bucket-34"
  }
 }
