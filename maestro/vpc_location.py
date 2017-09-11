@@ -1,5 +1,3 @@
-#!/usr/bin/env python2.7
-
 import boto3
 import maestro.lambda_config as lambda_config
 import sys
