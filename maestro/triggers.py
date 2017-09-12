@@ -15,6 +15,7 @@ principals = lambda_config.PRINCIPALS
 client = boto3.client('lambda')
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
+sns_client = boto3.client('sns')
 
 my_session = boto3.session.Session()
 region = my_session.region_name
@@ -31,8 +32,8 @@ def json_parser():
   print("No json document to read.. Please enter a valid json document")
 '''
 
-invoke_method = 's3'
-invoke_source = 'mm-img-bucket-test'
+invoke_method = 'sns'
+invoke_source = 'Test-topic'
 
 def check_s3():
   bucket_name = invoke_source #json_parser()['backup']['bucket_name']
@@ -49,7 +50,24 @@ def get_s3_arn():
     return "arn:aws:s3:::%s" % invoke_source
 
 def get_sns_arn():
-  print("Here is where we get the info for sns")
+  topic_name = invoke_source
+  list_of_topics = []
+  try:
+    existing_topics = sns_client.list_topics()
+    dumper = json.dumps(existing_topics, indent=4)
+    loader = json.loads(dumper)
+    topics = loader['Topics']
+
+    for obj in topics:
+      for key, value in obj.items():
+        list_of_topics.append(value)
+
+    for item in list_of_topics:
+      if item.find(topic_name):
+        return item
+
+  except ClientError as error:
+    print(json.dumps(error.response, indent=4))
 
 def get_sqs_arn():
   print("Here is where we get the info for sqs")
@@ -70,17 +88,17 @@ def add_invoke_permission():
       source_arn = "%s/*" % get_s3_arn()
     if invoke_method == 'sqs':
       principal = 'sqs.amazonaws.com'
-      source_arn = get_sns_arn()
+      source_arn = get_sqs_arn()
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
-      source_arn = get_sqs_arn()
+      source_arn = get_sns_arn()
     if invoke_method == 'cloudwatch':
       principal = 'events.amazonaws.com'
       source_arn = get_cloudwatch_arn()
 
     if len(principal)>0:
       if len(source_arn)>0:
-        statement_id = "%s-%s" % (lambda_name, 'prod')#json_parser['environment']['environment'])
+        statement_id = "%s-%s" % (lambda_name, 'prod-sns')#json_parser['environment']['environment'])
 #        qualifier = get_aliases()
 
         try:
@@ -120,6 +138,7 @@ def invoke_action():
     else:
       print("No function found")
       return False
+      sys.exit[1]
 
     if invoke_method == 's3':
       bucket_name = invoke_source
@@ -141,13 +160,24 @@ def invoke_action():
         print(json.dumps(error.response, indent=4))
 
     if invoke_method == 'sns':
-      print("Still figuring this out")
+      topic_arn = get_sns_arn()
+      try:
+        subscription = sns_client.subscribe(
+                        TopicArn=topic_arn,
+                        Protocol='Lambda',
+                        Endpoint=arn
+                      )
+      except ClientError as Error:
+        print(error.response['Error']['Message'])
+        sys.exit[1]
 
     if invoke_method == 'sqs':
       print("Still figuring this out")
 
     if invoke_method == 'cloudwatch':
       print("Still figuring this out")
+
+invoke_action()
 
 def remove_invoke_action():
   lambda_name = json_parser()['initializers']['name']
