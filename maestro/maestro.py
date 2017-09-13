@@ -386,7 +386,11 @@ def main():
             if 'backup' in json_parser():
               print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
-                return True
+                if ARGS.create_trigger:
+                  if create_trigger():
+                    return True
+                  else:
+                    return False
               else:
                 print("Backup failed..")
                 return False

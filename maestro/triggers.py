@@ -93,7 +93,7 @@ def add_invoke_permission():
       principal = 's3.amazonaws.com'
       print('principal: %s' % principal)
       source_arn = 'arn:aws:s3:::%s' % invoke_source
-      print(source_arn)
+      print('arn: %s' % source_arn)
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
       source_arn = get_sns_arn()
