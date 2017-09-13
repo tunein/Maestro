@@ -15,11 +15,11 @@ def json_parser():
     return True
   print("No json document to read.. Please enter a valid json document")
 
-ec2 = boto3.resource('ec2', region_name='us-west-2')#region_name='%s' % json_parser()['initializers']['region'])
+ec2 = boto3.resource('ec2', region_name='%s' % json_parser()['initializers']['region'])
 client = boto3.client('ec2')
 
 def get_vpc_id():
-  filters = [{'Name': 'tag:Name', 'Values': ['base::nonprod::vpc']}] #['%s' % json_parser()['vpcconfig']['vpc_name']]}]
+  filters = [{'Name': 'tag:Name', 'Values': ['%s' % json_parser()['vpcconfig']['vpc_name']]}]
   vpcs = list(ec2.vpcs.filter(Filters=filters))
   for vpc in vpcs:
     try:

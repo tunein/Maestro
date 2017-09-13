@@ -145,7 +145,7 @@ def invoke_action():
     for key, value in current_functions.items():
       if key == lambda_name:
         arn = value
-        print(arn)
+        print('lambda arn: %s' % arn)
       '''
       else:
         print("No function found")
