@@ -31,4 +31,7 @@ parser.add_argument(
 	'--invoke_source',
 	help="The name of the resource you'd like to trigger your lambda with",
 	)
+parser.add_argument(
+	'--alias',
+	help="Give your alias a name (ie: dev, stage, prod)")
 ARGS = parser.parse_args()

@@ -362,10 +362,16 @@ def main():
               if 'backup' in json_parser():
                 print("Backup option selected.. backing up to s3!")
                 if s3_backup.main():
-                  if ARGS.create_trigger:
-                    if create_trigger():
-                      return True
+                  if ARGS.alias:
+                    if alias.alias_creation():
+                      print("Alias added successfully")
+                      if ARGS.create_trigger:
+                        if create_trigger():
+                          return True
+                        else:
+                          return False
                     else:
+                      print("Alias failed to created")
                       return False
                 else:
                   print("Backup failed..")
@@ -386,10 +392,16 @@ def main():
             if 'backup' in json_parser():
               print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
-                if ARGS.create_trigger:
-                  if create_trigger():
-                    return True
+                if ARGS.alias:
+                  if alias.alias_creation():
+                    print("Alias added successfully")
+                    if ARGS.create_trigger:
+                      if create_trigger():
+                        return True
+                      else:
+                        return False
                   else:
+                    print("Alias failed to created")
                     return False
               else:
                 print("Backup failed..")
