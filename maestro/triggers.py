@@ -85,7 +85,7 @@ def get_aliases():
   print("Here is where you grab avail aliases")
 
 def add_invoke_permission():
-  lambda_name = 'example'
+  lambda_name = json_parser()['initializers']['name']
 
   if invoke_method in principals:
 
@@ -93,7 +93,7 @@ def add_invoke_permission():
       principal = 's3.amazonaws.com'
       print('principal: %s' % principal)
       source_arn = 'arn:aws:s3:::%s' % invoke_source
-      print(source_arn)
+      print('arn: %s' % source_arn)
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
       source_arn = get_sns_arn()
@@ -124,7 +124,7 @@ def add_invoke_permission():
           print(error.response['Error']['Message'])
 
 def invoke_action():
-  lambda_name = 'example'
+  lambda_name = json_parser()['initializers']['name']
   get_functions = client.list_functions()
   
   if get_functions['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -132,19 +132,27 @@ def invoke_action():
     loader = json.loads(dumper)
     functions = loader["Functions"]
 
-    current_functions = []
+    current_functions = {}
 
     for function in functions:
       names = function['FunctionName']
-      append = current_functions.append(names)
+      arns = function['FunctionArn']
+      append = current_functions.update({names: arns})
 
-    if lambda_name in current_functions:
-      arn = function['FunctionArn']
-    else:
-      print("No function found")
-      return False
-      sys.exit[1]
+    dump_function_dict = json.dumps(current_functions, indent=4)
+    load_function_dict = json.loads(dump_function_dict) 
 
+    for key, value in current_functions.items():
+      if key == lambda_name:
+        arn = value
+        print('lambda arn: %s' % arn)
+      '''
+      else:
+        print("No function found")
+        return False
+        sys.exit[1]
+
+    '''
     if invoke_method == 's3':
       bucket_name = invoke_source
       bucket_notification = s3.BucketNotification(bucket_name)
@@ -153,7 +161,7 @@ def invoke_action():
         put = bucket_notification.put(
                   NotificationConfiguration={'LambdaFunctionConfigurations': [
                   {
-                    'LambdaFunctionArn': '%s' % arn,
+                    'LambdaFunctionArn': arn,
                     'Events': [
                         's3:ObjectCreated:*',
                         ],
@@ -224,4 +232,3 @@ def remove_invoke_action():
       return True
   except ClientError as error:
     print(error.response['Error']['Message'])
-

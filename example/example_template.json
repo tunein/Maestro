@@ -3,7 +3,7 @@
     "name": "example",
     "description": "example description",
     "region": "us-west-2",
-    "role": "lambda_role"
+    "role": "maestro-test-role"
   },
  "provisioners": {
     "runtime": "python3.6",
@@ -12,8 +12,8 @@
     "publish": "yes"
  },
  "vpcconfig": {
-    "vpc_name": "Stock_VPC",
-    "security_group_ids": ["MMTest", "mm-test-2"] 
+    "vpc_name": "base::nonprod::vpc",
+    "security_group_ids": ["maestro-test-sg"]
  },
  "environment": {
     "environment": "prod"
@@ -22,6 +22,6 @@
     "Name": "Maestro-Test"
  },
  "backup": {
-    "bucket_name": "mmoon-test-lambda-backup-bucket-34"
+    "bucket_name": "maestro-test-lambda-backup"
  }
 }
