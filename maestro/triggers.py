@@ -43,11 +43,6 @@ def check_s3():
   except ClientError as error:
     print(error.response['Error']['Message'])
     sys.exit(1)
-    
-def get_s3_arn():
-  if check_s3():
-    print("Gathering ARN for S3 Bucket..")
-    return 
 
 def get_sns_arn():
   topic_name = invoke_source
