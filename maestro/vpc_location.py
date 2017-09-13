@@ -3,6 +3,7 @@ import maestro.lambda_config as lambda_config
 import sys
 import json
 import os
+from botocore.exceptions import ClientError
 from maestro.cli import ARGS
 
 DOC = ARGS.filename
@@ -14,11 +15,11 @@ def json_parser():
     return True
   print("No json document to read.. Please enter a valid json document")
 
-ec2 = boto3.resource('ec2', region_name='%s' % json_parser()['initializers']['region'])
+ec2 = boto3.resource('ec2', region_name='us-west-2')#region_name='%s' % json_parser()['initializers']['region'])
 client = boto3.client('ec2')
 
 def get_vpc_id():
-  filters = [{'Name': 'tag:Name', 'Values':['%s' % json_parser()['vpcconfig']['vpc_name']]}]
+  filters = [{'Name': 'tag:Name', 'Values': ['base::nonprod::vpc']}] #['%s' % json_parser()['vpcconfig']['vpc_name']]}]
   vpcs = list(ec2.vpcs.filter(Filters=filters))
   for vpc in vpcs:
     try:
@@ -37,14 +38,30 @@ def get_vpc_id():
       print(error.response['Error']['Message'])  
 
 def get_subnets():
-  filters = [{'Name': 'tag:Network', 'Values':['private']},{'Name': 'tag:Environment', 'Values':['%s' % json_parser()['environment']['environment']]}]
   vpc = ec2.Vpc(get_vpc_id())
-  subnets = list(vpc.subnets.filter(Filters=filters))
-  ids = []
+  subnets = list(vpc.subnets.all())
+
+  ids = {}
+  list_id = []
+
   for subnet in subnets:
-    if subnet.id != 0:
-      ids.append(subnet.id)
-  return ids
+    try:
+      info = ec2.Subnet(subnet.id)
+      get_tags = list(info.tags)
+      dumper = json.dumps(get_tags, indent=4)
+      loader = json.loads(dumper)
+
+      for item in loader:
+        keys = item['Value']
+        if keys.find('private')>0:
+          ids.update({keys: subnet.id})
+    except ClientError as error:
+      print(error.response['Error']['Message'])
+
+  for key, value in ids.items():
+    list_id.append(value)
+
+  return list_id
 
 def main():
   if get_vpc_id():
