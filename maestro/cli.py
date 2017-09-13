@@ -16,6 +16,7 @@ parser.add_argument(
 	)
 parser.add_argument(
 	'--create_trigger',
+	action='store_true',
 	help='Creates a lambda trigger. If added you must provide invoke method and invoke source'
 	)
 parser.add_argument(
@@ -34,4 +35,8 @@ parser.add_argument(
 parser.add_argument(
 	'--alias',
 	help="Give your alias a name (ie: dev, stage, prod)")
+parser.add_argument(
+	'--publish',
+	action='store_true',
+	help="Used only for update-code, true or false")
 ARGS = parser.parse_args()

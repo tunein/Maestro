@@ -207,17 +207,20 @@ def update():
   if zip_folder():
     print("Attempting to update lambda...")
 
-    publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-    if publish_answer.lower() in yes_or_no:
-      if publish_answer == 'y':
-        answer = True
-        print("Publishing update")
-      if publish_answer == 'n':
-        answer = False
-        print("Updating lambda without publishing")
+    if ARGS.publish:
+      answer = True
     else:
-      print("Please respond with 'y' for yes or 'n' for no!")
+      publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+      if publish_answer.lower() in yes_or_no:
+        if publish_answer == 'y':
+          answer = True
+          print("Publishing update")
+        if publish_answer == 'n':
+          answer = False
+          print("Updating lambda without publishing")
+      else:
+        print("Please respond with 'y' for yes or 'n' for no!")
 
     try:
       update = client.update_function_code(

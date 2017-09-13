@@ -35,7 +35,9 @@ def alias_creation():
     aliases.append(names['Name'])
 
   if ARGS.alias in aliases:
-    return True
+    print("Attempting to update alias %s" % ARGS.alias)
+    if alias_update():
+      return True
   else:
     pass
 
@@ -136,16 +138,17 @@ def alias_update():
     print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
     aliases.append(names['Name'])
   print("\n")
-  print("Available Versions")
+  #print("Available Versions")
   for version in versions:
     if version['Version'] != 0:
-      print('version: %s' % version['Version'])
+      #print('version: %s' % version['Version'])
       avail_versions.append(version['Version'])
 
   if len(aliases) != 0:
     #alias_name = input("What alias would you like to update? ")
     alias_name = ARGS.alias
-    version_update = input("What version would you like to assign the update alias to? ")
+    #version_update = input("What version would you like to assign the update alias to? ")
+    version_update = max(avail_versions)
 
     if alias_name in aliases:
       if version_update in avail_versions:
