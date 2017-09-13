@@ -26,11 +26,9 @@ parser.add_argument(
 	'--invoke_method',
 	choices=['s3', 'sqs', 'sns', 'cloudwatch'],
 	help='Pick from available invoke methods',
-	required=False
 	)
 parser.add_argument(
 	'--invoke_source',
 	help="The name of the resource you'd like to trigger your lambda with",
-	required=False
 	)
 ARGS = parser.parse_args()

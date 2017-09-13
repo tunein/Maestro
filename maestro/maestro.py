@@ -11,6 +11,8 @@ import maestro.alias as alias
 import maestro.lambda_config as lambda_config
 import maestro.security_groups as security_groups_method
 from maestro.cli import ARGS
+from maestro.triggers import creation as create_trigger
+from maestro.triggers import remove_invoke_action as delete_trigger
 
 #USER_ACTION = args
 DOC = ARGS.filename
@@ -360,7 +362,11 @@ def main():
               if 'backup' in json_parser():
                 print("Backup option selected.. backing up to s3!")
                 if s3_backup.main():
-                  return True
+                  if ARGS.create_trigger:
+                    if create_trigger():
+                      return True
+                    else:
+                      return False
                 else:
                   print("Backup failed..")
                   return False

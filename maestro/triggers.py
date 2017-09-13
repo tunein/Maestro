@@ -1,15 +1,15 @@
 #!/usr/bin/env python3.6
 
 import boto3
-import lambda_config as lambda_config
+import maestro.lambda_config as lambda_config
 import sys
 import json
 import os
 from datetime import datetime
 from botocore.exceptions import ClientError
-#from maestro.cli import ARGS
+from maestro.cli import ARGS
 
-#DOC = ARGS.filename
+DOC = ARGS.filename
 principals = lambda_config.PRINCIPALS
 
 client = boto3.client('lambda')
@@ -24,22 +24,21 @@ region = my_session.region_name
 accepted_prompt_actions = ['y', 'n']
 REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
-'''
+invoke_method = ARGS.invoke_method
+invoke_source = ARGS.invoke_source
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
     return read
     return True
   print("No json document to read.. Please enter a valid json document")
-'''
-
-invoke_method = 'cloudwatch'
-invoke_source = 'lambda-cloudwatch-event'
 
 def check_s3():
-  bucket_name = invoke_source #json_parser()['backup']['bucket_name']
+  bucket_name = invoke_source
   try:
     s3.meta.client.head_bucket(Bucket=bucket_name)
+    print("Bucket found!")
     return True
   except ClientError as error:
     print(error.response['Error']['Message'])
@@ -48,7 +47,7 @@ def check_s3():
 def get_s3_arn():
   if check_s3():
     print("Gathering ARN for S3 Bucket..")
-    return "arn:aws:s3:::%s" % invoke_source
+    return 
 
 def get_sns_arn():
   topic_name = invoke_source
@@ -97,20 +96,19 @@ def add_invoke_permission():
 
     if invoke_method == 's3':
       principal = 's3.amazonaws.com'
-      source_arn = "%s/*" % get_s3_arn()
+      print('principal: %s' % principal)
+      source_arn = 'arn:aws:s3:::%s' % invoke_source
+      print(source_arn)
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
       source_arn = get_sns_arn()
     if invoke_method == 'cloudwatch':
       principal = 'events.amazonaws.com'
       source_arn = get_cloudwatch_arn()
-    else:
-      print("No valid principal and source arn found.. breaking")
-      sys.exit[1]
 
     if len(principal)>0:
       if len(source_arn)>0:
-        statement_id = "%s-%s" % (lambda_name, 'prod-sns')#json_parser['environment']['environment'])
+        statement_id = "%s-%s" % (lambda_name, json_parser()['environment']['environment'])
 #        qualifier = get_aliases()
 
         try:
@@ -168,6 +166,8 @@ def invoke_action():
                 ]
               }
             )
+        if put['ResponseMetadata']['HTTPStatusCode'] == 200:
+          return True
       except ClientError as error:
         print(json.dumps(error.response, indent=4))
 
@@ -179,6 +179,8 @@ def invoke_action():
                         Protocol='Lambda',
                         Endpoint=arn
                       )
+        if subscription['ResponseMetadata']['HTTPStatusCode'] == 200:
+          return True
       except ClientError as Error:
         print(error.response['Error']['Message'])
         sys.exit[1]
@@ -195,8 +197,21 @@ def invoke_action():
                         }
                       ]
                     )
+        if add_target['ResponseMetadata']['HTTPStatusCode'] == 200:
+          return True
       except ClientError as error:
         print(error.response['Error']['Message'])
+
+def creation():
+  if add_invoke_permission():
+    if invoke_action():
+      print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
+      return True
+    else:
+      print("Actions not linked, see error code")
+      return False 
+  else:
+    print("Permissions not granted, see error code")
 
 def remove_invoke_action():
   lambda_name = json_parser()['initializers']['name']
@@ -214,3 +229,4 @@ def remove_invoke_action():
       return True
   except ClientError as error:
     print(error.response['Error']['Message'])
+
