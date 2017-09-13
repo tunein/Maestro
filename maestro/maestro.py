@@ -207,17 +207,20 @@ def update():
   if zip_folder():
     print("Attempting to update lambda...")
 
-    publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-    if publish_answer.lower() in yes_or_no:
-      if publish_answer == 'y':
-        answer = True
-        print("Publishing update")
-      if publish_answer == 'n':
-        answer = False
-        print("Updating lambda without publishing")
+    if ARGS.publish:
+      answer = True
     else:
-      print("Please respond with 'y' for yes or 'n' for no!")
+      publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+      if publish_answer.lower() in yes_or_no:
+        if publish_answer == 'y':
+          answer = True
+          print("Publishing update")
+        if publish_answer == 'n':
+          answer = False
+          print("Updating lambda without publishing")
+      else:
+        print("Please respond with 'y' for yes or 'n' for no!")
 
     try:
       update = client.update_function_code(
@@ -362,10 +365,16 @@ def main():
               if 'backup' in json_parser():
                 print("Backup option selected.. backing up to s3!")
                 if s3_backup.main():
-                  if ARGS.create_trigger:
-                    if create_trigger():
-                      return True
+                  if ARGS.alias:
+                    if alias.alias_creation():
+                      print("Alias added successfully")
+                      if ARGS.create_trigger:
+                        if create_trigger():
+                          return True
+                        else:
+                          return False
                     else:
+                      print("Alias failed to created")
                       return False
                 else:
                   print("Backup failed..")
@@ -386,10 +395,16 @@ def main():
             if 'backup' in json_parser():
               print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
-                if ARGS.create_trigger:
-                  if create_trigger():
-                    return True
+                if ARGS.alias:
+                  if alias.alias_creation():
+                    print("Alias added successfully")
+                    if ARGS.create_trigger:
+                      if create_trigger():
+                        return True
+                      else:
+                        return False
                   else:
+                    print("Alias failed to created")
                     return False
               else:
                 print("Backup failed..")
