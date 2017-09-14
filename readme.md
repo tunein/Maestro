@@ -30,12 +30,10 @@ maestro update-alias --alias dev function_name.json<br>
 maestro delete-alias function_name.json<br>
 <br>
 <b>Command line flags</b><br>
---publish<br>
-	<i>Rolls over any manual input for "publish" options.<br>
-	Currently only works with "create" and "update-code" functions</i><br>
+--publish <i>autopasses for publish input args</i><br>
 --create_trigger<br>
---invoke_method <i>[s3, cloudwatch, sns]</i><br>
---invoke_source <i>name of your resource</i><br>
+--invoke_method <i>$[s3, cloudwatch, sns])</i><br>
+--invoke_source <i>$name of your resource</i><br>
 <br>
 <i>It is also possible to string actions together</i><br>
 Example 1:<br>
