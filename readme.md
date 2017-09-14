@@ -1,8 +1,10 @@
 Created by M. Moon/Perilune Inc Copyright 2017<br>
-
+<br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Maestro_2016.svg/500px-Maestro_2016.svg.png">
+<br>
 <b>Current State: v0.1</b><br>
 <br>
-<b>Maestro is a command line tool for creating, updating, deleting, and publishing Lambdas for Amazon Web Services</b><br>
+<b>Maestro is a command line tool for managing Lambdas for Amazon Web Services</b><br>
 <br>
 -It takes a json document as an input to fill out all the information necessary for creating a lambda<br>
 -In the directory you're working in it looks for a directory called "lambda" and packages the contents into a zip<br>
@@ -36,16 +38,18 @@ maestro delete-alias function_name.json<br>
 --invoke_source <i>$name of your resource</i><br>
 <br>
 <i>It is also possible to string actions together</i><br>
-Example 1:<br>
+<b>Example 1:</b><br>
 maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json<br>
-</i>This will:</i><br>
+<br>
+<i><u>This will</u>:</i><br>
 --publish updated code<br>
 --reallocate the alias 'dev' to the new version<br>
 --add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator<br>
 <br>
-Example 2:<br>
+<b>Example 2:</b><br>
 maestro update-code --alias prod --publish example_template.json<br>
-</i>This will:</i><br>
+<br>
+<i><u>This will</u>:</i><br>
 Publish a new version of your lambda and then assign it the alias of "prod"<br>
 <br>
 <br>
