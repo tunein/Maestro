@@ -67,3 +67,19 @@ command: maestro create function_name.json<br>
 --------stuff.txt<br>
 ------/dependency-2<br>
 ------/dependency-etc<br>
+<br>
+<br>
+Current roadmap:<br>
+-Add API Gateway integration and command line flags<br>
+-Add letsencrypt/certbot integration for https<br>
+-Add route53 integration for dns<br>
+-Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream<br>
+-Add "test invoke" action and pipe lambda logs back<br>
+-Add dry run command line arg, add to all actions<br>
+-Version deletion (automatically & intelligently)<br>
+<br>
+Current known issues:<br>
+-If you try to re-add or change an invocation source to an alias after it's created it will return an error<br>
+----<i>For re-adding this is the expected behavior but an unfriendly user experience, it needs to recognize the == and move on</i><br>
+----<i>For changing sources I need to move the statement-ID to a command line arg, by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
+----<i>Since this is the last action run and does not impact code updates or changes, but will return an error saying the statement id already exists</i>
