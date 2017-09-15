@@ -80,11 +80,8 @@ Current roadmap:<br>
 <br>
 Current known issues:<br>
 -If you try to re-add or change an invocation source to an alias after it's created it will return an error<br>
-----<i>For re-adding this is the expected behavior but an unfriendly user experience<br>
-    it needs to recognize the == and move on</i><br>
+1)<i>For re-adding this is the expected behavior but an unfriendly user experience it needs to recognize the == and move on</i><br>
 <br>
-----<i>For changing sources I need to move the statement-ID to a command line arg<br>
-    by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
+2)<i>For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
 <br>
-----<i>Since this is the last action run and does not impact code updates or changes<br>
-    but will return an error saying the statement id already exists</i>
+3)<i>Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists</i>
