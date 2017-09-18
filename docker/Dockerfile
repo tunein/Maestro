@@ -5,11 +5,11 @@ ARG maestro_token
 ARG access_key
 ARG secret_key
 ARG region
-
 ARG build_token
 ARG user
 ARG repo
 ARG lambda_name
+ARG enviro
 
 ##Prep the system & get the basics
 RUN yum update -y \
@@ -60,4 +60,7 @@ RUN git clone https://$build_token:x-oauth-basic@github.com/$user/$repo.git
 
 WORKDIR $repo
 
-CMD maestro create $lambda_name.json
+ENV name $lambda_name
+ENV environment $enviro
+
+ENTRYPOINT maestro update-code --alias $environment --publish $name.json
