@@ -534,7 +534,6 @@ def main():
       if ARGS.action == "create-alias":
         if check():
           if alias.alias_creation():
-            print("Alias added successfully")
             return True
           else:
             print("Alias creation failed..")

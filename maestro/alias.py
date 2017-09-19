@@ -12,6 +12,18 @@ iam = boto3.resource('iam')
 roles = boto3.client('iam')
 DOC = ARGS.filename
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
@@ -36,26 +48,28 @@ def alias_creation():
 
   if ARGS.alias:    
     if ARGS.alias in aliases:
-      if ARGS.dry_run:
-        print("***Dry run option enabled, would have updated alias %s***" % ARGS.alias)
-        return True
+      if ARGS.publish:
+        if alias_update():
+          return True
       else:
-        if ARGS.publish:
+        ask = input("Alias exists, would you like to update it (y/n)? ")
+        if ask == 'y':
           if alias_update():
+            print("Attempting to update alias %s" % ARGS.alias)
             return True
-        else:
-          ask = input("Alias exists, would you like to update it (y/n)? ")
-          if ask == 'y':
-            if alias_update():
-              print("Attempting to update alias %s" % ARGS.alias)
-              return True
-            else:
-              return False
           else:
-            print("Exiting!")
-            sys.exit(1)
+            return False
+        else:
+          print("Exiting!")
+          sys.exit(1)
     else:
-      alias_name = ARGS.alias
+      if ARGS.dry_run:
+        alias_name = ARGS.alias
+        print(color.PURPLE + "***Dry run option enabled***" + color.END)
+        print(color.PURPLE + "Would have created alias: %s for %s" % (ARGS.alias, lambda_name) + color.END)
+      else:
+        alias_name = ARGS.alias
+        pass
   else:
     get_alias_name = input("What would you like this alias to be called? ")
     alias_name = get_alias_name.lower()
@@ -91,6 +105,12 @@ def alias_creation():
   else:
     function_version = input("What version would you like to create an alias for? ")
   
+  if ARGS.dry_run:
+    print(color.PURPLE + "Dry run creating alias '%s' for version '%s' on lambda '%s'" % (alias_name, function_version, lambda_name) + color.END)
+    return True
+  else:
+    pass
+
   if function_version in avail_versions: 
     try:
       add_alias = client.create_alias(
@@ -125,18 +145,26 @@ def alias_destroy():
     aliases.append(names['Name'])
 
   if len(aliases) != 0:
-    alias_name = input("What alias would you like to delete? ")
+    if ARGS.alias:
+      alias_name = ARGS.alias
+    else:
+      alias_name = input("What alias would you like to delete? ")
 
     if alias_name in aliases:
-      try:
-        delete_alias = client.delete_alias(
-            FunctionName='%s' % lambda_name,
-            Name='%s' % alias_name
-        )
-        print("Alias successfully deleted")
+      if ARGS.dry_run:
+        print(color.PURPLE + "***Dry run option enabled***" + color.END)
+        print(color.PURPLE + "Dry run deleting alias %s on %s" % (alias_name, lambda_name) + color.END)
         return True
-      except ClientError as error:
-        print(error.response['Error']['Message'])
+      else:
+        try:
+          delete_alias = client.delete_alias(
+              FunctionName='%s' % lambda_name,
+              Name='%s' % alias_name
+          )
+          print("Alias successfully deleted")
+          return True
+        except ClientError as error:
+          print(error.response['Error']['Message'])
     else:
       print("That alias does not exist, please check the list of existing aliases and try again")
   else:
@@ -175,7 +203,6 @@ def alias_update():
     if ARGS.alias:
       alias_name = ARGS.alias
     else:
-
       alias_name = input("What alias would you like to update? ")
 
     if ARGS.publish:
@@ -185,19 +212,24 @@ def alias_update():
 
     if alias_name in aliases:
       if version_update in avail_versions:
-        try:
-          update_alias = client.update_alias(
-                          FunctionName='%s' % lambda_name,
-                          Name='%s' % alias_name,
-                          FunctionVersion='%s' % version_update,
-                        )
-          if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
-            print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
-            return True
-          else:
-            return False
-        except ClientError as error:
-          print(error.response['Error']['Message'])
+        if ARGS.dry_run:
+          print(color.PURPLE + "***Dry run option enabled***" + color.END)
+          print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
+          return True
+        else:
+          try:
+            update_alias = client.update_alias(
+                            FunctionName='%s' % lambda_name,
+                            Name='%s' % alias_name,
+                            FunctionVersion='%s' % version_update,
+                          )
+            if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+              print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
+              return True
+            else:
+              return False
+          except ClientError as error:
+            print(error.response['Error']['Message'])
       else:
         print("Version not found..")
     else:
