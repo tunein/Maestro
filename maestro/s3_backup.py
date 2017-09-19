@@ -14,6 +14,18 @@ REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
 DOC = ARGS.filename
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
@@ -73,7 +85,7 @@ def upload_file():
   filename = '%s.zip' % lambda_name
   if check_file():
     if ARGS.dry_run:
-      print("***Dry Run enabled, would have uploaded backup archive to S3 bucket %s***" % bucket_name)
+      print(color.PURPLE + "***Dry Run enabled, would have uploaded backup archive to S3 bucket %s***" % bucket_name + color.END)
       return True
     else:
       upload = s3.Bucket(bucket_name).upload_file(file, filename)
