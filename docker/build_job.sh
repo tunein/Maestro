@@ -5,12 +5,12 @@ cd /Maestro/docker
 maestro_token=%env.MAESTRO_GIT_TOKEN%
 access_key=%env.AWS_ACCESS_KEY_ID%
 secret_key=%env.AWS_SECRET_ACCESS_KEY%
-region=$4
+region=
 build_token=%env.APP_GIT_TOKEN%
-user=$6
-repo=$7
-lambda_name=$8
-environment=$9
+user=
+repo=
+lambda_name=
+environment=
 
 docker build . -t maestro-build-container-$lambda_name \
         --build-arg maestro_token=$maestro_token \
