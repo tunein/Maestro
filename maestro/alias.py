@@ -34,17 +34,35 @@ def alias_creation():
   for names in load['Aliases']:    
     aliases.append(names['Name'])
 
-  if ARGS.alias in aliases:
-    print("Attempting to update alias %s" % ARGS.alias)
-    if alias_update():
-      return True
+  if ARGS.alias:    
+    if ARGS.alias in aliases:
+      ask = input("Alias exists, would you like to update it (y/n)? ")
+      if ask == 'y':
+        if alias_update():
+          print("Attempting to update alias %s" % ARGS.alias)
+          return True
+        else:
+          return False
+      else:
+        print("Exiting!")
+        sys.exit(1)
+    else:
+      alias_name = ARGS.alias
   else:
-    pass
+    get_alias_name = input("What would you like this alias to be called? ")
+    alias_name = get_alias_name.lower()
+    if alias_name in aliases:
+      ask = input("Alias exists, would you like to update it (y/n)? ")
+      if ask == 'y':
+        if alias_update():
+          print("Attempting to update alias %s" % ARGS.alias)
+          return True
+        else:
+          return False
+      else:
+        print("Exiting!")
+        sys.exit(1)
 
-  #get_alias_name = input("What would you like this alias to be called? ")
-  #alias_name = get_alias_name.lower()
-
-  alias_name = ARGS.alias
 
   versions = client.list_versions_by_function(
                     FunctionName='%s' % lambda_name,
@@ -60,7 +78,10 @@ def alias_creation():
       print('version: %s' % version['Version'])
       avail_versions.append(version['Version'])
 
-  function_version = input("What version would you like to create an alias for? ")
+  if ARGS.publish:
+    function_version = max(avail_versions)
+  else:
+    function_version = input("What version would you like to create an alias for? ")
   
   if function_version in avail_versions: 
     try:
@@ -138,17 +159,20 @@ def alias_update():
     print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
     aliases.append(names['Name'])
   print("\n")
-  #print("Available Versions")
   for version in versions:
     if version['Version'] != 0:
-      #print('version: %s' % version['Version'])
       avail_versions.append(version['Version'])
 
   if len(aliases) != 0:
-    #alias_name = input("What alias would you like to update? ")
-    alias_name = ARGS.alias
-    #version_update = input("What version would you like to assign the update alias to? ")
-    version_update = max(avail_versions)
+    if ARGS.alias:
+      alias_name = ARGS.alias
+    else:
+      alias_name = input("What alias would you like to update? ")
+
+    if ARGS.publish:
+      version_update = max(avail_versions)
+    else:
+      version_update = input("What version would you like to assign the update alias to? ")
 
     if alias_name in aliases:
       if version_update in avail_versions:

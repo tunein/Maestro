@@ -138,7 +138,6 @@ def check():
   else:
     return False
 
-#Add command line args for dry run
 def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
@@ -174,6 +173,11 @@ def create():
   else:
     vpc_config = { }
 
+  if ARGS.publish:
+    pub = True
+  else:
+    pub = False
+
   if zip_folder():
     print("Attempting to create lambda...")
     try:
@@ -188,6 +192,7 @@ def create():
         Description='%s' % json_parser()["initializers"]["description"],
         Timeout=json_parser()["provisioners"]["timeout"],
         MemorySize=json_parser()["provisioners"]["mem_size"],
+        Publish=pub,
         VpcConfig=vpc_config,
         Tags=tags
       )

@@ -39,4 +39,12 @@ parser.add_argument(
 	'--publish',
 	action='store_true',
 	help="Used only for update-code, true or false")
+parser.add_argument(
+	'--dry-run',
+	action='store_true',
+	help="Performs all actions as a dry run")
+parser.add_argument(
+	'--invoke',
+	action='store_true',
+	help="Invokes your lambda")
 ARGS = parser.parse_args()
