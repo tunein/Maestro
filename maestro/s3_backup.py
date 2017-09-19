@@ -72,9 +72,13 @@ def upload_file():
   file = os.getcwd() + '/%s.zip' % lambda_name
   filename = '%s.zip' % lambda_name
   if check_file():
-    upload = s3.Bucket(bucket_name).upload_file(file, filename)
-    print("Uploading file")
-    return True
+    if ARGS.dry_run:
+      print("***Dry Run enabled, would have uploaded backup archive to S3 bucket %s***" % bucket_name)
+      return True
+    else:
+      upload = s3.Bucket(bucket_name).upload_file(file, filename)
+      print("Uploading file to S3")
+      return True
   else:
     print("Hmm... I couldn't find the file")
     return False
@@ -83,13 +87,20 @@ def check_upload_exists():
   lambda_name = json_parser()["initializers"]["name"]
   bucket_name = json_parser()['backup']['bucket_name']
   filename = '/%s.zip' % lambda_name
-  file = s3.Object(bucket_name, filename)
-  if file.key == filename:
-    print("File exists")
+
+  if ARGS.dry_run:
     return True
   else:
-    print("No file found in %s" % bucket_name)
-    return False
+    try:
+      file = s3.Object(bucket_name, filename)
+      if file.key == filename:
+        print("File %s exists in %s" % (filename, bucket_name))
+        return True
+      else:
+        print("No file found in %s" % bucket_name)
+        return False
+    except ClientError as error:
+      print(error.response['Error']['Message'])
 
 def main():
   if json_parser():
@@ -97,5 +108,4 @@ def main():
       if check_s3():
         if upload_file():
           if check_upload_exists():
-            print("Successfully backed up to s3")
             return True

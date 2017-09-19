@@ -36,16 +36,24 @@ def alias_creation():
 
   if ARGS.alias:    
     if ARGS.alias in aliases:
-      ask = input("Alias exists, would you like to update it (y/n)? ")
-      if ask == 'y':
-        if alias_update():
-          print("Attempting to update alias %s" % ARGS.alias)
-          return True
-        else:
-          return False
+      if ARGS.dry_run:
+        print("***Dry run option enabled, would have updated alias %s***" % ARGS.alias)
+        return True
       else:
-        print("Exiting!")
-        sys.exit(1)
+        if ARGS.publish:
+          if alias_update():
+            return True
+        else:
+          ask = input("Alias exists, would you like to update it (y/n)? ")
+          if ask == 'y':
+            if alias_update():
+              print("Attempting to update alias %s" % ARGS.alias)
+              return True
+            else:
+              return False
+          else:
+            print("Exiting!")
+            sys.exit(1)
     else:
       alias_name = ARGS.alias
   else:
@@ -167,6 +175,7 @@ def alias_update():
     if ARGS.alias:
       alias_name = ARGS.alias
     else:
+
       alias_name = input("What alias would you like to update? ")
 
     if ARGS.publish:

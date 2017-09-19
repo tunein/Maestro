@@ -212,30 +212,47 @@ def update():
   if zip_folder():
     print("Attempting to update lambda...")
 
-    if ARGS.publish:
-      answer = True
+    if ARGS.dry_run:
+      print("***Dry Run option enabled, running dry run code-update***")
+      run = True
     else:
-      publish_answer = input("Would you like to publish this update? ('y/n'): ")
+      run = False
 
-      if publish_answer.lower() in yes_or_no:
-        if publish_answer == 'y':
-          answer = True
-          print("Publishing update")
-        if publish_answer == 'n':
-          answer = False
-          print("Updating lambda without publishing")
+    if ARGS.publish:
+      if ARGS.dry_run:
+        answer = False
       else:
-        print("Please respond with 'y' for yes or 'n' for no!")
+        answer = True
+    else:
+      if ARGS.dry_run:
+        answer = False
+      else:
+        publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+        if publish_answer.lower() in yes_or_no:
+          if publish_answer == 'y':
+            answer = True
+            print("Publishing update")
+          if publish_answer == 'n':
+            answer = False
+            print("Updating lambda without publishing")
+        else:
+          print("Please respond with 'y' for yes or 'n' for no!")
 
     try:
       update = client.update_function_code(
         FunctionName='%s' % lambda_name,
         ZipFile= open(archive_name, 'rb').read(),
-        Publish=answer
-        #DryRun=True|False
+        Publish=answer,
+        DryRun=run
       )
       if update['ResponseMetadata']['HTTPStatusCode'] == 200:
-        return True
+        if ARGS.dry_run:
+          print("***Dry Run Successful!***")
+          return True
+        else:
+          print("Lambda updated!")
+          return True
       else:
         return False
     except ClientError as error:
@@ -368,7 +385,6 @@ def main():
             if check():
               print("Lambda uploaded successfully")
               if 'backup' in json_parser():
-                print("Backup option selected.. backing up to s3!")
                 if s3_backup.main():
                   if ARGS.alias:
                     if alias.alias_creation():
@@ -396,13 +412,10 @@ def main():
       if ARGS.action == 'update-code':
         if check():
           if update():
-            print("Lambda updated")
             if 'backup' in json_parser():
-              print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
                 if ARGS.alias:
                   if alias.alias_creation():
-                    print("Alias added successfully")
                     if ARGS.create_trigger:
                       if create_trigger():
                         return True

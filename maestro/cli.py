@@ -40,7 +40,7 @@ parser.add_argument(
 	action='store_true',
 	help="Used only for update-code, true or false")
 parser.add_argument(
-	'--dry-run',
+	'--dry_run',
 	action='store_true',
 	help="Performs all actions as a dry run")
 parser.add_argument(
