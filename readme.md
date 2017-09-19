@@ -53,6 +53,17 @@ maestro update-code --alias prod --publish example_template.json<br>
 Publish a new version of your lambda and then assign it the alias of "prod"<br>
 <br>
 <br>
+<b>Action "--dry_run" specific notes:</b><br>
+<u>Available on the following Actions</u>:<br>
+create<br>
+update-code<br>
+delete<br>
+create-alias<br>
+update-alias<br>
+delete-alias<br>
+create-trigger (and by proxy: invoke_method & invoke_source)<br>
+<br>
+<br>
 <b>To use:</b><br>
 cd into the directory where your code is:<br>
 command: maestro create function_name.json<br>
@@ -75,7 +86,6 @@ Current roadmap:<br>
 -Add route53 integration for dns<br>
 -Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream<br>
 -Add "test invoke" action and pipe lambda logs back<br>
--Add dry run command line arg, add to all actions<br>
 -Version deletion (automatically & intelligently)<br>
 <br>
 Current known issues:<br>
