@@ -27,6 +27,18 @@ ACL_ANSWERS = lambda_config.ACL_ANSWERS
 invoke_method = ARGS.invoke_method
 invoke_source = ARGS.invoke_source
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
@@ -130,6 +142,16 @@ def add_invoke_permission():
           qualifier = ''
         statement_id = "%s-%s" % (lambda_name, ARGS.alias)        
 
+        if ARGS.dry_run:
+          print(color.PURPLE + "***Dry Run option enabled***" + color.END)
+          print(color.PURPLE + "Would add permissions for the following:" + color.END)
+          print(color.PURPLE + "Action: 'lambda:InvokeFunction'" + color.END)
+          print(color.PURPLE + "Function Name: %s" % lambda_name + color.END)
+          print(color.PURPLE + "Principal: %s" % principal + color.END)
+          print(color.PURPLE + "SourceArn: %s" % source_arn + color.END)
+          print(color.PURPLE + "StatementId: %s" % statement_id + color.END)
+          print(color.PURPLE + "Qualifier: %s" % qualifier + color.END)
+          return True
         try:
           add_permission = client.add_permission(
                             Action='lambda:InvokeFunction',
@@ -179,58 +201,85 @@ def invoke_action():
       bucket_name = invoke_source
       bucket_notification = s3.BucketNotification(bucket_name)
 
-      try:
-        put = bucket_notification.put(
-                  NotificationConfiguration={'LambdaFunctionConfigurations': [
-                  {
-                    'LambdaFunctionArn': '%s%s' % (arn, alias),
-                    'Events': [
-                        's3:ObjectCreated:*',
-                        ],
-                  }
-                ]
-              }
-            )
-        if put['ResponseMetadata']['HTTPStatusCode'] == 200:
-          return True
-      except ClientError as error:
-        print(json.dumps(error.response, indent=4))
+      if ARGS.dry_run:
+        print(color.PURPLE + "***Dry Run option enabled***" + color.END)
+        print(color.PURPLE + "Would add invocation permissions for the following:" + color.END)
+        print(color.PURPLE + "Lambda: %s" % lambda_name + color.END)
+        print(color.PURPLE + "Bucket: %s" % bucket_name + color.END)
+        print(color.PURPLE + "Event: s3:ObjectCreated:*" + color.END)
+        return True
+      else:
+        try:
+          put = bucket_notification.put(
+                    NotificationConfiguration={'LambdaFunctionConfigurations': [
+                    {
+                      'LambdaFunctionArn': '%s%s' % (arn, alias),
+                      'Events': [
+                          's3:ObjectCreated:*',
+                          ],
+                    }
+                  ]
+                }
+              )
+          if put['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
+            return True
+        except ClientError as error:
+          print(json.dumps(error.response, indent=4))
 
     if invoke_method == 'sns':
       topic_arn = get_sns_arn()
-      try:
-        subscription = sns_client.subscribe(
-                        TopicArn=topic_arn,
-                        Protocol='Lambda',
-                        Endpoint=arn
-                      )
-        if subscription['ResponseMetadata']['HTTPStatusCode'] == 200:
-          return True
-      except ClientError as Error:
-        print(error.response['Error']['Message'])
-        sys.exit[1]
+
+      if ARGS.dry_run:
+        print(color.PURPLE + "***Dry Run option enabled***" + color.END)
+        print(color.PURPLE + "Would add invocation permissions for the following:" + color.END)
+        print(color.PURPLE + "TopicArn: %s" % topic_arn + color.END)
+        print(color.PURPLE + "Protocol: Lambda" + color.END)
+        print(color.PURPLE + "Endpoint: %s" % arn + color.END)
+        return True
+      else:
+        try:
+          subscription = sns_client.subscribe(
+                          TopicArn=topic_arn,
+                          Protocol='Lambda',
+                          Endpoint=arn
+                        )
+          if subscription['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
+            return True
+        except ClientError as Error:
+          print(error.response['Error']['Message'])
+          sys.exit[1]
 
     if invoke_method == 'cloudwatch':
       rule = invoke_source
-      try:
-        add_target = cloudwatch_client.put_targets(
-                      Rule=rule,
-                      Targets=[
-                        {
-                        'Id': lambda_name,
-                        'Arn': arn,
-                        }
-                      ]
-                    )
-        if add_target['ResponseMetadata']['HTTPStatusCode'] == 200:
-          return True
-      except ClientError as error:
-        print(error.response['Error']['Message'])
+      if ARGS.dry_run:
+        print(color.PURPLE + "***Dry Run option enabled***" + color.END)
+        print(color.PURPLE + "Would add invocation permissions for the following:" + color.END)
+        print(color.PURPLE + "Cloudwatch Rule: %s" % rule + color.END)
+        print(color.PURPLE + "ID: %s" % lambda_name + color.END)
+        print(color.PURPLE + "Arn: %s" % arn + color.END)
+        return True
+      else:
+        try:
+          add_target = cloudwatch_client.put_targets(
+                        Rule=rule,
+                        Targets=[
+                          {
+                          'Id': lambda_name,
+                          'Arn': arn,
+                          }
+                        ]
+                      )
+          if add_target['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
+            return True
+        except ClientError as error:
+          print(error.response['Error']['Message'])
 
 def creation():
   if add_invoke_permission():
     if invoke_action():
-      print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
       return True
     else:
       print("Actions not linked, see error code")

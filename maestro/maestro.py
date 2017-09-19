@@ -27,50 +27,62 @@ AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
 
 yes_or_no = ['y', 'n']
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 def file_type():
-  print("validating file type...")
+  print(color.CYAN + "validating file type..." + color.END)
   if len(DOC)>0:
     if DOC.lower().endswith('.json'):
       return True
     return False
-  print("Please enter a valid json document after your action")
+  print(color.RED + "Please enter a valid json document after your action" + color.END)
 
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
     return read
     return True
-  print("No json document to read.. Please enter a valid json document")
+  print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
 
 def validate_action():
   if len(json_parser()["initializers"]["name"])>0:
     if any(action in ARGS.action for action in AVAIL_ACTIONS):
       return True
-    print("Not a valid action")
-  print("Check your json document for the right syntax..")
+    print(color.RED + "Not a valid action" + color.END)
+  print(color.RED + "Check your json document for the right syntax.." + color.END)
 
 def validate_runtime():
   if len(json_parser()["initializers"]["name"])>0:
     RUNTIME = json_parser()["provisioners"]["runtime"]
-    print("validating runtime %s..." % RUNTIME)
+    print(color.CYAN + "validating runtime %s..." % RUNTIME + color.END)
     if any(runtime in RUNTIME for runtime in AVAIL_RUNTIMES):
       return True
-    print("Not a valid runtime")
+    print(color.RED + "Not a valid runtime" + color.END)
 
 def validate_role():
   name = json_parser()["initializers"]["role"]
-  print("validating role %s..." % name)
+  print(color.CYAN + "validating role %s..." % name + color.END)
   data = iam.role_name=name
   if len(data)>0:
     return True
-  print("invalid role")  
+  print(color.RED + "invalid role" + color.END)  
 
 def validate_timeout():
   timeout = json_parser()["provisioners"]["timeout"]
   acceptable_range = range(1,301)
   if timeout in acceptable_range:
     return True
-  print("Timeout should between between 1 and 300 seconds, please adjust")
+  print(color.RED + "Timeout should between between 1 and 300 seconds, please adjust" + color.END)
 
 def validation():
   if file_type():
@@ -99,14 +111,14 @@ def zip_folder():
       for folder_name in folders:
         absolute_path = os.path.join(root, folder_name)
         shortened_path = os.path.join(root[length:], folder_name)
-        print("Adding '%s' to package." % shortened_path)
+        print(color.CYAN + "Adding '%s' to package." % shortened_path + color.END)
         zipped_lambda.write(absolute_path, shortened_path)
       for file_name in files:
         absolute_path = os.path.join(root, file_name)
         shortened_path = os.path.join(root[length:], file_name)
-        print("Adding '%s' to package." % shortened_path)
+        print(color.CYAN + "Adding '%s' to package." % shortened_path + color.END)
         zipped_lambda.write(absolute_path, shortened_path)
-    print("'%s' lambda packaged successfully." % lambda_name)
+    print(color.CYAN + "'%s' lambda packaged successfully." % lambda_name + color.END)
     return True
   except IOError:
     print(message)
@@ -138,7 +150,6 @@ def check():
   else:
     return False
 
-#Add command line args for dry run
 def create():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name
@@ -174,67 +185,104 @@ def create():
   else:
     vpc_config = { }
 
-  if zip_folder():
-    print("Attempting to create lambda...")
-    try:
-      create = client.create_function(
-        FunctionName='%s' % lambda_name,
-        Runtime='%s' % json_parser()["provisioners"]["runtime"],
-        Role='%s' % get_arn(),
-        Handler='%s' % json_parser()["initializers"]["name"],
-        Code={
-          'ZipFile': open(archive_name, 'rb').read()
-        },
-        Description='%s' % json_parser()["initializers"]["description"],
-        Timeout=json_parser()["provisioners"]["timeout"],
-        MemorySize=json_parser()["provisioners"]["mem_size"],
-        VpcConfig=vpc_config,
-        Tags=tags
-      )
-      if create['ResponseMetadata']['HTTPStatusCode'] == 201:
-        return True
-      else:
-        return False
-    except ClientError as error:
-      print(error.response['Error']['Message'])
-      sys.exit(1)
+  if ARGS.publish:
+    pub = True
+  else:
+    pub = False
 
-#Add command line args for dry run
+  if zip_folder():
+    if ARGS.dry_run:
+      print(color.BOLD + "***Dry Run option enabled***" + color.END)
+      print(color.PURPLE + "Would have attempted to create the following:" + color.END)
+      print(color.PURPLE + "FunctionName: %s" % lambda_name + color.END)
+      print(color.PURPLE + "Runtime: %s" % json_parser()["provisioners"]["runtime"] + color.END)
+      print(color.PURPLE + "Role: %s" % get_arn() + color.END)
+      print(color.PURPLE + "Handler: %s" % json_parser()["initializers"]["name"] + color.END)
+      print(color.PURPLE + "Archive: %s" % archive_name + color.END)
+      print(color.PURPLE + "Description: %s" % json_parser()["initializers"]["description"] + color.END)
+      print(color.PURPLE + "Timeout: %s" % json_parser()["provisioners"]["timeout"] + color.END)
+      print(color.PURPLE + "Memory Size: %s" % json_parser()["provisioners"]["mem_size"] + color.END)
+      print(color.PURPLE + "VPC Config: %s" % vpc_config + color.END)
+      print(color.PURPLE + "Tags: %s" % tags)
+      return True
+    else:
+      print(color.CYAN + "Attempting to create lambda..." + color.END)
+      try:
+        create = client.create_function(
+          FunctionName='%s' % lambda_name,
+          Runtime='%s' % json_parser()["provisioners"]["runtime"],
+          Role='%s' % get_arn(),
+          Handler='%s' % json_parser()["initializers"]["name"],
+          Code={
+            'ZipFile': open(archive_name, 'rb').read()
+          },
+          Description='%s' % json_parser()["initializers"]["description"],
+          Timeout=json_parser()["provisioners"]["timeout"],
+          MemorySize=json_parser()["provisioners"]["mem_size"],
+          Publish=pub,
+          VpcConfig=vpc_config,
+          Tags=tags
+        )
+        if create['ResponseMetadata']['HTTPStatusCode'] == 201:
+          return True
+        else:
+          return False
+      except ClientError as error:
+        print(color.RED + error.response['Error']['Message'] + color.END)
+        sys.exit(1)
+
 def update():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name  
 
   if zip_folder():
-    print("Attempting to update lambda...")
+    print(color.CYAN + "Attempting to update lambda..." + color.END)
+
+    if ARGS.dry_run:
+      print(color.PURPLE + "***Dry Run option enabled, running dry run code-update***" + color.END)
+      run = True
+    else:
+      run = False
 
     if ARGS.publish:
-      answer = True
-    else:
-      publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-      if publish_answer.lower() in yes_or_no:
-        if publish_answer == 'y':
-          answer = True
-          print("Publishing update")
-        if publish_answer == 'n':
-          answer = False
-          print("Updating lambda without publishing")
+      if ARGS.dry_run:
+        answer = False
       else:
-        print("Please respond with 'y' for yes or 'n' for no!")
+        answer = True
+    else:
+      if ARGS.dry_run:
+        answer = False
+      else:
+        publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+        if publish_answer.lower() in yes_or_no:
+          if publish_answer == 'y':
+            answer = True
+            print(color.CYAN + "Publishing update" + color.END)
+          if publish_answer == 'n':
+            answer = False
+            print(color.CYAN + "Updating lambda without publishing" + color.END)
+        else:
+          print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
 
     try:
       update = client.update_function_code(
         FunctionName='%s' % lambda_name,
         ZipFile= open(archive_name, 'rb').read(),
-        Publish=answer
-        #DryRun=True|False
+        Publish=answer,
+        DryRun=run
       )
       if update['ResponseMetadata']['HTTPStatusCode'] == 200:
-        return True
+        if ARGS.dry_run:
+          print(color.PURPLE + "***Dry Run Successful!***" + color.END)
+          return True
+        else:
+          print(color.CYAN + "Lambda updated!" + color.END)
+          return True
       else:
         return False
     except ClientError as error:
-      print(error.response['Error']['Message'])
+      print(color.RED + error.response['Error']['Message'] + color.END)
       sys.exit(1)
 
 def list_lambdas():
@@ -252,7 +300,7 @@ def list_lambdas():
         joiner = ':'.join(map(str, splitter))
         return joiner
   except ClientError as error:
-    print(error.response['Error']['Message'])
+    print(color.RED + error.response['Error']['Message'] + color.END)
 
 def update_config():
   lambda_name = json_parser()["initializers"]["name"]
@@ -283,7 +331,7 @@ def update_config():
                         Tags=tags
                       )
     except ClientError as error:
-      print(error.response['Error']['Message'])
+      print(color.RED + error.response['Error']['Message'] + color.END)
   else:
     pass
 
@@ -311,25 +359,69 @@ def update_config():
     else:
       return False
   except ClientError as error:
-    print(error.response['Error']['Message'])
+    print(color.RED + error.response['Error']['Message'] + color.END)
 
-#Add command line args for dry run
 def delete():
   lambda_name = json_parser()["initializers"]["name"]
 
-  try:
-    delete = client.delete_function(
-      FunctionName='%s' % lambda_name
-      )
-    if check():
-      return "Failed to delete Lambda"
-    else:
-      return True
-  except ClientError as error:
-    print(error.response['Error']['Message'])
-    sys.exit(1)
+  if ARGS.dry_run:
+    try:
+      print(color.PURPLE + "***Dry run option enabled, dry running a deletion***" + color.END)
+      alias = client.list_aliases(
+                      FunctionName='%s' % lambda_name,
+                      )
 
-#Add command line args for dry run
+      dump_json = json.dumps(alias, indent=4) 
+      load = json.loads(dump_json)
+
+      aliases = []
+
+      for names in load['Aliases']:    
+        aliases.append(names['Name'])
+
+      print(color.PURPLE + "Would delete:" + color.END)
+      print(color.PURPLE + "Lambda: %s" % lambda_name + color.END)
+      for item in aliases:
+        print(color.PURPLE + "Alias: %s" % item + color.END)
+
+      versions = client.list_versions_by_function(
+                  FunctionName='%s' % lambda_name,
+                )
+
+      version_json = json.dumps(versions, indent=4)
+      load_json = json.loads(version_json)
+      versions = load_json['Versions']
+      avail_versions = []
+
+      for version in versions:
+        avail_versions.append(version['Version'])
+
+      for vers in avail_versions:
+        print(color.PURPLE + "Version: %s" % vers + color.END)
+    except ClientError as error:
+      print(color.RED + error.response['Error']['Message'] + color.END)
+  else:
+    double_check = input("Are you SURE you want to delete this lambda (y/n)? ")
+    lowered_checked = double_check.lower()
+
+    if lowered_checked == 'y':
+      try:
+        delete = client.delete_function(
+          FunctionName='%s' % lambda_name
+          )
+        if check():
+          print(color.RED + "Failed to delete Lambda" + color.END)
+          return False
+        else:
+          print(color.CYAN + "Lambda %s deleted successfully" % lambda_name + color.END)
+          return True
+      except ClientError as error:
+        print(color.RED + error.response['Error']['Message'] + color.END)
+        sys.exit(1)
+    else:
+      print(color.RED + "Exiting" + color.END)
+      sys.exit(1)
+
 def publish():
   lambda_name = json_parser()["initializers"]["name"]
   
@@ -338,12 +430,12 @@ def publish():
       FunctionName='%s' % lambda_name,
       )
     if publish['ResponseMetadata']['HTTPStatusCode'] == 201:
-      print("Successfully published %s version %s" % (lambda_name, publish['Version']))
+      print(color.CYAN + "Successfully published %s version %s" % (lambda_name, publish['Version']) + color.END)
       return True 
     else:
       return False    
   except ClientError as error:
-    print(error.response['Error']['Message'])
+    print(color.RED + error.response['Error']['Message'] + color.END)
     sys.exit(1)
 
 '''
@@ -360,44 +452,43 @@ def main():
           print("This function already exists, please use action 'update'")
         else:
           if create():
-            if check():
-              print("Lambda uploaded successfully")
-              if 'backup' in json_parser():
-                print("Backup option selected.. backing up to s3!")
-                if s3_backup.main():
-                  if ARGS.alias:
-                    if alias.alias_creation():
-                      print("Alias added successfully")
-                      if ARGS.create_trigger:
-                        if create_trigger():
-                          return True
-                        else:
-                          return False
-                    else:
-                      print("Alias failed to created")
-                      return False
+            if ARGS.dry_run:
+              return True
+            else:
+              if check():
+                print("Lambda uploaded successfully")
+                if 'backup' in json_parser():
+                  if s3_backup.main():
+                    if ARGS.alias:
+                      if alias.alias_creation():
+                        print("Alias added successfully")
+                        if ARGS.create_trigger:
+                          if create_trigger():
+                            return True
+                          else:
+                            return False
+                      else:
+                        print("Alias failed to created")
+                        return False
+                  else:
+                    print("Backup failed..")
+                    return False
                 else:
-                  print("Backup failed..")
+                  print("Backup option not selected, skipping...")
                   return False
               else:
-                print("Backup option not selected, skipping...")
                 return False
-            else:
-              return "False"
-              print("Something went wrong.. I checked for your lambda after upload and it isn't there")
+                print("Something went wrong.. I checked for your lambda after upload and it isn't there")
           return False
           print("Lambda creation failed.. Check your settings")
 
       if ARGS.action == 'update-code':
         if check():
           if update():
-            print("Lambda updated")
             if 'backup' in json_parser():
-              print("Backup option selected.. backing up to s3!")
               if s3_backup.main():
                 if ARGS.alias:
                   if alias.alias_creation():
-                    print("Alias added successfully")
                     if ARGS.create_trigger:
                       if create_trigger():
                         return True
@@ -429,7 +520,6 @@ def main():
       if ARGS.action == "delete":
         if check():
           if delete():
-            print("Lambda deleted successfully")
             return True
         else:
           print("No lambda was found.. looks like you have nothing to delete")
@@ -444,7 +534,6 @@ def main():
       if ARGS.action == "create-alias":
         if check():
           if alias.alias_creation():
-            print("Alias added successfully")
             return True
           else:
             print("Alias creation failed..")
