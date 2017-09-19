@@ -1,10 +1,12 @@
 #!/bin/bash
 
-maestro_token=$1
-access_key=$2
-secret_key=$3
+cd /Maestro/docker
+
+maestro_token=%env.MAESTRO_GIT_TOKEN%
+access_key=%env.AWS_ACCESS_KEY_ID%
+secret_key=%env.AWS_SECRET_ACCESS_KEY%
 region=$4
-build_token=$5
+build_token=%env.APP_GIT_TOKEN%
 user=$6
 repo=$7
 lambda_name=$8
