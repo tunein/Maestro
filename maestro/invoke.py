@@ -1,15 +1,17 @@
 import boto3
-#import maestro.lambda_config as lambda_config
+import maestro.lambda_config as lambda_config
 import sys
 import json
 import zipfile
 import os
+import base64
 from botocore.exceptions import ClientError
-#from maestro.cli import ARGS
+from maestro.cli import ARGS
 
+test_invoke_type = lambda_config.TEST_INVOKE_TYPE
 client = boto3.client('lambda')
-#DOC = ARGS.filename
-#PAYLOAD = ARGS.payload
+DOC = ARGS.filename
+PAYLOAD = ARGS.payload
 
 class color:
    PURPLE = '\033[95m'
@@ -22,17 +24,17 @@ class color:
    BOLD = '\033[1m'
    UNDERLINE = '\033[4m'
    END = '\033[0m'
-'''
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
     return read
     return True
   print("No json document to read.. Please enter a valid json document")
-'''
+
 def list_lambdas():
-  #lambda_name = json_parser()["initializers"]["name"]
-  lambda_name = "example"
+  lambda_name = json_parser()["initializers"]["name"]
+
   try:
     response = client.list_functions(
                 FunctionVersion='ALL'
@@ -49,8 +51,7 @@ def list_lambdas():
     print(color.RED + error.response['Error']['Message'] + color.END)
 
 def list_aliases():
-  #lambda_name = json_parser()["initializers"]["name"]
-  lambda_name = "example"
+  lambda_name = json_parser()["initializers"]["name"]
 
   alias = client.list_aliases(
     FunctionName='%s' % lambda_name,
@@ -67,17 +68,13 @@ def list_aliases():
   return aliases
 
 def test_invoke():
-  alias = "dev"
-  invoke_type = "Event"
-  payload = ""
+  payload = os.getcwd() + "/test_payload.json"
   function_arn = list_lambdas()
   avail_aliases = list_aliases()
 
-  if alias:
-    if alias in avail_aliases:
-      qualifier = alias
-      function_arn = "%s:%s" % (function_arn, alias)
-      print(function_arn)
+  if ARGS.alias:
+    if ARGS.alias in avail_aliases:
+      function_arn = "%s:%s" % (function_arn, ARGS.alias)
   else:
     print("Available aliases:")
     for item in avail_aliases:
@@ -85,24 +82,39 @@ def test_invoke():
     ask = input("What alias would you like to invoke? ")
 
     if ask in avail_aliases:
-      qualifier = ask
+      function_arn = "%s:%s" % (function_arn, ask)
 
-  if invoke_type:
-    invocator = invoke_type
-  '''
-  if payload:
-    pay_load = payload
+  if ARGS.invoke_type:
+    if ARGS.invoke_type in test_invoke_type:
+      invocator = ARGS.invoke_type
   else:
-    payload = ''
-  '''
-  response = client.invoke(
-                      FunctionName=function_arn,
-                      InvocationType=invocator,
-                      LogType='Tail',
-                      #Payload=open(pay_load, 'rb').read(),
-                      Qualifier=qualifier
-                    )
-  if response['StatusCode'] == 202:
-    print(response)
+    ask_invoke = input("Please enter an invocation type (Event, RequestResponse, DryRun): ")
+    if ask_invoke in test_invoke_type:
+      invocator = ask_invoke
 
-test_invoke()
+  if ARGS.payload:
+    pay_load = ARGS.payload
+  else:
+    print("Please enter a valid json file as payload")
+    sys.exit(1)
+
+  try:
+    response = client.invoke(
+                        FunctionName=function_arn,
+                        InvocationType=invocator,
+                        LogType='Tail',
+                        Payload=open(payload, 'rb').read(),
+                      )
+    if response['StatusCode'] in [200, 202, 204]:
+      try:
+        coded_response = response['LogResult']
+        decoded_response = base64.b64decode(coded_response)
+        byte_to_string = decoded_response.decode("utf-8")
+        print(color.CYAN + "Invoked successfully! Logs below" + color.END)
+        print(color.DARKCYAN + byte_to_string + color.END)
+        return True
+      except:
+        print(color.CYAN + "Invoked successfully!" + color.END)
+        return True
+  except ClientError as error:
+    print(color.RED + error.response['Error']['Message'] + color.END)

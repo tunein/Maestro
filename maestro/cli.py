@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(
 	)
 parser.add_argument(
 	'action', 
-	choices=['create', 'update-code', 'update-config','delete', 'publish', 'create-alias', 'delete-alias', 'update-alias'],
+	choices=['create', 'update-code', 'update-config','delete', 'publish', 'create-alias', 'delete-alias', 'update-alias', 'invoke'],
 	help='Pick from one of the actions to start'
 	)
 parser.add_argument(
@@ -43,10 +43,6 @@ parser.add_argument(
 	'--dry_run',
 	action='store_true',
 	help="Performs all actions as a dry run")
-parser.add_argument(
-	'--invoke',
-	action='store_true',
-	help="Invokes your lambda")
 parser.add_argument(
 	'--invoke_type',
 	help="Choose from Event, RequestResponse, or Dry Run")
