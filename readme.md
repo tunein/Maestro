@@ -27,9 +27,10 @@ maestro update-code function_name.json<br>
 maestro update-config function_name.json<br>
 maestro publish function_name.json<br>
 maestro delete function_name.json<br>
-maestro create-alias --alias dev function_name.json<br>
-maestro update-alias --alias dev function_name.json<br>
+maestro create-alias function_name.json<br>
+maestro update-alias function_name.json<br>
 maestro delete-alias function_name.json<br>
+maestro invoke function_name.json
 <br>
 <b>Command line flags</b><br>
 --publish <i>autopasses for publish input args on 'create' and 'update-code' actions</i><br>
@@ -64,6 +65,26 @@ delete-alias<br>
 create-trigger (and by proxy: invoke_method & invoke_source)<br>
 <br>
 <br>
+<b>Action "invoke" specific notes:</b><br>
+You are able to invoke your lambda using the action "invoke"<br>
+<br>
+<b>Example 1:</b><br>
+maestro invoke example_template.json<br>
+<br>
+<i><u>This will</u>:</i><br>
+-Return a list of available aliases to invoke, prompt the user to pick one<br>
+-Prompt the user for an invocation type (Event, RequestResponse, DryRun)<br>
+-Ask for a payload file (it expects that the file is in the current working directory)<br>
+-Invoke!<br>
+-Presently only 'RequestResponse' returns logs to the console<br>
+<br>
+<b>Example 2:</b><br>
+maestro invoke example_template.json --payload test_payload.json --alias dev --invoke_type RequestResponse<br>
+<br>
+<i><u>This will</u>:</i><br>
+Do everything stated above without user prompts<br>
+<br>
+<br>
 <b>To use:</b><br>
 cd into the directory where your code is:<br>
 command: maestro create function_name.json<br>
@@ -85,7 +106,6 @@ Current roadmap:<br>
 -Add letsencrypt/certbot integration for https<br>
 -Add route53 integration for dns<br>
 -Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream<br>
--Add "test invoke" action and pipe lambda logs back<br>
 -Version deletion (automatically & intelligently)<br>
 <br>
 Current known issues:<br>
