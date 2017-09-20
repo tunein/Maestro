@@ -1,8 +1,10 @@
 Created by M. Moon/Perilune Inc Copyright 2017<br>
-
+<br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Maestro_2016.svg/500px-Maestro_2016.svg.png">
+<br>
 <b>Current State: v0.1</b><br>
 <br>
-<b>Maestro is a command line tool for creating, updating, deleting, and publishing Lambdas for Amazon Web Services</b><br>
+<b>Maestro is a command line tool for managing Lambdas for Amazon Web Services</b><br>
 <br>
 -It takes a json document as an input to fill out all the information necessary for creating a lambda<br>
 -In the directory you're working in it looks for a directory called "lambda" and packages the contents into a zip<br>
@@ -30,25 +32,36 @@ maestro update-alias --alias dev function_name.json<br>
 maestro delete-alias function_name.json<br>
 <br>
 <b>Command line flags</b><br>
---publish<br>
-	<i>Rolls over any manual input for "publish" options.<br>
-	Currently only works with "create" and "update-code" functions</i><br>
+--publish <i>autopasses for publish input args on 'create' and 'update-code' actions</i><br>
 --create_trigger<br>
---invoke_method <i>[s3, cloudwatch, sns]</i><br>
---invoke_source <i>name of your resource</i><br>
+--invoke_method <i>$[s3, cloudwatch, sns])</i><br>
+--invoke_source <i>$name of your resource</i><br>
 <br>
 <i>It is also possible to string actions together</i><br>
-Example 1:<br>
+<b>Example 1:</b><br>
 maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json<br>
-</i>This will:</i><br>
+<br>
+<i><u>This will</u>:</i><br>
 --publish updated code<br>
 --reallocate the alias 'dev' to the new version<br>
 --add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator<br>
 <br>
-Example 2:<br>
+<b>Example 2:</b><br>
 maestro update-code --alias prod --publish example_template.json<br>
-</i>This will:</i><br>
+<br>
+<i><u>This will</u>:</i><br>
 Publish a new version of your lambda and then assign it the alias of "prod"<br>
+<br>
+<br>
+<b>Action "--dry_run" specific notes:</b><br>
+<u>Available on the following Actions</u>:<br>
+create<br>
+update-code<br>
+delete<br>
+create-alias<br>
+update-alias<br>
+delete-alias<br>
+create-trigger (and by proxy: invoke_method & invoke_source)<br>
 <br>
 <br>
 <b>To use:</b><br>
@@ -65,3 +78,20 @@ command: maestro create function_name.json<br>
 --------stuff.txt<br>
 ------/dependency-2<br>
 ------/dependency-etc<br>
+<br>
+<br>
+Current roadmap:<br>
+-Add API Gateway integration and command line flags<br>
+-Add letsencrypt/certbot integration for https<br>
+-Add route53 integration for dns<br>
+-Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream<br>
+-Add "test invoke" action and pipe lambda logs back<br>
+-Version deletion (automatically & intelligently)<br>
+<br>
+Current known issues:<br>
+-If you try to re-add or change an invocation source to an alias after it's created it will return an error<br>
+1)<i>For re-adding this is the expected behavior but an unfriendly user experience it needs to recognize the == and move on</i><br>
+<br>
+2)<i>For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
+<br>
+3)<i>Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists</i>
