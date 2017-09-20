@@ -68,7 +68,6 @@ def list_aliases():
   return aliases
 
 def test_invoke():
-  payload = os.getcwd() + "/test_payload.json"
   function_arn = list_lambdas()
   avail_aliases = list_aliases()
 
@@ -95,15 +94,15 @@ def test_invoke():
   if ARGS.payload:
     pay_load = ARGS.payload
   else:
-    print("Please enter a valid json file as payload")
-    sys.exit(1)
+    get_file = input("Input a valid json filename for payload: ")
+    pay_load = os.getcwd() + "/%s" % get_file
 
   try:
     response = client.invoke(
                         FunctionName=function_arn,
                         InvocationType=invocator,
                         LogType='Tail',
-                        Payload=open(payload, 'rb').read(),
+                        Payload=open(pay_load, 'rb').read(),
                       )
     if response['StatusCode'] in [200, 202, 204]:
       try:
