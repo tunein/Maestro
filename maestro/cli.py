@@ -47,4 +47,10 @@ parser.add_argument(
 	'--invoke',
 	action='store_true',
 	help="Invokes your lambda")
+parse.add_argument(
+	'--invoke_type',
+	help="Choose from Event, RequestResponse, or Dry Run")
+parser.add_argument(
+	'--payload',
+	help='Input a filename for your test payload')
 ARGS = parser.parse_args()
