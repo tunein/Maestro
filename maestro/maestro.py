@@ -10,13 +10,12 @@ import maestro.s3_backup as s3_backup
 import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
 import maestro.security_groups as security_groups_method
+import maestro.invoke as invoke
 from maestro.cli import ARGS
 from maestro.triggers import creation as create_trigger
 from maestro.triggers import remove_invoke_action as delete_trigger
 
-#USER_ACTION = args
 DOC = ARGS.filename
-#ACTION = USER_ACTION.lower()
 
 client = boto3.client('lambda')
 iam = boto3.resource('iam')
@@ -197,7 +196,7 @@ def create():
       print(color.PURPLE + "FunctionName: %s" % lambda_name + color.END)
       print(color.PURPLE + "Runtime: %s" % json_parser()["provisioners"]["runtime"] + color.END)
       print(color.PURPLE + "Role: %s" % get_arn() + color.END)
-      print(color.PURPLE + "Handler: %s" % json_parser()["initializers"]["name"] + color.END)
+      print(color.PURPLE + "Handler: %s" % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]) + color.END)
       print(color.PURPLE + "Archive: %s" % archive_name + color.END)
       print(color.PURPLE + "Description: %s" % json_parser()["initializers"]["description"] + color.END)
       print(color.PURPLE + "Timeout: %s" % json_parser()["provisioners"]["timeout"] + color.END)
@@ -212,7 +211,7 @@ def create():
           FunctionName='%s' % lambda_name,
           Runtime='%s' % json_parser()["provisioners"]["runtime"],
           Role='%s' % get_arn(),
-          Handler='%s' % json_parser()["initializers"]["name"],
+          Handler='%s.%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
           Code={
             'ZipFile': open(archive_name, 'rb').read()
           },
@@ -347,7 +346,7 @@ def update_config():
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
       Role='%s' % get_arn(),
-      Handler='%s' % json_parser()["initializers"]["name"],
+      Handler='%s.%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
       Description='%s' % json_parser()["initializers"]["description"],
       Timeout=json_parser()["provisioners"]["timeout"],
       MemorySize=json_parser()["provisioners"]["mem_size"],
@@ -549,6 +548,13 @@ def main():
       if ARGS.action == "update-alias":
         if check():
           if alias.alias_update():
+            return True
+          else:
+            return False
+     
+      if ARGS.action == "invoke":
+        if check():
+          if invoke.test_invoke():
             return True
           else:
             return False

@@ -8,6 +8,18 @@ from maestro.cli import ARGS
 
 DOC = ARGS.filename
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
@@ -32,10 +44,10 @@ def get_vpc_id():
       if len(vpc_id)!=0:
         return vpc_id
       else:
-        print("Couldn't find the ID for your vpc, check the name and try again")
+        print(color.RED + "Couldn't find the ID for your vpc, check the name and try again" + color.END)
         return False
     except ClientError as error:
-      print(error.response['Error']['Message'])  
+      print(color.RED + error.response['Error']['Message'] + color.END)  
 
 def get_subnets():
   vpc = ec2.Vpc(get_vpc_id())
@@ -56,7 +68,7 @@ def get_subnets():
         if keys.find('private')>0:
           ids.update({keys: subnet.id})
     except ClientError as error:
-      print(error.response['Error']['Message'])
+      print(color.RED + error.response['Error']['Message'] + color.END)
 
   for key, value in ids.items():
     list_id.append(value)

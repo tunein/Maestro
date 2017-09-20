@@ -3,7 +3,9 @@
     "name": "example",
     "description": "example description",
     "region": "us-west-2",
-    "role": "maestro-test-role"
+    "role": "maestro-test-role",
+    "handler": "example",
+    "main_function": "main"
   },
  "provisioners": {
     "runtime": "python3.6",
