@@ -1,15 +1,15 @@
 import boto3
-import maestro.lambda_config as lambda_config
+#import maestro.lambda_config as lambda_config
 import sys
 import json
 import zipfile
 import os
 from botocore.exceptions import ClientError
-from maestro.cli import ARGS
+#from maestro.cli import ARGS
 
 client = boto3.client('lambda')
-DOC = ARGS.filename
-PAYLOAD = ARGS.payload
+#DOC = ARGS.filename
+#PAYLOAD = ARGS.payload
 
 class color:
    PURPLE = '\033[95m'
@@ -22,17 +22,17 @@ class color:
    BOLD = '\033[1m'
    UNDERLINE = '\033[4m'
    END = '\033[0m'
-
+'''
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
     return read
     return True
   print("No json document to read.. Please enter a valid json document")
-
+'''
 def list_lambdas():
-  lambda_name = json_parser()["initializers"]["name"]
-
+  #lambda_name = json_parser()["initializers"]["name"]
+  lambda_name = "example"
   try:
     response = client.list_functions(
                 FunctionVersion='ALL'
@@ -49,7 +49,8 @@ def list_lambdas():
     print(color.RED + error.response['Error']['Message'] + color.END)
 
 def list_aliases():
-  lambda_name = json_parser()["initializers"]["name"]
+  #lambda_name = json_parser()["initializers"]["name"]
+  lambda_name = "example"
 
   alias = client.list_aliases(
     FunctionName='%s' % lambda_name,
@@ -66,14 +67,17 @@ def list_aliases():
   return aliases
 
 def test_invoke():
+  alias = "dev"
+  invoke_type = "Event"
+  payload = ""
   function_arn = list_lambdas()
   avail_aliases = list_aliases()
 
-  if ARGS.alias:
-    if ARGS.alias in avail_aliases:
-      qualifier = ARGS.alias
-      function_qual = "%s:%s" % (function_arn, alias)
-      print(function_qual)
+  if alias:
+    if alias in avail_aliases:
+      qualifier = alias
+      function_arn = "%s:%s" % (function_arn, alias)
+      print(function_arn)
   else:
     print("Available aliases:")
     for item in avail_aliases:
@@ -83,18 +87,22 @@ def test_invoke():
     if ask in avail_aliases:
       qualifier = ask
 
-  if ARGS.invoke_type:
+  if invoke_type:
     invocator = invoke_type
-
-  if ARGS.payload:
-    payload = ARGS.payload
+  '''
+  if payload:
+    pay_load = payload
   else:
     payload = ''
-
+  '''
   response = client.invoke(
-                      FunctionName=function_qual,
+                      FunctionName=function_arn,
                       InvocationType=invocator,
                       LogType='Tail',
-                      Payload=open(payload, 'rb').read(),
+                      #Payload=open(pay_load, 'rb').read(),
                       Qualifier=qualifier
                     )
+  if response['StatusCode'] == 202:
+    print(response)
+
+test_invoke()
