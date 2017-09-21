@@ -21,6 +21,7 @@ parser.add_argument(
 	)
 parser.add_argument(
 	'--delete_trigger',
+	action='store_true',
 	help='Deletes a lambda trigger'
 	)
 parser.add_argument(
