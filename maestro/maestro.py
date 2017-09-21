@@ -508,6 +508,23 @@ def main():
       if ARGS.action == "update-config":
         if check():
           if update_config():
+            
+            if ARGS.create_trigger:
+              if create_trigger():
+                return True
+              else:
+                return False
+            else:
+              pass
+
+            if ARGS.delete_trigger:
+              if delete_trigger():
+                return True
+              else:
+                return False
+            else:
+              pass
+
             print("Lambda configuration updated!")
             return True
           else:

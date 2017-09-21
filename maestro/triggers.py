@@ -140,7 +140,7 @@ def add_invoke_permission():
           qualifier = ARGS.alias
         else:
           qualifier = ''
-        statement_id = "%s-%s" % (lambda_name, ARGS.alias)        
+        statement_id = "%s-%s-%s" % (lambda_name, ARGS.alias, invoke_source)        
 
         if ARGS.dry_run:
           print(color.PURPLE + "***Dry Run option enabled***" + color.END)
@@ -289,15 +289,15 @@ def creation():
 
 def remove_invoke_action():
   lambda_name = json_parser()['initializers']['name']
-  statement_id = "%s-%s" % (lambda_name, ARGS.alias)
+  statement_id = "%s-%s-%s" % (lambda_name, ARGS.alias, invoke_source)
   qualifier = ARGS.alias
   try:
     remove = client.remove_permission(
                 FunctionName=lambda_name,
                 StatementId=statement_id,
-                Qualifier=qualifer
+                Qualifier=qualifier
             )
-    if remove['ResponseMetedata']['HTTPStatusCode'] == 201:
+    if remove['ResponseMetadata']['HTTPStatusCode'] == 200:
       print("Successfully removed access permission on %s" % lambda_name)
       return True
   except ClientError as error:
