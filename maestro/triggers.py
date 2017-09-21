@@ -140,7 +140,7 @@ def add_invoke_permission():
           qualifier = ARGS.alias
         else:
           qualifier = ''
-        statement_id = "%s-%s" % (lambda_name, ARGS.alias)        
+        statement_id = "%s-%s-%s" % (lambda_name, ARGS.alias, invoke_source)        
 
         if ARGS.dry_run:
           print(color.PURPLE + "***Dry Run option enabled***" + color.END)
