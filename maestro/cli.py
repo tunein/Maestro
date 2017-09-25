@@ -54,4 +54,7 @@ parser.add_argument(
 	'--no_pub',
 	action='store_true',
 	help='Deploys code to $LATEST')
+parser.add_argument(
+	'--version',
+	help='Select a version to invoke')
 ARGS = parser.parse_args()
