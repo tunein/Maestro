@@ -252,17 +252,20 @@ def update():
       if ARGS.dry_run:
         answer = False
       else:
-        publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-        if publish_answer.lower() in yes_or_no:
-          if publish_answer == 'y':
-            answer = True
-            print(color.CYAN + "Publishing update" + color.END)
-          if publish_answer == 'n':
-            answer = False
-            print(color.CYAN + "Updating lambda without publishing" + color.END)
+        if ARGS.no_pub:
+          answer = False
         else:
-          print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
+          publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+          if publish_answer.lower() in yes_or_no:
+            if publish_answer == 'y':
+              answer = True
+              print(color.CYAN + "Publishing update" + color.END)
+            if publish_answer == 'n':
+              answer = False
+              print(color.CYAN + "Updating lambda without publishing" + color.END)
+          else:
+            print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
 
     try:
       update = client.update_function_code(

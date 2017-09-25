@@ -50,4 +50,8 @@ parser.add_argument(
 parser.add_argument(
 	'--payload',
 	help='Input a filename for your test payload')
+parser.add_argument(
+	'--no_pub',
+	action='store_true',
+	help='Deploys code to $LATEST')
 ARGS = parser.parse_args()
