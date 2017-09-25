@@ -189,6 +189,11 @@ def create():
   else:
     pub = False
 
+  if 'variables' in json_parser():
+    env_vars = json_parser()['variables']
+  else:
+    env_vars = { }
+
   if zip_folder():
     if ARGS.dry_run:
       print(color.BOLD + "***Dry Run option enabled***" + color.END)
@@ -220,6 +225,9 @@ def create():
           MemorySize=json_parser()["provisioners"]["mem_size"],
           Publish=pub,
           VpcConfig=vpc_config,
+          Environment={
+            'Variables': env_vars
+            },
           Tags=tags
         )
         if create['ResponseMetadata']['HTTPStatusCode'] == 201:
@@ -345,6 +353,11 @@ def update_config():
   else:
     vpc_config = { }
 
+  if 'variables' in json_parser():
+    env_vars = json_parser()['variables']
+  else:
+    env_vars = { }
+
   try:
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
@@ -355,6 +368,9 @@ def update_config():
       MemorySize=json_parser()["provisioners"]["mem_size"],
       VpcConfig=vpc_config,
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
+      Environment={
+          'Variables': env_vars
+        }
       )
     if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
       return True

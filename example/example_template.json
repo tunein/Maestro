@@ -17,8 +17,9 @@
     "vpc_name": "base::nonprod::vpc",
     "security_group_ids": ["maestro-test-sg"]
  },
- "environment": {
-    "environment": "prod"
+ "variables": {
+    "environment": "prod",
+    "url": "www.tunein.com"
  },
   "tags": {
     "Name": "Maestro-Test"
