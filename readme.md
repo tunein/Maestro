@@ -34,9 +34,14 @@ maestro invoke function_name.json
 <br>
 <b>Command line flags</b><br>
 --publish <i>autopasses for publish input args on 'create' and 'update-code' actions</i><br>
---create_trigger<br>
+--create_trigger <i>stores 'True', must be used to create trigger, must include invoke method and source</i><br>
 --invoke_method <i>$[s3, cloudwatch, sns])</i><br>
 --invoke_source <i>$name of your resource</i><br>
+--dry_run <i>dry run</i><br>
+--version <i>specify a specific version, this is used for invoking lambdas</i><br>
+--invoke_type <i>specify an invocation type from the CLI, options are: RequestResponse, Event, and DryRun)</i><br>
+--payload <i>used to specify a file with a json payload to pass into the lambda, used to test invoking</i><br>
+--no_pub <i>this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions</i>
 <br>
 <i>It is also possible to string actions together</i><br>
 <b>Example 1:</b><br>

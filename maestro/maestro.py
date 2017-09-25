@@ -189,6 +189,11 @@ def create():
   else:
     pub = False
 
+  if 'variables' in json_parser():
+    env_vars = json_parser()['variables']
+  else:
+    env_vars = { }
+
   if zip_folder():
     if ARGS.dry_run:
       print(color.BOLD + "***Dry Run option enabled***" + color.END)
@@ -220,6 +225,9 @@ def create():
           MemorySize=json_parser()["provisioners"]["mem_size"],
           Publish=pub,
           VpcConfig=vpc_config,
+          Environment={
+            'Variables': env_vars
+            },
           Tags=tags
         )
         if create['ResponseMetadata']['HTTPStatusCode'] == 201:
@@ -252,17 +260,20 @@ def update():
       if ARGS.dry_run:
         answer = False
       else:
-        publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-        if publish_answer.lower() in yes_or_no:
-          if publish_answer == 'y':
-            answer = True
-            print(color.CYAN + "Publishing update" + color.END)
-          if publish_answer == 'n':
-            answer = False
-            print(color.CYAN + "Updating lambda without publishing" + color.END)
+        if ARGS.no_pub:
+          answer = False
         else:
-          print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
+          publish_answer = input("Would you like to publish this update? ('y/n'): ")
+
+          if publish_answer.lower() in yes_or_no:
+            if publish_answer == 'y':
+              answer = True
+              print(color.CYAN + "Publishing update" + color.END)
+            if publish_answer == 'n':
+              answer = False
+              print(color.CYAN + "Updating lambda without publishing" + color.END)
+          else:
+            print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
 
     try:
       update = client.update_function_code(
@@ -342,6 +353,11 @@ def update_config():
   else:
     vpc_config = { }
 
+  if 'variables' in json_parser():
+    env_vars = json_parser()['variables']
+  else:
+    env_vars = { }
+
   try:
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
@@ -352,6 +368,9 @@ def update_config():
       MemorySize=json_parser()["provisioners"]["mem_size"],
       VpcConfig=vpc_config,
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
+      Environment={
+          'Variables': env_vars
+        }
       )
     if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
       return True

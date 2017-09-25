@@ -67,21 +67,49 @@ def list_aliases():
 
   return aliases
 
+def list_versions():
+  lambda_name = json_parser()["initializers"]["name"]
+
+  versions = client.list_versions_by_function(
+                    FunctionName='%s' % lambda_name,
+                  )
+
+  version_json = json.dumps(versions, indent=4)
+  load_json = json.loads(version_json)
+  versions = load_json['Versions']
+  avail_versions = []
+
+  for version in versions:
+    if version['Version'] != 0:
+      avail_versions.append(version['Version'])
+
+  return avail_versions
+
 def test_invoke():
   function_arn = list_lambdas()
   avail_aliases = list_aliases()
+  versions = list_versions()
 
-  if ARGS.alias:
-    if ARGS.alias in avail_aliases:
-      function_arn = "%s:%s" % (function_arn, ARGS.alias)
+  if ARGS.version:
+    if ARGS.version in versions:
+      if ARGS.version == "LATEST":
+        function_arn = "%s" % function_arn
+      else:
+        function_arn = "%s:%s" % (function_arn, ARGS.version)
   else:
-    print("Available aliases:")
-    for item in avail_aliases:
-      print("Alias: %s" % item)
-    ask = input("What alias would you like to invoke? ")
+    if ARGS.alias:
+      if ARGS.alias in avail_aliases:
+        function_arn = "%s:%s" % (function_arn, ARGS.alias)
+    else:
+      print("Available aliases:")
+      for item in avail_aliases:
+        print("Alias: %s" % item)
+        for version in versions:
+          print("Version: %s" % version)
+      ask = input("What alias or version would you like to invoke? ")
 
-    if ask in avail_aliases:
-      function_arn = "%s:%s" % (function_arn, ask)
+      if ask in [avail_aliases, versions]:
+        function_arn = "%s:%s" % (function_arn, ask)
 
   if ARGS.invoke_type:
     if ARGS.invoke_type in test_invoke_type:
