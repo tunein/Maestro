@@ -30,7 +30,7 @@ maestro delete function_name.json<br>
 maestro create-alias function_name.json<br>
 maestro update-alias function_name.json<br>
 maestro delete-alias function_name.json<br>
-maestro invoke function_name.json
+maestro invoke function_name.json<br>
 <br>
 <b>Command line flags</b><br>
 --publish <i>autopasses for publish input args on 'create' and 'update-code' actions</i><br>
@@ -41,7 +41,8 @@ maestro invoke function_name.json
 --version <i>specify a specific version, this is used for invoking lambdas</i><br>
 --invoke_type <i>specify an invocation type from the CLI, options are: RequestResponse, Event, and DryRun)</i><br>
 --payload <i>used to specify a file with a json payload to pass into the lambda, used to test invoking</i><br>
---no_pub <i>this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions</i>
+--no_pub <i>this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions</i><br>
+--event_type <i>this is used for the 'S3' invoke_method only, and allows you to use "ObjectCreated" and "ObjectRemoved" for the event type to invoke your lambda</i><br>
 <br>
 <i>It is also possible to string actions together</i><br>
 <b>Example 1:</b><br>
