@@ -24,8 +24,11 @@ region = my_session.region_name
 accepted_prompt_actions = ['y', 'n']
 REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
+EVENT_TYPES = lambda_config.EVENT_TYPES
+
 invoke_method = ARGS.invoke_method
 invoke_source = ARGS.invoke_source
+event_type = ARGS.event_type
 
 class color:
    PURPLE = '\033[95m'
@@ -123,9 +126,9 @@ def add_invoke_permission():
   if invoke_method in principals:
     if invoke_method == 's3':
       principal = 's3.amazonaws.com'
-      print('principal: %s' % principal)
+      print('Using principal: %s' % principal)
       source_arn = 'arn:aws:s3:::%s' % invoke_source
-      print('arn: %s' % source_arn)
+      print('Invoke source arn: %s' % source_arn)
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
       source_arn = get_sns_arn()
@@ -210,12 +213,21 @@ def invoke_action():
         return True
       else:
         try:
+          e_type = "ObjectCreated"
+
+          if event_type:
+            if event_type in EVENT_TYPES:
+              e_type = event_type
+            else:
+              print("Event type invalid, removing permissions and rolling back")
+              return False
+
           put = bucket_notification.put(
                     NotificationConfiguration={'LambdaFunctionConfigurations': [
                     {
                       'LambdaFunctionArn': '%s%s' % (arn, alias),
                       'Events': [
-                          's3:ObjectCreated:*',
+                          's3:%s:*' % e_type,
                           ],
                     }
                   ]
@@ -226,6 +238,7 @@ def invoke_action():
             return True
         except ClientError as error:
           print(json.dumps(error.response, indent=4))
+          return False
 
     if invoke_method == 'sns':
       topic_arn = get_sns_arn()
@@ -279,11 +292,11 @@ def invoke_action():
 
 def creation():
   if add_invoke_permission():
-    if invoke_action():
+    if invoke_action():    
       return True
     else:
-      print("Actions not linked, see error code")
-      return False 
+      if remove_invoke_action():
+        return False 
   else:
     print("Permissions not granted, see error code")
 
@@ -297,7 +310,7 @@ def remove_invoke_action():
                 StatementId=statement_id,
                 Qualifier=qualifier
             )
-    if remove['ResponseMetadata']['HTTPStatusCode'] == 200:
+    if remove['ResponseMetadata']['HTTPStatusCode'] == 204:
       print("Successfully removed access permission on %s" % lambda_name)
       return True
   except ClientError as error:

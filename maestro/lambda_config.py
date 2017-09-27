@@ -4,3 +4,4 @@ REGIONS = ['eu-west-1', 'us-west-1', 'us-west-2', 'ap-south-1', 'ap-southeast-1'
 ACL_ANSWERS = ['private', 'public-read', 'public-read-write', 'authenticated-read']
 PRINCIPALS = ['s3', 'sns', 'cloudwatch']
 TEST_INVOKE_TYPE = ['Event', 'DryRun', 'RequestResponse']
+EVENT_TYPES = ['ObjectCreated', 'ObjectRemoved']
