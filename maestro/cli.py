@@ -57,4 +57,7 @@ parser.add_argument(
 parser.add_argument(
 	'--version',
 	help='Select a version to invoke')
+parser.add_argument(
+	'--event_type',
+	help="Indicate event type for S3 only. You can choose 'created' or 'deleted'")
 ARGS = parser.parse_args()
