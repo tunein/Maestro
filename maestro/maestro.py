@@ -502,7 +502,7 @@ def main():
                     return False
                 else:
                   print("Backup option not selected, skipping...")
-                  return False
+                  return True
               else:
                 return False
                 print("Something went wrong.. I checked for your lambda after upload and it isn't there")
