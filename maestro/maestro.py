@@ -3,6 +3,7 @@ import sys
 import json
 import zipfile
 import os
+from time import gmtime, strftime
 from botocore.exceptions import ClientError
 
 import maestro.vpc_location as vpc_location
@@ -443,9 +444,17 @@ def delete():
 def publish():
   lambda_name = json_parser()["initializers"]["name"]
   
-  try: 
+  try:
+    if ARGS.version_description:
+      version_descript = ARGS.version_description
+      print("Descript: %s" % version_descript)
+    else:
+      version_descript = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+      print("Descript: %s" % version_descript)
+
     publish = client.publish_version(
       FunctionName='%s' % lambda_name,
+      Description=version_descript
       )
     if publish['ResponseMetadata']['HTTPStatusCode'] == 201:
       print(color.CYAN + "Successfully published %s version %s" % (lambda_name, publish['Version']) + color.END)

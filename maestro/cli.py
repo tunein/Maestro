@@ -60,4 +60,7 @@ parser.add_argument(
 parser.add_argument(
 	'--event_type',
 	help="Indicate event type for S3 only. You can choose 'created' or 'deleted'")
+parser.add_argument(
+	'--version_description',
+	help="Pass a description into the version")
 ARGS = parser.parse_args()
