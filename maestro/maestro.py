@@ -101,7 +101,7 @@ def get_arn():
 def zip_folder():
   lambda_name = json_parser()["initializers"]["name"]
   output_path = os.getcwd() + '/%s.zip' % lambda_name
-  folder_path = os.curdir + '/lambda'
+  folder_path = os.curdir + '/dist'
   grab_lambda = os.walk(folder_path)
   length = len(folder_path)
 
