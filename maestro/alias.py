@@ -46,7 +46,32 @@ def alias_creation():
   for names in load['Aliases']:    
     aliases.append(names['Name'])
 
-  if ARGS.alias:    
+  if 'alias' in json_parser()['initializers']:
+    if json_parser()['initializers']['alias'] in aliases:
+      if ARGS.publish:
+        if alias_update():
+          return True
+      else:
+        ask = input("Alias exists, would you like to update it (y/n)? ")
+        if ask == 'y':
+          if alias_update():
+            print("Attempting to update alias %s" % ARGS.alias)
+            return True
+          else:
+            return False
+        else:
+          print("Exiting!")
+          sys.exit(1)  
+    else:
+      if ARGS.dry_run:
+        alias_name = ARGS.alias
+        print(color.PURPLE + "***Dry run option enabled***" + color.END)
+        print(color.PURPLE + "Would have created alias: %s for %s" % (ARGS.alias, lambda_name) + color.END)
+      else:
+        alias_name = json_parser()['initializers']['alias']
+        pass
+        
+  elif ARGS.alias:    
     if ARGS.alias in aliases:
       if ARGS.publish:
         if alias_update():
@@ -200,7 +225,9 @@ def alias_update():
       avail_versions.append(version['Version'])
 
   if len(aliases) != 0:
-    if ARGS.alias:
+    if 'alias' in json_parser()['initializers']:
+      alias_name = json_parser()['initializers']['alias']
+    elif ARGS.alias:
       alias_name = ARGS.alias
     else:
       alias_name = input("What alias would you like to update? ")
