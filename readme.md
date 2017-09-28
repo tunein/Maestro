@@ -115,9 +115,12 @@ Current roadmap:<br>
 -Version deletion (automatically & intelligently)<br>
 <br>
 Current known issues:<br>
--If you try to re-add or change an invocation source to an alias after it's created it will return an error<br>
-1)<i>For re-adding this is the expected behavior but an unfriendly user experience it needs to recognize the == and move on</i><br>
+1)If you try to re-add or change an invocation source to an alias after it's created it will return an error<br>
+a)<i>For re-adding this is the expected behavior but an unfriendly user experience it needs to recognize the == and move on</i><br>
 <br>
-2)<i>For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
+b)<i>For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)</i><br>
 <br>
-3)<i>Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists</i>
+c)<i>Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists</i><br>
+<br>
+2)You cannot currently assign a trigger to the $LATEST version<br>
+a)<i>This is due to some flawed logic in regards to the lambda qualifier, i will be fixing this soon</i><br>
