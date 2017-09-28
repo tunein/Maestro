@@ -95,10 +95,10 @@ def get_cloudwatch_arn():
 
       except ClientError as error:
         print(error.response['Error']['Message'])
-
+'''
 def get_functions():
   lambda_name = json_parser()['initializers']['name']
-
+'''
 
 def add_invoke_permission():
   lambda_name = json_parser()['initializers']['name']
@@ -125,10 +125,11 @@ def add_invoke_permission():
 
   if invoke_method in principals:
     if invoke_method == 's3':
-      principal = 's3.amazonaws.com'
-      print('Using principal: %s' % principal)
-      source_arn = 'arn:aws:s3:::%s' % invoke_source
-      print('Invoke source arn: %s' % source_arn)
+      if check_s3():
+        principal = 's3.amazonaws.com'
+        print('Using principal: %s' % principal)
+        source_arn = 'arn:aws:s3:::%s' % invoke_source
+        print('Invoke source arn: %s' % source_arn)
     if invoke_method == 'sns':
       principal = 'sns.amazonaws.com'
       source_arn = get_sns_arn()
