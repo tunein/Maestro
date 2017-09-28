@@ -42,7 +42,8 @@ maestro invoke function_name.json<br>
 --invoke_type <i>specify an invocation type from the CLI, options are: RequestResponse, Event, and DryRun)</i><br>
 --payload <i>used to specify a file with a json payload to pass into the lambda, used to test invoking</i><br>
 --no_pub <i>this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions</i><br>
---event_type <i>this is used for the 'S3' invoke_method only, and allows you to use "ObjectCreated" and "ObjectRemoved" for the event type to invoke your lambda</i><br>
+--event_type <i>this is used for the 'S3' invoke_method only, and allows you to use "ObjectCreated" and "ObjectRemoved" for the event type to invoke your lambda, default is "ObjectCreated"</i><br>
+--version_description <i>this is used for the "publish" action to pass a version description in, default is current date/time in UTC</i><br>
 <br>
 <i>It is also possible to string actions together</i><br>
 <b>Example 1:</b><br>
