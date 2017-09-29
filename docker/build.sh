@@ -11,8 +11,4 @@ region=%env.region%
 # VCS Shit
 
 ##Build dat shit
-docker run -v `pwd`:/app -w /app/helloworld microsoft/dotnet dotnet restore && dotnet build -o bin
-
-mkdir -p dist
-
-cp /bin/*.dll /dist
+docker run -v `pwd`:/app -w /app/helloworld --entrypoint /bin/bash microsoft/dotnet -c 'dotnet restore && dotnet build -o dist'
