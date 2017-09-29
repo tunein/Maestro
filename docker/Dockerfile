@@ -26,11 +26,11 @@ RUN pip3 install .
 WORKDIR /home
 ######################Application Portion#################
 
-RUN aws s3 cp s3://ti-devops-test-lambda-artifacts/app.zip /tmp
+RUN aws s3 cp s3://ti-devops-test-lambda-artifacts/$app.zip /tmp
 
-RUN unzip /tmp/app.zip
+RUN unzip /tmp/$app.zip
 
-WORKDIR /tmp/app
+WORKDIR /tmp/$app
 
 ENTRYPOINT ["maestro"]
 CMD ["--help"]
