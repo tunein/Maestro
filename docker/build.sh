@@ -39,5 +39,6 @@ fi
 }
 
 if build; then
-	if run; then
-		remove
+  if run; then
+    remove
+fi
