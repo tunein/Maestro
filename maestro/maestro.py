@@ -458,7 +458,7 @@ def publish():
       )
     if publish['ResponseMetadata']['HTTPStatusCode'] == 201:
       print(color.CYAN + "Successfully published %s version %s" % (lambda_name, publish['Version']) + color.END)
-      return True 
+      return 0
     else:
       return False    
   except ClientError as error:
@@ -509,7 +509,7 @@ def main():
           return False
           print("Lambda creation failed.. Check your settings")
 
-      if ARGS.action == 'update-code':
+      elif ARGS.action == 'update-code':
         if check():
           if update():
             if 'backup' in json_parser():
@@ -533,7 +533,7 @@ def main():
         else:
           print("No lambda was found.. please create using action 'create'")
 
-      if ARGS.action == "update-config":
+      elif ARGS.action == "update-config":
         if check():
           if update_config():
             
@@ -561,46 +561,46 @@ def main():
         print("Check failed, please check settings")
         return False
 
-      if ARGS.action == "delete":
+      elif ARGS.action == "delete":
         if check():
           if delete():
-            return True
+            return 0
         else:
           print("No lambda was found.. looks like you have nothing to delete")
 
-      if ARGS.action == "publish":
+      elif ARGS.action == "publish":
         if check():
           if publish():
-            return True
+            return 0
         else:
           print("No lambda was found.. Check your settings")
 
-      if ARGS.action == "create-alias":
+      elif ARGS.action == "create-alias":
         if check():
           if alias.alias_creation():
-            return True
+            return 0
           else:
             print("Alias creation failed..")
             return False
 
-      if ARGS.action == "delete-alias":
+      elif ARGS.action == "delete-alias":
         if check():
           if alias.alias_destroy():
-            return True
+            return 0
           else:
             return False
 
-      if ARGS.action == "update-alias":
+      elif ARGS.action == "update-alias":
         if check():
           if alias.alias_update():
-            return True
+            return 0
           else:
             return False
      
-      if ARGS.action == "invoke":
+      elif ARGS.action == "invoke":
         if check():
           if invoke.test_invoke():
-            return True
+            return 0
           else:
             return False
 
