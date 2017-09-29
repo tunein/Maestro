@@ -217,7 +217,7 @@ def create():
           FunctionName='%s' % lambda_name,
           Runtime='%s' % json_parser()["provisioners"]["runtime"],
           Role='%s' % get_arn(),
-          Handler='%s.%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
+          Handler='%s%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
           Code={
             'ZipFile': open(archive_name, 'rb').read()
           },
@@ -363,7 +363,7 @@ def update_config():
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
       Role='%s' % get_arn(),
-      Handler='%s.%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
+      Handler='%s%s' % (json_parser()["initializers"]["handler"], json_parser()["initializers"]["main_function"]),
       Description='%s' % json_parser()["initializers"]["description"],
       Timeout=json_parser()["provisioners"]["timeout"],
       MemorySize=json_parser()["provisioners"]["mem_size"],
