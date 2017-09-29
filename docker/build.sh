@@ -6,58 +6,13 @@ AWS_SECRET_ACCESS_KEY=%env.AWS_SECRET_ACCESS_KEY%
 environment=%env.environment%
 region=%env.region%
 
-if [ -d Maestro ]; then
-  git pull origin --branch master
-else
-  git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/Maestro.git
-fi  
 
-cd Maestro
+####
+# VCS Shit
 
-if [ -f Dockerfile ]; then
-  docker build . -t maestro
-else
-  echo "No Dockerfile... exiting"
-fi
+##Build dat shit
+docker run -v `pwd`:/app -w /app/helloworld microsoft/dotnet dotnet restore && dotnet build -o bin
 
-cd
+mkdir -p dist
 
-build () {
-if [ -f Dockerfile.pypy ]; then
-    docker build -f Dockerfile.pypy . -t pypy-build-container-$lambda_name \
-            --build-arg maestro_token=$maestro_token \
-            --build-arg access_key=$AWS_ACCESS_KEY_ID \
-            --build-arg secret_key=$AWS_SECRET_ACCESS_KEY \
-            --build-arg region=$region
-    true
-else
-    echo "No build file found"
-    false
-fi
-}
-
-run () {
-check_images=$(docker images pypy-build-container-$lambda_name)
-if [ $? -eq 0 ]; then
-  docker run pypy-build-container-$lambda_name
-  true
-else
-  echo "false"
-  false
-fi
-}
-
-remove () {
-check_running=$(docker ps -f name=pypy-build-container-$lambda_name | grep Up | awk '{ print $1 }')
-if [ $? -eq 1 ]; then
-  echo "The container is still running.."
-else
-  docker rmi --force pypy-build-container-$lambda_name
-  true
-fi
-}
-
-if build; then
-  if run; then
-    remove
-fi
+cp /bin/*.dll /dist
