@@ -11,6 +11,9 @@ RUN mkdir ~/.aws && touch ~/.aws/config && touch ~/.aws/credentials
 RUN echo -en "[default]\nregion = $region" >> ~/.aws/config
 RUN echo -en "[default]\naws_access_key_id = $access_key\naws_secret_access_key = $secret_key" >> ~/.aws/credentials
 
+RUN pip3 install awscli
+
+######## Install Maestro ###############
 WORKDIR /home
 
 ##Get the application
@@ -23,9 +26,11 @@ RUN pip3 install .
 WORKDIR /home
 ######################Application Portion#################
 
-COPY $app /tmp/$app
+RUN aws s3 cp s3://ti-devops-test-lambda-artifacts/app.zip /tmp
 
-WORKDIR /tmp/$app
+RUN unzip /tmp/app.zip
+
+WORKDIR /tmp/app
 
 ENTRYPOINT ["maestro"]
 CMD ["--help"]

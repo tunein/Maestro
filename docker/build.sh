@@ -1,16 +1,20 @@
 #!/bin/bash
 
-aws s3 cp s3://ti-devops-test-dockerfiles/Maestro/Dockerfile.pypy
-
 maestro_token=%env.MAESTRO_GIT_TOKEN%
 AWS_ACCESS_KEY_ID=%env.AWS_ACCESS_KEY_ID%
 AWS_SECRET_ACCESS_KEY=%env.AWS_SECRET_ACCESS_KEY%
 environment=%env.environment%
 region=%env.region%
 
+git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/Maestro.git
+
+cp Maestro/docker/Dockerfile .
+
+cp Maestro/docker/Dockerfile.pypy .
+
 build () {
-if [ -f Dockerfile ]; then
-    docker build -f Dockerfile.pypy . -t dotnet-build-container-$lambda_name \
+if [ -f Dockerfile.pypy ]; then
+    docker build -f Dockerfile.pypy . -t pypy-build-container-$lambda_name \
             --build-arg maestro_token=$maestro_token \
             --build-arg access_key=$AWS_ACCESS_KEY_ID \
             --build-arg secret_key=$AWS_SECRET_ACCESS_KEY \
@@ -23,9 +27,9 @@ fi
 }
 
 run () {
-check_images=$(docker images maestro-build-container-$lambda_name)
+check_images=$(docker images pypy-build-container-$lambda_name)
 if [ $? -eq 0 ]; then
-  docker run go-build-container-$lambda_name
+  docker run pypy-build-container-$lambda_name
   true
 else
   echo "false"
@@ -34,11 +38,11 @@ fi
 }
 
 remove () {
-check_running=$(docker ps -f name=dotnet-build-container-$lambda_name | grep Up | awk '{ print $1 }')
+check_running=$(docker ps -f name=pypy-build-container-$lambda_name | grep Up | awk '{ print $1 }')
 if [ $? -eq 1 ]; then
   echo "The container is still running.."
 else
-  docker rmi --force dotnet-build-container-$lambda_name
+  docker rmi --force pypy-build-container-$lambda_name
   true
 fi
 }
