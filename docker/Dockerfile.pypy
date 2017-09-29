@@ -5,32 +5,22 @@ ARG access_key
 ARG secret_key
 ARG region
 
-ARG app
+#ARG app
 
 RUN mkdir ~/.aws && touch ~/.aws/config && touch ~/.aws/credentials
 RUN echo -en "[default]\nregion = $region" >> ~/.aws/config
 RUN echo -en "[default]\naws_access_key_id = $access_key\naws_secret_access_key = $secret_key" >> ~/.aws/credentials
 
 RUN pip3 install awscli
-
-######## Install Maestro ###############
-WORKDIR /home
-
-##Get the application
-RUN git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/Maestro.git
-
-##Install the app
-WORKDIR Maestro
-RUN pip3 install .
-
-WORKDIR /home
 ######################Application Portion#################
+RUN git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/maestro_lambda.git
 
-RUN aws s3 cp s3://ti-devops-test-lambda-artifacts/$app.zip /tmp
+WORKDIR maestro_lambda
 
-RUN unzip /tmp/$app.zip
+####
+# Do the build
+####
 
-WORKDIR /tmp/$app
+RUN zip -r app.zip app
 
-ENTRYPOINT ["maestro"]
-CMD ["--help"]
+ENTRYPOINT aws s3 cp app.zip s3://ti-devops-test-lambda-artifacts
