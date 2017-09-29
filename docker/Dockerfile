@@ -4,11 +4,8 @@ ARG maestro_token
 ARG access_key
 ARG secret_key
 ARG region
-ARG build_token
-ARG user
-ARG repo
-ARG lambda_name
-ARG enviro
+
+ARG app
 
 RUN mkdir ~/.aws && touch ~/.aws/config && touch ~/.aws/credentials
 RUN echo -en "[default]\nregion = $region" >> ~/.aws/config
@@ -26,11 +23,9 @@ RUN pip3 install .
 WORKDIR /home
 ######################Application Portion#################
 
-RUN git clone https://$build_token:x-oauth-basic@github.com/$user/$repo.git
+COPY $app /tmp/$app
 
-WORKDIR $repo
+WORKDIR /tmp/$app
 
-ENV name $lambda_name
-ENV environment $enviro
-
-ENTRYPOINT maestro update-code --alias $environment --publish $name.json
+ENTRYPOINT ["maestro"]
+CMD ["--help"]
