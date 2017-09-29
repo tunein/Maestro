@@ -1,0 +1,35 @@
+FROM tunein/gobuilder
+
+ARG access_key
+ARG secret_key
+ARG region
+
+ARG repo_name
+ARG token
+
+RUN mkdir ~/.aws && touch ~/.aws/config && touch ~/.aws/credentials
+RUN echo -en "[default]\nregion = $region" >> ~/.aws/config
+RUN echo -en "[default]\naws_access_key_id = $access_key\naws_secret_access_key = $secret_key" >> ~/.aws/credentials
+
+WORKDIR /home
+
+##Get the go framework node wrapper
+RUN git clone https://$token:x-oauth-basic@github.com/tunein/go_framework.git
+
+##Get the app
+RUN git clone https://$token:x-oauth-basic@github.com/tunein/$repo_name.git
+
+RUN cp /go_framework/shim/taskShim.js $repo_name
+
+##Switch to the dir to build
+WORKDIR $repo_name
+
+##build the code
+RUN go build
+
+##Do the shim
+RUN ##do the shim
+
+##use the entrypoint to copy the stuffs
+ENTRYPOINT ['aws s3 cp']
+CMD ['--help']
