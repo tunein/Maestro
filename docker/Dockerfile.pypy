@@ -23,4 +23,4 @@ WORKDIR maestro_lambda
 
 RUN zip -r app.zip app
 
-ENTRYPOINT 
+ENTRYPOINT aws s3 cp app.zip s3://ti-devops-test-lambda-artifacts
