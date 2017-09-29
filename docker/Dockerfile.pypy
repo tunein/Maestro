@@ -1,0 +1,26 @@
+FROM tunein/python36builder:latest
+
+ARG maestro_token
+ARG access_key
+ARG secret_key
+ARG region
+
+#ARG app
+
+RUN mkdir ~/.aws && touch ~/.aws/config && touch ~/.aws/credentials
+RUN echo -en "[default]\nregion = $region" >> ~/.aws/config
+RUN echo -en "[default]\naws_access_key_id = $access_key\naws_secret_access_key = $secret_key" >> ~/.aws/credentials
+
+RUN pip3 install awscli
+######################Application Portion#################
+RUN git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/maestro_lambda.git
+
+WORKDIR maestro_lambda
+
+####
+# Do the build
+####
+
+RUN zip -r app.zip app
+
+ENTRYPOINT 
