@@ -3,7 +3,7 @@
 environment=%env.environment%
 region=%env.region%
 lambda_name=%env.lambda_name%
-git_sha=git_sha
+git_sha=$(git rev-parse HEAD)
 
 publish_code () {
   check_images=$(docker images maestro-build-container-$lambda_name)
