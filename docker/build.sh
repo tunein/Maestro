@@ -6,11 +6,21 @@ AWS_SECRET_ACCESS_KEY=%env.AWS_SECRET_ACCESS_KEY%
 environment=%env.environment%
 region=%env.region%
 
-git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/Maestro.git
+if [ -d Maestro ]; then
+  git pull origin --branch master
+else
+  git clone https://$maestro_token:x-oauth-basic@github.com/MoonMoon1919/Maestro.git
+fi  
 
-cp Maestro/docker/Dockerfile .
+cd Maestro
 
-cp Maestro/docker/Dockerfile.pypy .
+if [ -f Dockerfile ]; then
+  docker build . -t maestro
+else
+  echo "No Dockerfile... exiting"
+fi
+
+cd
 
 build () {
 if [ -f Dockerfile.pypy ]; then
