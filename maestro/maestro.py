@@ -15,6 +15,8 @@ import maestro.invoke as invoke
 from maestro.cli import ARGS
 from maestro.triggers import creation as create_trigger
 from maestro.triggers import remove_invoke_action as delete_trigger
+from maestro.dlq import get_sns_arn
+from maestro.dlq import get_sqs_arn
 
 DOC = ARGS.filename
 
@@ -156,7 +158,7 @@ def create():
 
   subnet_ids = []
 
-  if 'vpc_name' in json_parser()['vpcconfig']:
+  if 'vpc_name' in json_parser()['vpcsetting']:
     subnets = vpc_location.main()
     subnet_ids.extend(subnets)
   else:
@@ -164,7 +166,7 @@ def create():
 
   security_group_id_list = []
 
-  if 'security_group_ids' in json_parser()['vpcconfig']:
+  if 'security_group_ids' in json_parser()['vpcsetting']:
     groups = security_groups_method.main()
     security_group_id_list.extend(groups)
   else:
@@ -195,6 +197,22 @@ def create():
   else:
     env_vars = { }
 
+  target_arn = { }
+
+  if 'deadletterconfig' in json_parser():
+    dlq_type = json_parser()['deadletterconfig']['type']
+    name = json_parser()['deadletterconfig']['target_name']
+    if dlq_type == 'sns':
+      arn = get_sns_arn(name)
+      target_arn.update({'TargetArn': arn})
+    elif dlq_type == 'sqs':
+      arn = get_sqs_arn(name)
+      target_arn.update({'TargetArn': arn})
+    else:
+      raise RuntimeError('No valid DLQ type found')
+  else:
+    pass
+
   if zip_folder():
     if ARGS.dry_run:
       print(color.BOLD + "***Dry Run option enabled***" + color.END)
@@ -208,6 +226,8 @@ def create():
       print(color.PURPLE + "Timeout: %s" % json_parser()["provisioners"]["timeout"] + color.END)
       print(color.PURPLE + "Memory Size: %s" % json_parser()["provisioners"]["mem_size"] + color.END)
       print(color.PURPLE + "VPC Config: %s" % vpc_config + color.END)
+      print(color.PURPLE + "Environment Variables: %s" % env_vars + color.END)
+      print(color.PURPLE + "DLQ Target: %s" % target_arn)
       print(color.PURPLE + "Tags: %s" % tags)
       return True
     else:
@@ -229,6 +249,7 @@ def create():
           Environment={
             'Variables': env_vars
             },
+          DeadLetterConfig=target_arn,
           Tags=tags
         )
         if create['ResponseMetadata']['HTTPStatusCode'] == 201:
@@ -318,7 +339,7 @@ def update_config():
 
   subnet_ids = []
 
-  if 'vpc_name' in json_parser()['vpcconfig']:
+  if 'vpc_name' in json_parser()['vpcsetting']:
     subnets = vpc_location.main()
     subnet_ids.extend(subnets)
   else:
@@ -326,7 +347,7 @@ def update_config():
 
   security_group_id_list = []
 
-  if 'security_group_ids' in json_parser()['vpcconfig']:
+  if 'security_group_ids' in json_parser()['vpcsetting']:
     groups = security_groups_method.main()
     security_group_id_list.extend(groups)
   else:
@@ -359,6 +380,23 @@ def update_config():
   else:
     env_vars = { }
 
+  target_arn = { }
+
+  if 'deadletterconfig' in json_parser():
+    dlq_type = json_parser()['deadletterconfig']['type']
+    name = json_parser()['deadletterconfig']['target_name']
+    if dlq_type == 'sns':
+      arn = get_sns_arn(name)
+      target_arn.update({'TargetArn': arn})
+    elif dlq_type == 'sqs':
+      arn = get_sqs_arn(name)
+      target_arn.update({'TargetArn': arn})
+    else:
+      raise RuntimeError('No valid DLQ type found')
+  else:
+    print('No DLQ resource found, passing')
+    pass
+
   try:
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
@@ -371,7 +409,8 @@ def update_config():
       Runtime='%s' % json_parser()["provisioners"]["runtime"],
       Environment={
           'Variables': env_vars
-        }
+        },
+      DeadLetterConfig=target_arn
       )
     if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
       return True
