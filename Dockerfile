@@ -1,4 +1,4 @@
-FROM tunein/python36builder:latest
+FROM tunein/py36alpine:0.1
 
 WORKDIR /app
 

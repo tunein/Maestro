@@ -13,13 +13,17 @@
     "mem_size": 128,
     "publish": "yes"
  },
- "vpcconfig": {
+ "vpcsetting": {
     "vpc_name": "base::nonprod::vpc",
     "security_group_ids": ["maestro-test-sg"]
  },
  "variables": {
     "environment": "prod",
     "url": "www.tunein.com"
+ },
+ "deadletterconfig": {
+    "type": "sns",
+    "target_name": "lambda-dlq-sns"
  },
   "tags": {
     "Name": "Maestro-Test"
