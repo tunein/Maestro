@@ -158,7 +158,7 @@ def create():
 
   subnet_ids = []
 
-  if 'vpc_name' in json_parser()['vpcsetting']:
+  if 'vpc_setting' in json_parser():
     subnets = vpc_location.main()
     subnet_ids.extend(subnets)
   else:
@@ -166,7 +166,7 @@ def create():
 
   security_group_id_list = []
 
-  if 'security_group_ids' in json_parser()['vpcsetting']:
+  if 'vpc_setting' in json_parser():
     groups = security_groups_method.main()
     security_group_id_list.extend(groups)
   else:
@@ -199,9 +199,9 @@ def create():
 
   target_arn = { }
 
-  if 'deadletterconfig' in json_parser():
-    dlq_type = json_parser()['deadletterconfig']['type']
-    name = json_parser()['deadletterconfig']['target_name']
+  if 'dead_letter_config' in json_parser():
+    dlq_type = json_parser()['dead_letter_config']['type']
+    name = json_parser()['dead_letter_config']['target_name']
     if dlq_type == 'sns':
       arn = get_sns_arn(name)
       target_arn.update({'TargetArn': arn})
@@ -339,7 +339,7 @@ def update_config():
 
   subnet_ids = []
 
-  if 'vpc_name' in json_parser()['vpcsetting']:
+  if 'vpc_setting' in json_parser():
     subnets = vpc_location.main()
     subnet_ids.extend(subnets)
   else:
@@ -347,7 +347,7 @@ def update_config():
 
   security_group_id_list = []
 
-  if 'security_group_ids' in json_parser()['vpcsetting']:
+  if 'vpc_setting' in json_parser():
     groups = security_groups_method.main()
     security_group_id_list.extend(groups)
   else:
@@ -382,9 +382,9 @@ def update_config():
 
   target_arn = { }
 
-  if 'deadletterconfig' in json_parser():
-    dlq_type = json_parser()['deadletterconfig']['type']
-    name = json_parser()['deadletterconfig']['target_name']
+  if 'dead_letter_config' in json_parser():
+    dlq_type = json_parser()['dead_letter_config']['type']
+    name = json_parser()['dead_letter_config']['target_name']
     if dlq_type == 'sns':
       arn = get_sns_arn(name)
       target_arn.update({'TargetArn': arn})
