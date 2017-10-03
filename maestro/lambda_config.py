@@ -5,3 +5,4 @@ ACL_ANSWERS = ['private', 'public-read', 'public-read-write', 'authenticated-rea
 PRINCIPALS = ['s3', 'sns', 'cloudwatch']
 TEST_INVOKE_TYPE = ['Event', 'DryRun', 'RequestResponse']
 EVENT_TYPES = ['ObjectCreated', 'ObjectRemoved']
+TRACE_TYPES = ['active', 'passthrough']
