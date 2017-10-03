@@ -36,7 +36,7 @@ def security_groups():
   dump = json.dumps(response, indent=4)
   load = json.loads(dump)
   sgs = load['SecurityGroups']
-  group_names = json_parser()['vpcsetting']['security_group_ids']
+  group_names = json_parser()['vpc_setting']['security_group_ids']
 
   groups = {}
 
