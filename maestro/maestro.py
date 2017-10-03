@@ -558,18 +558,18 @@ def main():
                   if alias.alias_creation():
                     if ARGS.create_trigger:
                       if create_trigger():
-                        return True
+                        return 0
                       else:
-                        return False
+                        return 1
                   else:
                     print("Alias failed to created")
-                    return False
+                    return 1
               else:
                 print("Backup failed..")
-                return False
+                return 1
             else:
               print("Backup option not selected, skipping...")
-              return False
+              return 0
         else:
           print("No lambda was found.. please create using action 'create'")
 
@@ -621,28 +621,28 @@ def main():
             return 0
           else:
             print("Alias creation failed..")
-            return False
+            return 1
 
       elif ARGS.action == "delete-alias":
         if check():
           if alias.alias_destroy():
             return 0
           else:
-            return False
+            return 1
 
       elif ARGS.action == "update-alias":
         if check():
           if alias.alias_update():
             return 0
           else:
-            return False
+            return 1
      
       elif ARGS.action == "invoke":
         if check():
           if invoke.test_invoke():
             return 0
           else:
-            return False
+            return 1
 
 if __name__ == "__main__":
   main()
