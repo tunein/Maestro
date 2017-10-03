@@ -519,7 +519,7 @@ def main():
         else:
           if create():
             if ARGS.dry_run:
-              return True
+              return 0
             else:
               if check():
                 print("Lambda uploaded successfully")
@@ -530,23 +530,24 @@ def main():
                         print("Alias added successfully")
                         if ARGS.create_trigger:
                           if create_trigger():
-                            return True
+                            return 0
                           else:
-                            return False
+                            return 1
                       else:
                         print("Alias failed to created")
-                        return False
+                        return 1
                   else:
                     print("Backup failed..")
-                    return False
+                    return 1
                 else:
                   print("Backup option not selected, skipping...")
-                  return True
+                  return 0
               else:
-                return False
                 print("Something went wrong.. I checked for your lambda after upload and it isn't there")
-          return False
-          print("Lambda creation failed.. Check your settings")
+                return 1
+          else:
+            print("Lambda creation failed.. Check your settings")             
+            return 1
 
       elif ARGS.action == 'update-code':
         if check():
@@ -557,18 +558,18 @@ def main():
                   if alias.alias_creation():
                     if ARGS.create_trigger:
                       if create_trigger():
-                        return True
+                        return 0
                       else:
-                        return False
+                        return 1
                   else:
                     print("Alias failed to created")
-                    return False
+                    return 1
               else:
                 print("Backup failed..")
-                return False
+                return 1
             else:
               print("Backup option not selected, skipping...")
-              return False
+              return 0
         else:
           print("No lambda was found.. please create using action 'create'")
 
@@ -578,27 +579,27 @@ def main():
             
             if ARGS.create_trigger:
               if create_trigger():
-                return True
+                return 0
               else:
-                return False
+                return 1
             else:
               pass
 
             if ARGS.delete_trigger:
               if delete_trigger():
-                return True
+                return 0
               else:
-                return False
+                return 1
             else:
               pass
 
             print("Lambda configuration updated!")
-            return True
+            return 0
           else:
             print("Lambda configuration not updated, please check your settings")
-            return False
+            return 1
         print("Check failed, please check settings")
-        return False
+        return 1
 
       elif ARGS.action == "delete":
         if check():
@@ -620,28 +621,28 @@ def main():
             return 0
           else:
             print("Alias creation failed..")
-            return False
+            return 1
 
       elif ARGS.action == "delete-alias":
         if check():
           if alias.alias_destroy():
             return 0
           else:
-            return False
+            return 1
 
       elif ARGS.action == "update-alias":
         if check():
           if alias.alias_update():
             return 0
           else:
-            return False
+            return 1
      
       elif ARGS.action == "invoke":
         if check():
           if invoke.test_invoke():
             return 0
           else:
-            return False
+            return 1
 
 if __name__ == "__main__":
   main()
