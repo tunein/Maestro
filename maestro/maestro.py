@@ -26,6 +26,7 @@ roles = boto3.client('iam')
 
 AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
 AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
+TRACING_TYPES = lambda_config.TRACE_TYPES
 
 yes_or_no = ['y', 'n']
 
@@ -213,6 +214,22 @@ def create():
   else:
     pass
 
+  trace_type = { }
+
+  if 'tracing_mode' in json_parser()['initializers']:
+    mode = json_parser()['initializers']['tracing_mode']
+    if mode in TRACING_TYPES:
+      if mode == "active":
+        capmode = "Active"
+        trace_type.update({'Mode': capmode})
+      elif mode == "passthrough":
+        capmode = "PassThrough"
+        trace_type.update({'Mode': capmode})
+    else:
+      raise RuntimeError('No valid trace mode found')
+  else:
+    trace_type = {'Mode': 'PassThrough'}
+
   if zip_folder():
     if ARGS.dry_run:
       print(color.BOLD + "***Dry Run option enabled***" + color.END)
@@ -228,6 +245,7 @@ def create():
       print(color.PURPLE + "VPC Config: %s" % vpc_config + color.END)
       print(color.PURPLE + "Environment Variables: %s" % env_vars + color.END)
       print(color.PURPLE + "DLQ Target: %s" % target_arn)
+      print(color.PURPLE + "Tracing Config: %s" % trace_type)
       print(color.PURPLE + "Tags: %s" % tags)
       return True
     else:
@@ -250,6 +268,7 @@ def create():
             'Variables': env_vars
             },
           DeadLetterConfig=target_arn,
+          TracingConfig=trace_type,
           Tags=tags
         )
         if create['ResponseMetadata']['HTTPStatusCode'] == 201:
@@ -397,6 +416,22 @@ def update_config():
     print('No DLQ resource found, passing')
     pass
 
+  trace_type = { }
+
+  if 'tracing_mode' in json_parser()['initializers']:
+    mode = json_parser()['initializers']['tracing_mode']
+    if mode in TRACING_TYPES:
+      if mode == "active":
+        capmode = "Active"
+        trace_type.update({'Mode': capmode})
+      elif mode == "passthrough":
+        capmode = "PassThrough"
+        trace_type.update({'Mode': capmode})
+    else:
+      raise RuntimeError('No valid trace mode found')
+  else:
+    trace_type = {'Mode': 'PassThrough'}
+
   try:
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
@@ -410,7 +445,8 @@ def update_config():
       Environment={
           'Variables': env_vars
         },
-      DeadLetterConfig=target_arn
+      DeadLetterConfig=target_arn,
+      TracingConfig=trace_type
       )
     if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
       return True
