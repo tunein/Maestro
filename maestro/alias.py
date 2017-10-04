@@ -70,8 +70,8 @@ def alias_creation():
       else:
         alias_name = json_parser()['initializers']['alias']
         pass
-        
-  elif ARGS.alias:    
+  
+  elif ARGS.alias:
     if ARGS.alias in aliases:
       if ARGS.publish:
         if alias_update():
@@ -207,6 +207,15 @@ def alias_update():
   versions = load_json['Versions']
   avail_versions = []
 
+  for version in versions:
+    if version['Version'] != 0:
+      version = version['Version']
+      if version == "$LATEST":
+        version = 0
+        avail_versions.append(version)
+      else:
+        avail_versions.append(version)
+
   alias = client.list_aliases(
     FunctionName='%s' % lambda_name,
     )
@@ -220,9 +229,6 @@ def alias_update():
     print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
     aliases.append(names['Name'])
   print("\n")
-  for version in versions:
-    if version['Version'] != 0:
-      avail_versions.append(version['Version'])
 
   if len(aliases) != 0:
     if 'alias' in json_parser()['initializers']:
@@ -233,12 +239,23 @@ def alias_update():
       alias_name = input("What alias would you like to update? ")
 
     if ARGS.publish:
-      version_update = max(avail_versions)
+      largest = max(avail_versions, key=int)
+      if largest == 0:
+        version_update = '$LATEST'
+      else:
+        version_update = largest
     else:
+      for version in avail_versions:
+        print("Version: " + str(version))
+
       version_update = input("What version would you like to assign the update alias to? ")
 
     if alias_name in aliases:
       if version_update in avail_versions:
+        if version_update == 0:
+          version_update == "$LATEST"
+        else:
+          pass
         if ARGS.dry_run:
           print(color.PURPLE + "***Dry run option enabled***" + color.END)
           print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
