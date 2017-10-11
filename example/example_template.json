@@ -3,31 +3,38 @@
     "name": "example",
     "description": "example description",
     "region": "us-west-2",
-    "role": "maestro-test-role",
+    "role": "example-role",
     "handler": "example.main",
+    "alias": "example-env",
+    "tracing_mode": "active"
   },
  "provisioners": {
     "runtime": "python3.6",
-    "timeout": 250,
+    "timeout": 150,
     "mem_size": 128,
     "publish": "yes"
  },
  "vpcsetting": {
-    "vpc_name": "base::nonprod::vpc",
-    "security_group_ids": ["maestro-test-sg"]
+    "vpc_name": "example-vpc",
+    "security_group_ids": ["example-sg"]
  },
  "variables": {
-    "environment": "prod",
-    "url": "www.tunein.com"
+    "backend-url": "example-env.your-backend.com",
+    "api_token": "thisisanapitoken"
  },
  "deadletterconfig": {
     "type": "sns",
-    "target_name": "lambda-dlq-sns"
+    "target_name": "example-sns-target"
  },
   "tags": {
-    "Name": "Maestro-Test"
+    "Name": "example",
+    "environment": "example-env"
+ },
+  "trigger": {
+    "method": "cloudwatch",
+    "source": "example-10-min-cron"
  },
  "backup": {
-    "bucket_name": "maestro-test-lambda-backup"
+    "bucket_name": "your-backup-bucket-name"
  }
 }
