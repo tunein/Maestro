@@ -61,7 +61,6 @@ def check_s3():
     sys.exit(1)
 
 def get_sns_arn():
-  print("getting source arn!")
   if 'trigger' in json_parser():
     invoke_source = json_parser()['trigger']['source']
   elif ARGS.invoke_method and ARGS.invoke_source:
