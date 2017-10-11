@@ -26,10 +26,6 @@ REGIONS = lambda_config.REGIONS
 ACL_ANSWERS = lambda_config.ACL_ANSWERS
 EVENT_TYPES = lambda_config.EVENT_TYPES
 
-invoke_method = ARGS.invoke_method
-invoke_source = ARGS.invoke_source
-event_type = ARGS.event_type
-
 class color:
    PURPLE = '\033[95m'
    CYAN = '\033[96m'
@@ -50,6 +46,11 @@ def json_parser():
   print("No json document to read.. Please enter a valid json document")
 
 def check_s3():
+  if 'trigger' in json_parser():
+    invoke_source = json_parser()['trigger']['source']
+  elif ARGS.invoke_method and ARGS.invoke_source:
+    invoke_source = ARGS.invoke_source
+
   bucket_name = invoke_source
   try:
     s3.meta.client.head_bucket(Bucket=bucket_name)
@@ -60,7 +61,13 @@ def check_s3():
     sys.exit(1)
 
 def get_sns_arn():
+  if 'trigger' in json_parser():
+    invoke_source = json_parser()['trigger']['source']
+  elif ARGS.invoke_method and ARGS.invoke_source:
+    invoke_source = ARGS.invoke_source
+
   topic_name = invoke_source
+
   list_of_topics = []
   try:
     existing_topics = sns_client.list_topics()
@@ -73,32 +80,33 @@ def get_sns_arn():
         list_of_topics.append(value)
 
     for item in list_of_topics:
-      if item.find(topic_name):
+      if topic_name in item:
         return item
 
   except ClientError as error:
     print(json.dumps(error.response, indent=4))
 
 def get_cloudwatch_arn():
-    event_name = invoke_source
+  if 'trigger' in json_parser():
+    invoke_source = json_parser()['trigger']['source']
+  elif ARGS.invoke_method and ARGS.invoke_source:
+    invoke_source = ARGS.invoke_source
 
-    if len(event_name)>0:
-      try:
-        get_events = cloudwatch_client.list_rules(NamePrefix=event_name)
-        
-        dumper = json.dumps(get_events, indent=4)
-        loader = json.loads(dumper)
-        if loader['ResponseMetadata']['HTTPStatusCode'] == 200:
-          rules = loader['Rules']
-          for rule in rules:
-              return rule['Arn']
+  event_name = invoke_source
 
-      except ClientError as error:
-        print(error.response['Error']['Message'])
-'''
-def get_functions():
-  lambda_name = json_parser()['initializers']['name']
-'''
+  if len(event_name)>0:
+    try:
+      get_events = cloudwatch_client.list_rules(NamePrefix=event_name)
+      
+      dumper = json.dumps(get_events, indent=4)
+      loader = json.loads(dumper)
+      if loader['ResponseMetadata']['HTTPStatusCode'] == 200:
+        rules = loader['Rules']
+        for rule in rules:
+            return rule['Arn']
+
+    except ClientError as error:
+      print(error.response['Error']['Message'])
 
 def add_invoke_permission():
   lambda_name = json_parser()['initializers']['name']
@@ -123,6 +131,16 @@ def add_invoke_permission():
       if key == lambda_name:
         arn = value
 
+  if 'trigger' in json_parser():
+    invoke_method = json_parser()['trigger']['method']
+    invoke_source = json_parser()['trigger']['source']
+  elif ARGS.invoke_method and ARGS.invoke_source:
+    invoke_method = ARGS.invoke_method
+    invoke_source = ARGS.invoke_source
+  else:
+    invoke_method = input("Enter an invocation method (s3/sns/cloudwatch): ")
+    invoke_source = input("Enter an invocation source (bucket name/topic name/event name: ")
+
   if invoke_method in principals:
     if invoke_method == 's3':
       if check_s3():
@@ -140,10 +158,13 @@ def add_invoke_permission():
     if len(principal)>0:
       if len(source_arn)>0:
 
-        if ARGS.alias:
+        if 'alias' in json_parser()['initializers']:
+          qualifier = json_parser()['initializers']['alias']
+        elif ARGS.alias:
           qualifier = ARGS.alias
         else:
           qualifier = ''
+
         statement_id = "%s-%s-%s" % (lambda_name, ARGS.alias, invoke_source)        
 
         if ARGS.dry_run:
@@ -177,7 +198,9 @@ def invoke_action():
   lambda_name = json_parser()['initializers']['name']
   get_functions = client.list_functions()
   
-  if ARGS.alias:
+  if 'alias' in json_parser()['initializers']:
+    alias = ':%s' % json_parser()['initializers']['alias']
+  elif ARGS.alias:
     alias = ':%s' % ARGS.alias
   else:
     alias = ''
@@ -201,6 +224,16 @@ def invoke_action():
       if key == lambda_name:
         arn = value
 
+    if 'trigger' in json_parser():
+      invoke_method = json_parser()['trigger']['method']
+      invoke_source = json_parser()['trigger']['source']
+    elif ARGS.invoke_method and ARGS.invoke_source:
+      invoke_method = ARGS.invoke_method
+      invoke_source = ARGS.invoke_source
+    else:
+      invoke_method = input("Enter an invocation method (s3/sns/cloudwatch): ")
+      invoke_source = input("Enter an invocation source (bucket name/topic name/event name: ")
+
     if invoke_method == 's3':
       bucket_name = invoke_source
       bucket_notification = s3.BucketNotification(bucket_name)
@@ -216,7 +249,16 @@ def invoke_action():
         try:
           e_type = "ObjectCreated"
 
-          if event_type:
+          if 'trigger' in json_parser():
+            if 'event_type' in json_parser()['trigger']:
+              event_type = json_parser()['trigger']['event_type']
+            else:
+              event_type = e_type
+          elif ARGS.event_type:
+            event_type = ARGS.event_type
+          else:
+            event_type = e_type
+
             if event_type in EVENT_TYPES:
               e_type = event_type
             else:
@@ -256,7 +298,7 @@ def invoke_action():
           subscription = sns_client.subscribe(
                           TopicArn=topic_arn,
                           Protocol='Lambda',
-                          Endpoint=arn
+                          Endpoint='%s%s' % (arn, alias)
                         )
           if subscription['ResponseMetadata']['HTTPStatusCode'] == 200:
             print("Permssions granted, linked to %s on %s as Lambda invocator" % (invoke_source, invoke_method))
@@ -267,6 +309,7 @@ def invoke_action():
 
     if invoke_method == 'cloudwatch':
       rule = invoke_source
+
       if ARGS.dry_run:
         print(color.PURPLE + "***Dry Run option enabled***" + color.END)
         print(color.PURPLE + "Would add invocation permissions for the following:" + color.END)
@@ -281,7 +324,7 @@ def invoke_action():
                         Targets=[
                           {
                           'Id': lambda_name,
-                          'Arn': arn,
+                          'Arn': '%s%s' % (arn, alias),
                           }
                         ]
                       )
@@ -302,9 +345,22 @@ def creation():
     print("Permissions not granted, see error code")
 
 def remove_invoke_action():
-  lambda_name = json_parser()['initializers']['name']
+  lambda_name = json_parser()['initializers']['name'] 
+  
+  if 'trigger' in json_parser():
+    invoke_source = json_parser()['trigger']['source']
+  elif ARGS.invoke_method and ARGS.invoke_source:
+    invoke_source = ARGS.invoke_source
+
+  if 'alias' in json_parser()['initializers']:
+    qualifier = json_parser()['initializers']['alias']
+  elif ARGS.alias:
+    qualifier = ARGS.alias
+  else:
+    qualifier = ''
+
   statement_id = "%s-%s-%s" % (lambda_name, ARGS.alias, invoke_source)
-  qualifier = ARGS.alias
+
   try:
     remove = client.remove_permission(
                 FunctionName=lambda_name,

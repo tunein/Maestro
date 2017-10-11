@@ -559,24 +559,69 @@ def main():
             else:
               if check():
                 print("Lambda uploaded successfully")
-                if 'backup' in json_parser():
-                  if s3_backup.main():
-                    if ARGS.alias:
-                      if alias.alias_creation():
-                        print("Alias added successfully")
-                        if ARGS.create_trigger:
-                          if create_trigger():
+                if 'alias' in json_parser()['initializers']:
+                  if alias.alias_creation():
+                    print("Alias added successfully")
+                    if 'trigger' in json_parser():
+                      if create_trigger():
+                        if 'backup' in json_parser():
+                          if s3_backup.main():
                             return 0
                           else:
+                            print("Backup failed")
                             return 1
+                        else:
+                            return 0
+                      else:
+                        print("Alias failed to created")
+                        return 0
+                    elif ARGS.create_trigger:
+                      if create_trigger():
+                        if 'backup' in json_parser():
+                          if s3_backup.main():
+                            return 0
+                          else:
+                            print("Backup failed")
+                            return 1
+                        else:
+                          return 0
                       else:
                         print("Alias failed to created")
                         return 1
-                  else:
-                    print("Backup failed..")
-                    return 1
+                    else:
+                      return 0
+                elif ARGS.alias:
+                  if alias.alias_creation():
+                    print("Alias added successfully")
+                    if 'trigger' in json_parser():
+                      if create_trigger():
+                        if 'backup' in json_parser():
+                          if s3_backup.main():
+                            return 0
+                          else:
+                            print("Backup failed")
+                            return 1
+                        else:
+                          return 0
+                      else:
+                        print("Alias failed to created")
+                        return 1
+                    elif ARGS.create_trigger:
+                      if create_trigger():
+                        if 'backup' in json_parser():
+                          if s3_backup.main():
+                            return 0
+                          else:
+                            print("Backup failed")
+                            return 1
+                        else:
+                          return 0
+                      else:
+                        print("Alias failed to created")
+                        return 1
+                    else:
+                      return 0
                 else:
-                  print("Backup option not selected, skipping...")
                   return 0
               else:
                 print("Something went wrong.. I checked for your lambda after upload and it isn't there")
@@ -612,14 +657,6 @@ def main():
       elif ARGS.action == "update-config":
         if check():
           if update_config():
-            
-            if ARGS.create_trigger:
-              if create_trigger():
-                return 0
-              else:
-                return 1
-            else:
-              pass
 
             if ARGS.delete_trigger:
               if delete_trigger():
@@ -628,6 +665,18 @@ def main():
                 return 1
             else:
               pass
+            
+            if 'trigger' in json_parser():
+              if create_trigger():
+                return 0
+            else:
+              if ARGS.create_trigger:
+                if create_trigger():
+                  return 0
+                else:
+                  return 1
+              else:
+                pass
 
             print("Lambda configuration updated!")
             return 0
