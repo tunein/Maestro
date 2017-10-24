@@ -588,6 +588,9 @@ def main():
                       else:
                         print("Alias failed to created")
                         return 1
+                    elif 'backup' in json_parser():
+                      if s3_backup.main():
+                        return 0
                     else:
                       return 0
                 elif ARGS.alias:
@@ -619,8 +622,14 @@ def main():
                       else:
                         print("Alias failed to created")
                         return 1
+                    elif 'backup' in json_parser():
+                      if s3_backup.main():
+                        return 0
                     else:
                       return 0
+                elif 'backup' in json_parser():
+                  if s3_backup.main():
+                    return 0
                 else:
                   return 0
               else:
