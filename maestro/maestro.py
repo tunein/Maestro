@@ -17,6 +17,7 @@ from maestro.triggers import creation as create_trigger
 from maestro.triggers import remove_invoke_action as delete_trigger
 from maestro.dlq import get_sns_arn
 from maestro.dlq import get_sqs_arn
+from maestro.cloudwatch_sub import cloudwatchSubscription
 
 DOC = ARGS.filename
 
@@ -564,6 +565,16 @@ def main():
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
                       if create_trigger():
+                        if 'logging' in json_parser():
+                          name = json_parser()['initializers']['name']
+                          role = json_parser()['initializers']['role']
+                          region = json_parser()['initializers']['region']
+                          dest_lambda = json_parser()['logging']['destination_lambda']
+                          dest_alias = json_parser()['logging']['destination_alias']
+                          
+                          cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+                        else:
+                          pass
                         if 'backup' in json_parser():
                           if s3_backup.main():
                             return 0
@@ -577,6 +588,16 @@ def main():
                         return 0
                     elif ARGS.create_trigger:
                       if create_trigger():
+                        if 'logging' in json_parser():
+                          name = json_parser()['initializers']['name']
+                          role = json_parser()['initializers']['role']
+                          region = json_parser()['initializers']['region']
+                          dest_lambda = json_parser()['logging']['destination_lambda']
+                          dest_alias = json_parser()['logging']['destination_alias']
+                          
+                          cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+                        else:
+                          pass
                         if 'backup' in json_parser():
                           if s3_backup.main():
                             return 0
@@ -588,6 +609,23 @@ def main():
                       else:
                         print("Alias failed to created")
                         return 1
+                    elif 'logging' in json_parser():
+                      name = json_parser()['initializers']['name']
+                      role = json_parser()['initializers']['role']
+                      region = json_parser()['initializers']['region']
+                      dest_lambda = json_parser()['logging']['destination_lambda']
+                      dest_alias = json_parser()['logging']['destination_alias']
+                      
+                      cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+
+                      if 'backup' in json_parser():
+                        if s3_backup.main():
+                          return 0
+                        else:
+                          print("Backup failed")
+                          return 1
+                      else:
+                        return 0
                     elif 'backup' in json_parser():
                       if s3_backup.main():
                         return 0
@@ -598,6 +636,16 @@ def main():
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
                       if create_trigger():
+                        if 'logging' in json_parser():
+                          name = json_parser()['initializers']['name']
+                          role = json_parser()['initializers']['role']
+                          region = json_parser()['initializers']['region']
+                          dest_lambda = json_parser()['logging']['destination_lambda']
+                          dest_alias = json_parser()['logging']['destination_alias']
+                          
+                          cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+                        else:
+                          pass
                         if 'backup' in json_parser():
                           if s3_backup.main():
                             return 0
@@ -611,6 +659,16 @@ def main():
                         return 1
                     elif ARGS.create_trigger:
                       if create_trigger():
+                        if 'logging' in json_parser():
+                          name = json_parser()['initializers']['name']
+                          role = json_parser()['initializers']['role']
+                          region = json_parser()['initializers']['region']
+                          dest_lambda = json_parser()['logging']['destination_lambda']
+                          dest_alias = json_parser()['logging']['destination_alias']
+                          
+                          cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+                        else:
+                          pass
                         if 'backup' in json_parser():
                           if s3_backup.main():
                             return 0
@@ -627,6 +685,23 @@ def main():
                         return 0
                     else:
                       return 0
+                elif 'logging' in json_parser():
+                  name = json_parser()['initializers']['name']
+                  role = json_parser()['initializers']['role']
+                  region = json_parser()['initializers']['region']
+                  dest_lambda = json_parser()['logging']['destination_lambda']
+                  dest_alias = json_parser()['logging']['destination_alias']
+                  
+                  cloudwatchSubscription(name, dest_lambda, dest_alias, region, role)
+
+                  if 'backup' in json_parser():
+                    if s3_backup.main():
+                      return 0
+                    else:
+                      print("Backup failed")
+                      return 1
+                  else:
+                    return 0
                 elif 'backup' in json_parser():
                   if s3_backup.main():
                     return 0

@@ -4,6 +4,15 @@ from botocore.exceptions import ClientError
 
 logClient = boto3.client('logs')
 lambdaClient = boto3.client('lambda')
+iam = boto3.resource('iam')
+
+#Invoke the function, creating the log group
+def invokeFunction(name):
+	print('Creating log group')
+	try:
+		invoke = lambdaClient.invoke(FunctionName=name)
+	except ClientError as error:
+		print(error)
 
 #Get the group name of the new lambda, this is more of a check to see if it exists
 def getLogGroupName(name):
@@ -71,9 +80,21 @@ def putInvokePerm(destLambda, destAlias, name, region, logArn):
 	except ClientError as error:
 		print(error)
 
-#Main Entrypoint
-def cloudwatchSubscription(newLambdaName, destLambdaName, destLambdaAlias, region, roleArn):
+#Get role arn
+def getRoleArn(role):
+	print('Gathering role arn')
+	try:
+		role = iam.Role('name')
+
+		return role.arn
+	except ClientError as error:
+		print(error)
+
+########## Main Entrypoint ############
+def cloudwatchSubscription(newLambdaName, destLambdaName, destLambdaAlias, region, role):
+	invocation = invokeFunction(newLambdaName)
 	groupName, groupArn = getLogGroupName(newLambdaName)
 	arn = getDestinationArn(destLambdaName, destLambdaAlias)
+	roleArn = getRoleArn(role)
 	permission = putInvokePerm(destLambdaName, destLambdaAlias, newLambdaName, region, groupArn)
 	subscription = putSubfilter(groupName, arn, roleArn, newLambdaName)
