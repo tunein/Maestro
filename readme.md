@@ -41,7 +41,7 @@ Maestro is a command line tool for managing Lambdas for Amazon Web Services
 ---
 
 **Command line flags**  
-- --publish autopasses *for publish input args on 'create' and 'update-code' actions*  
+- --publish *autopasses for publish input args on 'create' and 'update-code' actions*  
 - --create_trigger *stores 'True', must be used to create trigger, must include invoke method and source*  
 - --invoke_method *$[s3, cloudwatch, sns])*  
 - --invoke_source *$name of your resource*  
