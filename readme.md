@@ -12,6 +12,7 @@ Maestro is a command line tool for managing Lambdas for Amazon Web Services
 - Once complete it uploads your package into lambda with all of the settings you provided  
 
 ---
+Installation Notes
 
 **To install**  
 - Clone this directory  
