@@ -41,17 +41,17 @@ Maestro is a command line tool for managing Lambdas for Amazon Web Services
 ---
 
 **Command line flags**  
-- *--publish autopasses* for publish input args on 'create' and 'update-code' actions  
-- *--create_trigger* stores 'True', must be used to create trigger, must include invoke method and source  
-- *--invoke_method* $[s3, cloudwatch, sns])  
-- *--invoke_source* $name of your resource  
-- *--dry_run* dry run  
-- *--version* specify a specific version, this is used for invoking lambdas  
-- *--invoke_type* specify an invocation type from the CLI, options are: RequestResponse, Event, and DryRun)  
-- *--payload* used to specify a file with a json payload to pass into the lambda, used to test invoking  
-- *--no_pub* this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions  
-- *--event_type* this is used for the 'S3' invoke_method only, and allows you to use "ObjectCreated" and "ObjectRemoved" for the event type to invoke your lambda, default is "ObjectCreated"  
-- *--version_description* this is used for the "publish" action to pass a version description in, default is current date/time in UTC  
+- --publish autopasses *for publish input args on 'create' and 'update-code' actions*  
+- --create_trigger *stores 'True', must be used to create trigger, must include invoke method and source*  
+- --invoke_method *$[s3, cloudwatch, sns])*  
+- --invoke_source *$name of your resource*  
+- --dry_run *dry run*  
+- --version *specify a specific version, this is used for invoking lambdas*  
+- --invoke_type *specify an invocation type from the CLI, options are: RequestResponse, Event, and DryRun)*  
+- --payload *used to specify a file with a json payload to pass into the lambda, used to test invoking*  
+- --no_pub *this is used to automatically pass over the "would you like to publish?" input stage for code updates. Useful for pushing code up to $LATEST and testing without mucking with aliases/versions*  
+- --event_type *this is used for the 'S3' invoke_method only, and allows you to use "ObjectCreated" and "ObjectRemoved" for the event type to invoke your lambda, default is "ObjectCreated"*  
+- --version_description *this is used for the "publish" action to pass a version description in, default is current date/time in UTC*  
 
 ---
 
