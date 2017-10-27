@@ -12,7 +12,6 @@ Current State: v0.1.4
 - Once complete it uploads your package into lambda with all of the settings you provided  
 
 ---
-Installation Notes
 
 **To install**  
 - Clone this directory  
