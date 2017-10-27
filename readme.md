@@ -65,8 +65,6 @@ This will:
 - reallocate the alias 'dev' to the new version  
 - add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator  
 
--
-
 Example 2:   
 - maestro update-code --alias prod --publish example_template.json  
 
