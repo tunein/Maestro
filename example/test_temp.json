@@ -5,7 +5,7 @@
     "region": "us-west-2",
     "role": "lambda_role",
     "handler": "example.main",
-    "alias": "testtesttest"
+    "alias": "live"
   },
  "provisioners": {
     "runtime": "python3.6",
@@ -15,6 +15,10 @@
  "vpc_setting": {
     "vpc_name": "Stock_VPC",
     "security_group_ids": ["MMTest"]
+ },
+ "trigger": {
+    "method": "sns",
+    "source": "test-topic-lambda"
  },
  "backup": {
     "bucket_name": "mm-img-bucket-test"

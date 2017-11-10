@@ -577,7 +577,7 @@ def main():
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
-                      if create_trigger():
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -600,7 +600,7 @@ def main():
                         print("Alias failed to created")
                         return 0
                     elif ARGS.create_trigger:
-                      if create_trigger():
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -648,7 +648,7 @@ def main():
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
-                      if create_trigger():
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -671,7 +671,7 @@ def main():
                         print("Alias failed to created")
                         return 1
                     elif ARGS.create_trigger:
-                      if create_trigger():
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -735,7 +735,7 @@ def main():
                 if ARGS.alias:
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     if ARGS.create_trigger:
-                      if create_trigger():
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
                         return 0
                       else:
                         return 1
@@ -756,7 +756,7 @@ def main():
           if update_config():
 
             if ARGS.delete_trigger:
-              if delete_trigger():
+              if delete_trigger(lambda_name=json_parser()['initializers']['name'], trigger=True, alias=json_parser()['initializers']['alias'], invoke_source=json_parser()['trigger']['source']):
                 return 0
               else:
                 return 1
@@ -764,11 +764,11 @@ def main():
               pass
             
             if 'trigger' in json_parser():
-              if create_trigger():
+              if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                 return 0
             else:
               if ARGS.create_trigger:
-                if create_trigger():
+                if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                   return 0
                 else:
                   return 1
