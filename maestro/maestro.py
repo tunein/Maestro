@@ -31,6 +31,7 @@ from maestro.security_groups import security_groups as security_groups_method
 from maestro.s3_backup import main as s3_backup
 from maestro.invoke import main as invoke
 from maestro.cloudwatch_sub import cloudwatchSubscription
+from maestro.config_validator import validation
 
 DOC = ARGS.filename
 
@@ -38,11 +39,8 @@ client = boto3.client('lambda')
 iam = boto3.resource('iam')
 roles = boto3.client('iam')
 
-AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
-AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
 TRACING_TYPES = lambda_config.TRACE_TYPES
-
-yes_or_no = ['y', 'n']
+ACCEPTED_PROMPT_ACTIONS = lambda_config.ACCEPTED_PROMPT_ACTIONS
 
 class color:
    PURPLE = '\033[95m'
@@ -56,59 +54,12 @@ class color:
    UNDERLINE = '\033[4m'
    END = '\033[0m'
 
-def file_type():
-  print(color.CYAN + "validating file type..." + color.END)
-  if len(DOC)>0:
-    if DOC.lower().endswith('.json'):
-      return True
-    return False
-  print(color.RED + "Please enter a valid json document after your action" + color.END)
-
 def json_parser():
   with open('%s' % DOC) as json_data:
     read = json.load(json_data)
     return read
     return True
   print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
-
-def validate_action():
-  if len(json_parser()["initializers"]["name"])>0:
-    if any(action in ARGS.action for action in AVAIL_ACTIONS):
-      return True
-    print(color.RED + "Not a valid action" + color.END)
-  print(color.RED + "Check your json document for the right syntax.." + color.END)
-
-def validate_runtime():
-  if len(json_parser()["initializers"]["name"])>0:
-    RUNTIME = json_parser()["provisioners"]["runtime"]
-    print(color.CYAN + "validating runtime %s..." % RUNTIME + color.END)
-    if any(runtime in RUNTIME for runtime in AVAIL_RUNTIMES):
-      return True
-    print(color.RED + "Not a valid runtime" + color.END)
-
-def validate_role():
-  name = json_parser()["initializers"]["role"]
-  print(color.CYAN + "validating role %s..." % name + color.END)
-  data = iam.role_name=name
-  if len(data)>0:
-    return True
-  print(color.RED + "invalid role" + color.END)  
-
-def validate_timeout():
-  timeout = json_parser()["provisioners"]["timeout"]
-  acceptable_range = range(1,301)
-  if timeout in acceptable_range:
-    return True
-  print(color.RED + "Timeout should between between 1 and 300 seconds, please adjust" + color.END)
-
-def validation():
-  if file_type():
-    if json_parser():
-      if validate_action():
-        if validate_runtime():
-          if validate_role():
-            if validate_timeout():
-              return True
 
 def get_arn():
   role = iam.Role('%s' % json_parser()["initializers"]["role"])
@@ -320,7 +271,7 @@ def update():
         else:
           publish_answer = input("Would you like to publish this update? ('y/n'): ")
 
-          if publish_answer.lower() in yes_or_no:
+          if publish_answer.lower() in ACCEPTED_PROMPT_ACTIONS:
             if publish_answer == 'y':
               answer = True
               print(color.CYAN + "Publishing update" + color.END)
@@ -561,7 +512,7 @@ def is_event_source():
 '''
 
 def main():
-  if validation():
+  if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
       if ARGS.action == 'create':
         print("Checking to see if lambda already exists")
         if check():
