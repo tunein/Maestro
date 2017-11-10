@@ -6,13 +6,16 @@ import os
 from time import gmtime, strftime
 from botocore.exceptions import ClientError
 
+#Clean these up...
 import maestro.vpc_location as vpc_location
 import maestro.s3_backup as s3_backup
 import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
-import maestro.security_groups as security_groups_method
 import maestro.invoke as invoke
+
+#Clean this up...
 from maestro.cli import ARGS
+from maestro.security_groups import security_groups as security_groups_method
 from maestro.triggers import creation as create_trigger
 from maestro.triggers import remove_invoke_action as delete_trigger
 from maestro.dlq import get_sns_arn
@@ -169,7 +172,7 @@ def create():
   security_group_id_list = []
 
   if 'vpc_setting' in json_parser():
-    groups = security_groups_method.main()
+    groups = security_groups_method(json_parser()['vpc_setting']['security_group_ids'])
     security_group_id_list.extend(groups)
   else:
     pass
@@ -368,7 +371,7 @@ def update_config():
   security_group_id_list = []
 
   if 'vpc_setting' in json_parser():
-    groups = security_groups_method.main()
+    groups = security_groups_method(json_parser()['vpc_setting']['security_group_ids'])
     security_group_id_list.extend(groups)
   else:
     pass
