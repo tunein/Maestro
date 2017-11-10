@@ -334,7 +334,7 @@ def invoke_action():
         except ClientError as error:
           print(error.response['Error']['Message'])
 
-def creation():
+def create_trigger():
   if add_invoke_permission():
     if invoke_action():    
       return True

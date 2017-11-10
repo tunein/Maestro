@@ -8,19 +8,28 @@ from botocore.exceptions import ClientError
 
 #Clean these up...
 import maestro.vpc_location as vpc_location
-import maestro.s3_backup as s3_backup
-import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
 
-#Clean this up...
+#Get CLI Args
 from maestro.cli import ARGS
+
+#Alias module
+from maestro.alias import alias_creation as alias_creation
+from maestro.alias import alias_destroy as alias_destroy
+from maestro.alias import alias_update as alias_update
+
+#Trigger module
+from maestro.triggers import create_trigger as create_trigger
+from maestro.triggers import remove_invoke_action as delete_trigger
+
+#DLQ module
+from maestro.dlq import get_sns_arn
+from maestro.dlq import get_sqs_arn
+
+#Everything else
 from maestro.security_groups import security_groups as security_groups_method
 from maestro.s3_backup import main as s3_backup
 from maestro.invoke import main as invoke
-from maestro.triggers import creation as create_trigger
-from maestro.triggers import remove_invoke_action as delete_trigger
-from maestro.dlq import get_sns_arn
-from maestro.dlq import get_sqs_arn
 from maestro.cloudwatch_sub import cloudwatchSubscription
 
 DOC = ARGS.filename
@@ -565,7 +574,7 @@ def main():
               if check():
                 print("Lambda uploaded successfully")
                 if 'alias' in json_parser()['initializers']:
-                  if alias.alias_creation():
+                  if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
                       if create_trigger():
@@ -636,7 +645,7 @@ def main():
                     else:
                       return 0
                 elif ARGS.alias:
-                  if alias.alias_creation():
+                  if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
                       if create_trigger():
@@ -724,7 +733,7 @@ def main():
             if 'backup' in json_parser():
               if s3_backup(json_parser()['initializers']['name'], json_parser()['backup']['bucket_name'], ARGS.dry_run):
                 if ARGS.alias:
-                  if alias.alias_creation():
+                  if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     if ARGS.create_trigger:
                       if create_trigger():
                         return 0
@@ -790,7 +799,7 @@ def main():
 
       elif ARGS.action == "create-alias":
         if check():
-          if alias.alias_creation():
+          if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
             return 0
           else:
             print("Alias creation failed..")
@@ -798,14 +807,14 @@ def main():
 
       elif ARGS.action == "delete-alias":
         if check():
-          if alias.alias_destroy():
+          if alias_destroy(json_parser()['initializers']['name'], ARGS.alias, ARGS.dry_run):
             return 0
           else:
             return 1
 
       elif ARGS.action == "update-alias":
         if check():
-          if alias.alias_update():
+          if alias_update(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
             return 0
           else:
             return 1

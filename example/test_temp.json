@@ -4,7 +4,8 @@
     "description": "example description",
     "region": "us-west-2",
     "role": "lambda_role",
-    "handler": "example.main"
+    "handler": "example.main",
+    "alias": "testtesttest"
   },
  "provisioners": {
     "runtime": "python3.6",
