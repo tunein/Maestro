@@ -161,7 +161,7 @@ def create():
   subnet_ids = []
 
   if 'vpc_setting' in json_parser():
-    subnets = vpc_location.main()
+    subnets = vpc_location.main(json_parser()['vpc_setting']['vpc_name'])
     subnet_ids.extend(subnets)
   else:
     pass
@@ -360,7 +360,7 @@ def update_config():
   subnet_ids = []
 
   if 'vpc_setting' in json_parser():
-    subnets = vpc_location.main()
+    subnets = vpc_location.main(json_parser()['vpc_setting']['vpc_name'])
     subnet_ids.extend(subnets)
   else:
     pass
