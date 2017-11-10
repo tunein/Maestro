@@ -33,11 +33,12 @@ from maestro.cloudwatch_sub import cloudwatchSubscription
 from maestro.config_validator import validation
 from maestro.zip_function import zip_function
 from maestro.check_existence import check
+from maestro.role_arn import get_arn
 
 DOC = ARGS.filename
 
 client = boto3.client('lambda')
-iam = boto3.resource('iam')
+
 roles = boto3.client('iam')
 
 TRACING_TYPES = lambda_config.TRACE_TYPES
@@ -61,11 +62,6 @@ def json_parser():
     return read
     return True
   print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
-
-def get_arn():
-  role = iam.Role('%s' % json_parser()["initializers"]["role"])
-  arn = role.arn
-  return arn
 
 def create():
   lambda_name = json_parser()["initializers"]["name"]
@@ -150,7 +146,7 @@ def create():
       print(color.PURPLE + "Would have attempted to create the following:" + color.END)
       print(color.PURPLE + "FunctionName: %s" % lambda_name + color.END)
       print(color.PURPLE + "Runtime: %s" % json_parser()["provisioners"]["runtime"] + color.END)
-      print(color.PURPLE + "Role: %s" % get_arn() + color.END)
+      print(color.PURPLE + "Role: %s" % get_arn(json_parser()["initializers"]["role"]) + color.END)
       print(color.PURPLE + "Handler: %s" % json_parser()["initializers"]["handler"] + color.END)
       print(color.PURPLE + "Archive: %s" % archive_name + color.END)
       print(color.PURPLE + "Description: %s" % json_parser()["initializers"]["description"] + color.END)
@@ -168,7 +164,7 @@ def create():
         create = client.create_function(
           FunctionName='%s' % lambda_name,
           Runtime='%s' % json_parser()["provisioners"]["runtime"],
-          Role='%s' % get_arn(),
+          Role='%s' % get_arn(json_parser()["initializers"]["role"]),
           Handler='%s' % json_parser()["initializers"]["handler"],
           Code={
             'ZipFile': open(archive_name, 'rb').read()
@@ -349,7 +345,7 @@ def update_config():
   try:
     update_configuration = client.update_function_configuration(
       FunctionName='%s' % lambda_name,
-      Role='%s' % get_arn(),
+      Role='%s' % get_arn(json_parser()["initializers"]["role"]),
       Handler='%s' % json_parser()["initializers"]["handler"],
       Description='%s' % json_parser()["initializers"]["description"],
       Timeout=json_parser()["provisioners"]["timeout"],
@@ -417,7 +413,7 @@ def delete():
         delete = client.delete_function(
           FunctionName='%s' % lambda_name
           )
-        if check():
+        if check(json_parser()['initializers']['name']):
           print(color.RED + "Failed to delete Lambda" + color.END)
           return False
         else:
@@ -471,13 +467,13 @@ def main():
             if ARGS.dry_run:
               return 0
             else:
-              if check():
+              if check(json_parser()['initializers']['name']):
                 print("Lambda uploaded successfully")
                 if 'alias' in json_parser()['initializers']:
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
-                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -500,7 +496,7 @@ def main():
                         print("Alias failed to created")
                         return 0
                     elif ARGS.create_trigger:
-                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -548,7 +544,7 @@ def main():
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     print("Alias added successfully")
                     if 'trigger' in json_parser():
-                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -571,7 +567,7 @@ def main():
                         print("Alias failed to created")
                         return 1
                     elif ARGS.create_trigger:
-                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                         if 'logging' in json_parser():
                           name = json_parser()['initializers']['name']
                           role = json_parser()['initializers']['role']
@@ -628,14 +624,14 @@ def main():
             return 1
 
       elif ARGS.action == 'update-code':
-        if check():
+        if check(json_parser()['initializers']['name']):
           if update():
             if 'backup' in json_parser():
               if s3_backup(json_parser()['initializers']['name'], json_parser()['backup']['bucket_name'], ARGS.dry_run):
                 if ARGS.alias:
                   if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
                     if ARGS.create_trigger:
-                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias']):
+                      if create_trigger(json_parser()['initializers']['name'], trigger=True, invoke_method=json_parser()['trigger']['method'], invoke_source=json_parser()['trigger']['source'], alias=json_parser()['initializers']['alias'], event_type=ARGS.event_type, dry_run=ARGS.dry_run):
                         return 0
                       else:
                         return 1
@@ -652,7 +648,7 @@ def main():
           print("No lambda was found.. please create using action 'create'")
 
       elif ARGS.action == "update-config":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if update_config():
 
             if ARGS.delete_trigger:
@@ -684,21 +680,21 @@ def main():
         return 1
 
       elif ARGS.action == "delete":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if delete():
             return 0
         else:
           print("No lambda was found.. looks like you have nothing to delete")
 
       elif ARGS.action == "publish":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if publish():
             return 0
         else:
           print("No lambda was found.. Check your settings")
 
       elif ARGS.action == "create-alias":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
             return 0
           else:
@@ -706,21 +702,21 @@ def main():
             return 1
 
       elif ARGS.action == "delete-alias":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if alias_destroy(json_parser()['initializers']['name'], ARGS.alias, ARGS.dry_run):
             return 0
           else:
             return 1
 
       elif ARGS.action == "update-alias":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if alias_update(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
             return 0
           else:
             return 1
      
       elif ARGS.action == "invoke":
-        if check():
+        if check(json_parser()['initializers']['name']):
           if invoke(
                 json_parser()['initializers']['name'], 
                 version=ARGS.version,
