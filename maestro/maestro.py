@@ -1,7 +1,6 @@
 import boto3
 import sys
 import json
-import zipfile
 import os
 from time import gmtime, strftime
 from botocore.exceptions import ClientError
@@ -32,6 +31,7 @@ from maestro.s3_backup import main as s3_backup
 from maestro.invoke import main as invoke
 from maestro.cloudwatch_sub import cloudwatchSubscription
 from maestro.config_validator import validation
+from maestro.zip_function import zip_function
 
 DOC = ARGS.filename
 
@@ -65,40 +65,6 @@ def get_arn():
   role = iam.Role('%s' % json_parser()["initializers"]["role"])
   arn = role.arn
   return arn
-
-def zip_folder():
-  lambda_name = json_parser()["initializers"]["name"]
-  output_path = os.getcwd() + '/%s.zip' % lambda_name
-  folder_path = os.curdir + '/dist'
-  grab_lambda = os.walk(folder_path)
-  length = len(folder_path)
-
-  try:
-    zipped_lambda = zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED)
-    for root, folders, files in grab_lambda:
-      for folder_name in folders:
-        absolute_path = os.path.join(root, folder_name)
-        shortened_path = os.path.join(root[length:], folder_name)
-        print(color.CYAN + "Adding '%s' to package." % shortened_path + color.END)
-        zipped_lambda.write(absolute_path, shortened_path)
-      for file_name in files:
-        absolute_path = os.path.join(root, file_name)
-        shortened_path = os.path.join(root[length:], file_name)
-        print(color.CYAN + "Adding '%s' to package." % shortened_path + color.END)
-        zipped_lambda.write(absolute_path, shortened_path)
-    print(color.CYAN + "'%s' lambda packaged successfully." % lambda_name + color.END)
-    return True
-  except IOError:
-    print(message)
-    sys.exit(1)
-  except OSError:
-    print(message)
-    sys.exit(1)
-  except zipfile.BadZipfile:
-    print(message)
-    sys.exit(1)
-  finally:
-    zipped_lambda.close()
 
 def check():
   proposed_function = json_parser()["initializers"]["name"]
@@ -195,7 +161,7 @@ def create():
   else:
     trace_type = {'Mode': 'PassThrough'}
 
-  if zip_folder():
+  if zip_function(lambda_name):
     if ARGS.dry_run:
       print(color.BOLD + "***Dry Run option enabled***" + color.END)
       print(color.PURPLE + "Would have attempted to create the following:" + color.END)
@@ -248,7 +214,7 @@ def update():
   lambda_name = json_parser()["initializers"]["name"]
   archive_name = os.getcwd() + '/%s.zip' % lambda_name  
 
-  if zip_folder():
+  if zip_function(lambda_name):
     print(color.CYAN + "Attempting to update lambda..." + color.END)
 
     if ARGS.dry_run:
