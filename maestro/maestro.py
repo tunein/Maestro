@@ -32,6 +32,7 @@ from maestro.invoke import main as invoke
 from maestro.cloudwatch_sub import cloudwatchSubscription
 from maestro.config_validator import validation
 from maestro.zip_function import zip_function
+from maestro.check_existence import check
 
 DOC = ARGS.filename
 
@@ -65,24 +66,6 @@ def get_arn():
   role = iam.Role('%s' % json_parser()["initializers"]["role"])
   arn = role.arn
   return arn
-
-def check():
-  proposed_function = json_parser()["initializers"]["name"]
-  existing_functions = client.list_functions()
-  parse = json.dumps(existing_functions)
-  load = json.loads(parse) 
-  functions = load["Functions"]
-
-  current_functions = []
-
-  for function in functions:
-    names = function['FunctionName']
-    append = current_functions.append(names)
-
-  if proposed_function in current_functions:
-    return True
-  else:
-    return False
 
 def create():
   lambda_name = json_parser()["initializers"]["name"]
@@ -481,7 +464,7 @@ def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
       if ARGS.action == 'create':
         print("Checking to see if lambda already exists")
-        if check():
+        if check(json_parser()['initializers']['name']):
           print("This function already exists, please use action 'update'")
         else:
           if create():
