@@ -11,12 +11,12 @@ import maestro.vpc_location as vpc_location
 import maestro.s3_backup as s3_backup
 import maestro.alias as alias 
 import maestro.lambda_config as lambda_config
-import maestro.invoke as invoke
 
 #Clean this up...
 from maestro.cli import ARGS
 from maestro.security_groups import security_groups as security_groups_method
 from maestro.s3_backup import main as s3_backup
+from maestro.invoke import main as invoke
 from maestro.triggers import creation as create_trigger
 from maestro.triggers import remove_invoke_action as delete_trigger
 from maestro.dlq import get_sns_arn
@@ -812,7 +812,13 @@ def main():
      
       elif ARGS.action == "invoke":
         if check():
-          if invoke.test_invoke():
+          if invoke(
+                json_parser()['initializers']['name'], 
+                version=ARGS.version,
+                alias=ARGS.alias,
+                invoke_type=ARGS.invoke_type,
+                payload=ARGS.payload
+                ):
             return 0
           else:
             return 1
