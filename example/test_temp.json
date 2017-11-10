@@ -14,5 +14,8 @@
  "vpc_setting": {
     "vpc_name": "Stock_VPC",
     "security_group_ids": ["MMTest"]
+ },
+ "backup": {
+    "bucket_name": "mm-img-bucket-test"
  }
 }

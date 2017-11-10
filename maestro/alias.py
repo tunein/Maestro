@@ -1,28 +1,33 @@
+#External libs
 import boto3
-import maestro.lambda_config as lambda_config
 import sys
 import json
 import zipfile
 import os
 from botocore.exceptions import ClientError
+
+#Our modules
+import maestro.lambda_config as lambda_config
 from maestro.cli import ARGS
 
+#This is only here for printing pretty colors
+class color:
+     PURPLE = '\033[95m'
+     CYAN = '\033[96m'
+     DARKCYAN = '\033[36m'
+     BLUE = '\033[94m'
+     GREEN = '\033[92m'
+     YELLOW = '\033[93m'
+     RED = '\033[91m'
+     BOLD = '\033[1m'
+     UNDERLINE = '\033[4m'
+     END = '\033[0m'
+
+#Establish our boto resources
 client = boto3.client('lambda')
 iam = boto3.resource('iam')
 roles = boto3.client('iam')
 DOC = ARGS.filename
-
-class color:
-   PURPLE = '\033[95m'
-   CYAN = '\033[96m'
-   DARKCYAN = '\033[36m'
-   BLUE = '\033[94m'
-   GREEN = '\033[92m'
-   YELLOW = '\033[93m'
-   RED = '\033[91m'
-   BOLD = '\033[1m'
-   UNDERLINE = '\033[4m'
-   END = '\033[0m'
 
 def json_parser():
   with open('%s' % DOC) as json_data:
