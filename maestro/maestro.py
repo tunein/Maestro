@@ -4,12 +4,12 @@ import json
 import os
 
 #Our modules
-from maestro.main import main
+#from maestro.main import main
+
+#Get CLI Args
+from cli import ARGS
 
 '''
-#Get CLI Args
-from maestro.cli import ARGS
-
 #Alias module
 from maestro.alias import alias_creation as alias_creation
 from maestro.alias import alias_destroy as alias_destroy
@@ -43,12 +43,7 @@ import maestro.vpc_location as vpc_location
 import maestro.lambda_config as lambda_config
 '''
 
-DOC = ARGS.filename
-
-client = boto3.client('lambda')
-
-TRACING_TYPES = lambda_config.TRACE_TYPES
-ACCEPTED_PROMPT_ACTIONS = lambda_config.ACCEPTED_PROMPT_ACTIONS
+#DOC = ARGS.filename
 
 class color:
    PURPLE = '\033[95m'
@@ -61,13 +56,6 @@ class color:
    BOLD = '\033[1m'
    UNDERLINE = '\033[4m'
    END = '\033[0m'
-
-def json_parser():
-  with open('%s' % DOC) as json_data:
-    read = json.load(json_data)
-    return read
-    return True
-  print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
 
 def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):

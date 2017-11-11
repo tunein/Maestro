@@ -12,7 +12,6 @@
     "runtime": "python3.6",
     "timeout": 150,
     "mem_size": 128,
-    "publish": "yes"
  },
  "vpc_setting": {
     "vpc_name": "example-vpc",

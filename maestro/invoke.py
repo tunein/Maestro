@@ -146,11 +146,11 @@ def test_invoke(function_arn, avail_aliases, avail_versions, *, version=False, a
 
     try:
         response = client.invoke(
-                                                FunctionName=function_arn,
-                                                InvocationType=invocator,
-                                                LogType='Tail',
-                                                Payload=open(pay_load, 'rb').read(),
-                                            )
+                                FunctionName=function_arn,
+                                InvocationType=invocator,
+                                LogType='Tail',
+                                Payload=open(pay_load, 'rb').read(),
+                                )
         if response['StatusCode'] in [200, 202, 204]:
             try:
                 coded_response = response['LogResult']
@@ -180,11 +180,4 @@ def main(lambda_name, version, alias, invoke_type, payload):
     function_arn = get_lambda_arn(lambda_name)
     avail_aliases = list_aliases(lambda_name)
     avail_versions = list_versions(lambda_name)
-    invoke = test_invoke(function_arn=function_arn, 
-                                                avail_aliases=avail_aliases, 
-                                                avail_versions=avail_versions,
-                                                version=version,
-                                                alias=alias,
-                                                invoke_type=invoke_type,
-                                                payload=payload
-                                            )
+    invoke = test_invoke(function_arn=function_arn, avail_aliases=avail_aliases, avail_versions=avail_versions, version=version, alias=alias, invoke_type=invoke_type, payload=payload)

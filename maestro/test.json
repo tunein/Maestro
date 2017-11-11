@@ -1,0 +1,30 @@
+{
+ "initializers": {
+    "name": "example",
+    "description": "example description",
+    "region": "us-west-2",
+    "role": "lambda_role",
+    "handler": "example.main",
+    "alias": "live"
+  },
+ "provisioners": {
+    "runtime": "python3.6",
+    "timeout": 150,
+    "mem_size": 128
+ },
+ "vpc_setting": {
+    "vpc_name": "Stock_VPC",
+    "security_group_ids": ["MMTest"]
+ },
+ "trigger": {
+    "method": "s3",
+    "source": "test-topic-lambda"
+ },
+ "tags": {
+    "name": "test lambda",
+    "environment": "test"
+ },
+ "backup": {
+    "bucket_name": "mm-img-bucket-test"
+ }
+}
