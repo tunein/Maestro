@@ -50,12 +50,12 @@ def alias_creation(lambda_name, new_alias=False, dry_run=False, publish=False):
     if new_alias:
         if new_alias in aliases:
             if publish:
-                if alias_update():
+                if alias_update(lambda_name, new_alias, dry_run, publish):
                     return True
             else:
                 ask = input("Alias exists, would you like to update it (y/n)? ")
                 if ask == 'y':
-                    if alias_update():
+                    if alias_update(lambda_name, new_alias, dry_run, publish):
                         print("Attempting to update alias %s" % new_alias)
                         return True
                     else:
