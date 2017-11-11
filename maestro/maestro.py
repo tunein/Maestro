@@ -25,6 +25,7 @@ from maestro.dlq import get_sqs_arn
 from maestro.create_lambda import create
 from maestro.publish_lambda import publish
 from maestro.delete_lambda import delete
+from maestro.update_lambda_code import update_code
 
 #Everything else
 from maestro.security_groups import security_groups as security_groups_method
@@ -64,63 +65,6 @@ def json_parser():
     return read
     return True
   print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
-
-def update():
-  lambda_name = json_parser()["initializers"]["name"]
-  archive_name = os.getcwd() + '/%s.zip' % lambda_name  
-
-  if zip_function(lambda_name):
-    print(color.CYAN + "Attempting to update lambda..." + color.END)
-
-    if ARGS.dry_run:
-      print(color.PURPLE + "***Dry Run option enabled, running dry run code-update***" + color.END)
-      run = True
-    else:
-      run = False
-
-    if ARGS.publish:
-      if ARGS.dry_run:
-        answer = False
-      else:
-        answer = True
-    else:
-      if ARGS.dry_run:
-        answer = False
-      else:
-        if ARGS.no_pub:
-          answer = False
-        else:
-          publish_answer = input("Would you like to publish this update? ('y/n'): ")
-
-          if publish_answer.lower() in ACCEPTED_PROMPT_ACTIONS:
-            if publish_answer == 'y':
-              answer = True
-              print(color.CYAN + "Publishing update" + color.END)
-            if publish_answer == 'n':
-              answer = False
-              print(color.CYAN + "Updating lambda without publishing" + color.END)
-          else:
-            print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
-
-    try:
-      update = client.update_function_code(
-        FunctionName='%s' % lambda_name,
-        ZipFile= open(archive_name, 'rb').read(),
-        Publish=answer,
-        DryRun=run
-      )
-      if update['ResponseMetadata']['HTTPStatusCode'] == 200:
-        if ARGS.dry_run:
-          print(color.PURPLE + "***Dry Run Successful!***" + color.END)
-          return True
-        else:
-          print(color.CYAN + "Lambda updated!" + color.END)
-          return True
-      else:
-        return False
-    except ClientError as error:
-      print(color.RED + error.response['Error']['Message'] + color.END)
-      sys.exit(1)
 
 def list_lambdas():
   lambda_name = json_parser()["initializers"]["name"]
@@ -423,7 +367,7 @@ def main():
 
       elif ARGS.action == 'update-code':
         if check(json_parser()['initializers']['name']):
-          if update():
+          if update_code(json_parser()['initializers']['name'], dry_run=ARGS.dry_run, publish=ARGS.publish, no_pub=ARGS.no_pub):
             if 'backup' in json_parser():
               if s3_backup(json_parser()['initializers']['name'], json_parser()['backup']['bucket_name'], ARGS.dry_run):
                 if ARGS.alias:
