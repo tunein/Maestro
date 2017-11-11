@@ -7,40 +7,21 @@ import sys
 from cli import ARGS
 
 #Configuration module
-from config_parser import ConfigReturn
+from maestro.config.config_parser import ConfigReturn
 
 #Get the config file that has our allowances 
-import maestro.lambda_config as lambda_config
-
-#Trigger module
-from maestro.triggers import create_trigger as create_trigger
-from maestro.triggers import remove_invoke_action as delete_trigger
-
-#DLQ module
-from maestro.dlq import get_sns_arn
-from maestro.dlq import get_sqs_arn
+import maestro.config.lambda_config as lambda_config
+from maestro.config.config_validator import validation
 
 #Core actions
-from maestro.create_lambda import create
-from maestro.delete_lambda import delete
-from maestro.update_lambda_code import update_code
-from maestro.update_lambda_config import update_config
-from maestro.publish_lambda import publish
-from maestro.invoke import main as invoke
-from maestro.alias import alias_creation as alias_creation
-from maestro.alias import alias_destroy as alias_destroy
-from maestro.alias import alias_update as alias_update
-
-#Everything else
-from maestro.security_groups import security_groups as security_groups_method
-from maestro.s3_backup import main as s3_backup
-
-from maestro.cloudwatch_sub import cloudwatchSubscription
-from maestro.config_validator import validation
-from maestro.zip_function import zip_function
-from maestro.check_existence import check
-from maestro.role_arn import get_arn
-from maestro.vpc_location import main as vpc_location
+from maestro.actions.create import create_action
+from maestro.actions.create_alias import create_alias_action
+from maestro.actions.delete import delete_action
+from maestro.actions.delete_alias import delete_alias_action
+from maestro.actions.invoke import invoke_action
+from maestro.actions.update_alias import update_alias_action
+from maestro.actions.update_code import update_code_action
+from maestro.actions.update_config import update_config_action
 
 def main():
     '''

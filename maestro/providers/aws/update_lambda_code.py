@@ -5,8 +5,10 @@ import json
 import os
 from botocore.exceptions import ClientError
 
-#Our modules
-import maestro.lambda_config as lambda_config
+#Get our config
+import maestro.config.lambda_config as lambda_config
+
+#Get other necessary AWS modules
 from maestro.role_arn import get_arn
 from maestro.vpc_location import main as vpc_location
 from maestro.security_groups import security_groups
