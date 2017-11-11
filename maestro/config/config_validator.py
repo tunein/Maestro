@@ -30,7 +30,7 @@ roles = boto3.client('iam')
 AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
 AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
 
-def file_type(doc):
+def validate_file_type(doc):
     '''
     Validates we have a doc with the extension json
     
@@ -41,7 +41,7 @@ def file_type(doc):
     if len(doc)>0:
         if doc.lower().endswith('.json'):
             return True
-        return False
+        sys.exit(1)
     print(color.RED + "Please enter a valid json document after your action" + color.END)
 
 def validate_action(current_action):
@@ -53,7 +53,9 @@ def validate_action(current_action):
     '''
     if any(action in current_action for action in AVAIL_ACTIONS):
         return True
-    print(color.RED + "Not a valid action" + color.END)
+    else:
+        print(color.RED + "Not a valid action" + color.END)
+        sys.exit(1)
 
 def validate_runtime(config_runtime):
     '''
@@ -65,7 +67,9 @@ def validate_runtime(config_runtime):
     print(color.CYAN + "validating runtime %s..." % config_runtime + color.END)
     if any(runtime in config_runtime for runtime in AVAIL_RUNTIMES):
         return True
-    print(color.RED + "Not a valid runtime" + color.END)
+    else:
+        print(color.RED + "Not a valid runtime" + color.END)
+        sys.exit(1) 
 
 def validate_role(role):
     '''
@@ -78,7 +82,10 @@ def validate_role(role):
     data = iam.role_name=role
     if len(data)>0:
         return True
-    print(color.RED + "invalid role" + color.END)  
+    else:
+        print(color.RED + "invalid role" + color.END)
+        sys.exit(1)
+      
 
 def validate_timeout(timeout):
     '''
@@ -90,17 +97,6 @@ def validate_timeout(timeout):
     acceptable_range = range(1,301)
     if timeout in acceptable_range:
         return True
-    print(color.RED + "Timeout should between between 1 and 300 seconds, please adjust" + color.END)
-
-######### Main Entry point ##########
-def validation(doc, current_action, config_runtime, role, timeout):
-    '''
-    This is the main entrypoint to this module, for ease of use in calling it from elsewhere
-    Runs everything down in a row to validate all of our actions
-    '''
-    if file_type(doc):
-        if validate_action(current_action):
-            if validate_runtime(config_runtime):
-                if validate_role(role):
-                    if validate_timeout(timeout):
-                        return True
+    else:
+        print(color.RED + "Timeout should between between 1 and 300 seconds, please adjust" + color.END)
+        sys.exit(1)
