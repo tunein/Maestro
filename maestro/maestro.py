@@ -5,10 +5,6 @@ import os
 from time import gmtime, strftime
 from botocore.exceptions import ClientError
 
-#Clean these up...
-import maestro.vpc_location as vpc_location
-import maestro.lambda_config as lambda_config
-
 #Get CLI Args
 from maestro.cli import ARGS
 
@@ -34,12 +30,14 @@ from maestro.config_validator import validation
 from maestro.zip_function import zip_function
 from maestro.check_existence import check
 from maestro.role_arn import get_arn
+from maestro.create_lambda import create
+
+import maestro.vpc_location as vpc_location
+import maestro.lambda_config as lambda_config
 
 DOC = ARGS.filename
 
 client = boto3.client('lambda')
-
-roles = boto3.client('iam')
 
 TRACING_TYPES = lambda_config.TRACE_TYPES
 ACCEPTED_PROMPT_ACTIONS = lambda_config.ACCEPTED_PROMPT_ACTIONS
@@ -62,132 +60,6 @@ def json_parser():
     return read
     return True
   print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
-
-def create():
-  lambda_name = json_parser()["initializers"]["name"]
-  archive_name = os.getcwd() + '/%s.zip' % lambda_name
-
-  subnet_ids = []
-
-  if 'vpc_setting' in json_parser():
-    subnets = vpc_location.main(json_parser()['vpc_setting']['vpc_name'])
-    subnet_ids.extend(subnets)
-  else:
-    pass
-
-  security_group_id_list = []
-
-  if 'vpc_setting' in json_parser():
-    groups = security_groups_method(json_parser()['vpc_setting']['security_group_ids'])
-    security_group_id_list.extend(groups)
-  else:
-    pass
-
-  tags = {}
-
-  if 'tags' in json_parser():
-    tags.update(json_parser()['tags'])
-  else:
-    pass
-
-  if len(subnet_ids)>0:
-    vpc_config = {
-                    'SubnetIds': subnet_ids,
-                    'SecurityGroupIds': security_group_id_list
-                  }
-  else:
-    vpc_config = { }
-
-  if ARGS.publish:
-    pub = True
-  else:
-    pub = False
-
-  if 'variables' in json_parser():
-    env_vars = json_parser()['variables']
-  else:
-    env_vars = { }
-
-  target_arn = { }
-
-  if 'dead_letter_config' in json_parser():
-    dlq_type = json_parser()['dead_letter_config']['type']
-    name = json_parser()['dead_letter_config']['target_name']
-    if dlq_type == 'sns':
-      arn = get_sns_arn(name)
-      target_arn.update({'TargetArn': arn})
-    elif dlq_type == 'sqs':
-      arn = get_sqs_arn(name)
-      target_arn.update({'TargetArn': arn})
-    else:
-      raise RuntimeError('No valid DLQ type found')
-  else:
-    pass
-
-  trace_type = { }
-
-  if 'tracing_mode' in json_parser()['initializers']:
-    mode = json_parser()['initializers']['tracing_mode']
-    if mode in TRACING_TYPES:
-      if mode == "active":
-        capmode = "Active"
-        trace_type.update({'Mode': capmode})
-      elif mode == "passthrough":
-        capmode = "PassThrough"
-        trace_type.update({'Mode': capmode})
-    else:
-      raise RuntimeError('No valid trace mode found')
-  else:
-    trace_type = {'Mode': 'PassThrough'}
-
-  if zip_function(lambda_name):
-    if ARGS.dry_run:
-      print(color.BOLD + "***Dry Run option enabled***" + color.END)
-      print(color.PURPLE + "Would have attempted to create the following:" + color.END)
-      print(color.PURPLE + "FunctionName: %s" % lambda_name + color.END)
-      print(color.PURPLE + "Runtime: %s" % json_parser()["provisioners"]["runtime"] + color.END)
-      print(color.PURPLE + "Role: %s" % get_arn(json_parser()["initializers"]["role"]) + color.END)
-      print(color.PURPLE + "Handler: %s" % json_parser()["initializers"]["handler"] + color.END)
-      print(color.PURPLE + "Archive: %s" % archive_name + color.END)
-      print(color.PURPLE + "Description: %s" % json_parser()["initializers"]["description"] + color.END)
-      print(color.PURPLE + "Timeout: %s" % json_parser()["provisioners"]["timeout"] + color.END)
-      print(color.PURPLE + "Memory Size: %s" % json_parser()["provisioners"]["mem_size"] + color.END)
-      print(color.PURPLE + "VPC Config: %s" % vpc_config + color.END)
-      print(color.PURPLE + "Environment Variables: %s" % env_vars + color.END)
-      print(color.PURPLE + "DLQ Target: %s" % target_arn)
-      print(color.PURPLE + "Tracing Config: %s" % trace_type)
-      print(color.PURPLE + "Tags: %s" % tags)
-      return True
-    else:
-      print(color.CYAN + "Attempting to create lambda..." + color.END)
-      try:
-        create = client.create_function(
-          FunctionName='%s' % lambda_name,
-          Runtime='%s' % json_parser()["provisioners"]["runtime"],
-          Role='%s' % get_arn(json_parser()["initializers"]["role"]),
-          Handler='%s' % json_parser()["initializers"]["handler"],
-          Code={
-            'ZipFile': open(archive_name, 'rb').read()
-          },
-          Description='%s' % json_parser()["initializers"]["description"],
-          Timeout=json_parser()["provisioners"]["timeout"],
-          MemorySize=json_parser()["provisioners"]["mem_size"],
-          Publish=pub,
-          VpcConfig=vpc_config,
-          Environment={
-            'Variables': env_vars
-            },
-          DeadLetterConfig=target_arn,
-          TracingConfig=trace_type,
-          Tags=tags
-        )
-        if create['ResponseMetadata']['HTTPStatusCode'] == 201:
-          return True
-        else:
-          return False
-      except ClientError as error:
-        print(color.RED + error.response['Error']['Message'] + color.END)
-        sys.exit(1)
 
 def update():
   lambda_name = json_parser()["initializers"]["name"]
@@ -450,20 +322,27 @@ def publish():
     print(color.RED + error.response['Error']['Message'] + color.END)
     sys.exit(1)
 
-'''
-def is_event_source():
-
-  still working this out
-'''
-
 def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
       if ARGS.action == 'create':
+        
+        lambda_name = json_parser()['initializers']['name']
+        alias = json_parser()['initializers']['alias']
+        runtime = json_parser()['provisioners']['runtime']
+        role = json_parser()['initializers']['role']
+        handler = json_parser()['initializers']['handler']
+        description = json_parser()['initializers']['description']
+        timeout = json_parser()['provisioners']['timeout']
+        mem_size = json_parser()['provisioners']['mem_size']
+        vpc_setting = True
+        config_vpc_name = json_parser()['vpc_setting']['vpc_name']
+        config_security_groups = json_parser()['vpc_setting']['security_group_ids']
+
         print("Checking to see if lambda already exists")
         if check(json_parser()['initializers']['name']):
           print("This function already exists, please use action 'update'")
         else:
-          if create():
+          if create(lambda_name, runtime, role, handler, description, timeout, mem_size, vpc_setting, config_vpc_name, config_security_groups):
             if ARGS.dry_run:
               return 0
             else:
