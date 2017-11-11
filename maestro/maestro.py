@@ -1,11 +1,12 @@
 #External libs
-import boto3
 import sys
 import json
 import os
-from time import gmtime, strftime
-from botocore.exceptions import ClientError
 
+#Our modules
+from maestro.main import main
+
+'''
 #Get CLI Args
 from maestro.cli import ARGS
 
@@ -38,9 +39,9 @@ from maestro.config_validator import validation
 from maestro.zip_function import zip_function
 from maestro.check_existence import check
 from maestro.role_arn import get_arn
-
 import maestro.vpc_location as vpc_location
 import maestro.lambda_config as lambda_config
+'''
 
 DOC = ARGS.filename
 
