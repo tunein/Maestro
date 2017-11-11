@@ -20,6 +20,10 @@
     "method": "sns",
     "source": "test-topic-lambda"
  },
+ "tags": {
+    "name": "test lambda",
+    "environment": "test"
+ },
  "backup": {
     "bucket_name": "mm-img-bucket-test"
  }

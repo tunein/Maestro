@@ -45,7 +45,7 @@ def create(lambda_name, runtime, role, handler, description, timeout, mem_size, 
         role: valid AWS role, retrieved from config
         handler: the main entrypoint of your code, module.function_name
         description: simple description of the lambda
-        timeout: integer in seconds for long the lambda runs
+        timeout: integer in seconds for how long the lambda can run
         mem_size: integer in mb for how much memory your lambda needs
         vpc_setting: boolean, if yes grab vpc name and security group ids from config
         config_vpc_name: vpc name from config file

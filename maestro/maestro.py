@@ -1,3 +1,4 @@
+#External libs
 import boto3
 import sys
 import json
@@ -26,6 +27,7 @@ from maestro.create_lambda import create
 from maestro.publish_lambda import publish
 from maestro.delete_lambda import delete
 from maestro.update_lambda_code import update_code
+from maestro.update_lambda_config import update_config
 
 #Everything else
 from maestro.security_groups import security_groups as security_groups_method
@@ -65,125 +67,6 @@ def json_parser():
     return read
     return True
   print(color.RED + "No json document to read.. Please enter a valid json document" + color.END)
-
-def list_lambdas():
-  lambda_name = json_parser()["initializers"]["name"]
-  try:
-    response = client.list_functions(
-                FunctionVersion='ALL'
-              )
-    dump = json.dumps(response, indent=4)
-    load = json.loads(dump)
-    
-    for function in load['Functions']:
-      if lambda_name in function['FunctionName']:
-        splitter = function['FunctionArn'].split(':')[0:7]
-        joiner = ':'.join(map(str, splitter))
-        return joiner
-  except ClientError as error:
-    print(color.RED + error.response['Error']['Message'] + color.END)
-
-def update_config():
-  lambda_name = json_parser()["initializers"]["name"]
-
-  subnet_ids = []
-
-  if 'vpc_setting' in json_parser():
-    subnets = vpc_location.main(json_parser()['vpc_setting']['vpc_name'])
-    subnet_ids.extend(subnets)
-  else:
-    pass
-
-  security_group_id_list = []
-
-  if 'vpc_setting' in json_parser():
-    groups = security_groups_method(json_parser()['vpc_setting']['security_group_ids'])
-    security_group_id_list.extend(groups)
-  else:
-    pass
-
-  tags = {}
-
-  if 'tags' in json_parser():
-    tags.update(json_parser()['tags'])
-    try:
-      generate_tags = client.tag_resource(
-                        Resource=list_lambdas(),
-                        Tags=tags
-                      )
-    except ClientError as error:
-      print(color.RED + error.response['Error']['Message'] + color.END)
-  else:
-    pass
-
-  if len(subnet_ids)>0:
-    vpc_config = {
-                  'SubnetIds': subnet_ids,
-                  'SecurityGroupIds': security_group_id_list
-                }
-  else:
-    vpc_config = { }
-
-  if 'variables' in json_parser():
-    env_vars = json_parser()['variables']
-  else:
-    env_vars = { }
-
-  target_arn = { }
-
-  if 'dead_letter_config' in json_parser():
-    dlq_type = json_parser()['dead_letter_config']['type']
-    name = json_parser()['dead_letter_config']['target_name']
-    if dlq_type == 'sns':
-      arn = get_sns_arn(name)
-      target_arn.update({'TargetArn': arn})
-    elif dlq_type == 'sqs':
-      arn = get_sqs_arn(name)
-      target_arn.update({'TargetArn': arn})
-    else:
-      raise RuntimeError('No valid DLQ type found')
-  else:
-    print('No DLQ resource found, passing')
-    pass
-
-  trace_type = { }
-
-  if 'tracing_mode' in json_parser()['initializers']:
-    mode = json_parser()['initializers']['tracing_mode']
-    if mode in TRACING_TYPES:
-      if mode == "active":
-        capmode = "Active"
-        trace_type.update({'Mode': capmode})
-      elif mode == "passthrough":
-        capmode = "PassThrough"
-        trace_type.update({'Mode': capmode})
-    else:
-      raise RuntimeError('No valid trace mode found')
-  else:
-    trace_type = {'Mode': 'PassThrough'}
-
-  try:
-    update_configuration = client.update_function_configuration(
-      FunctionName='%s' % lambda_name,
-      Role='%s' % get_arn(json_parser()["initializers"]["role"]),
-      Handler='%s' % json_parser()["initializers"]["handler"],
-      Description='%s' % json_parser()["initializers"]["description"],
-      Timeout=json_parser()["provisioners"]["timeout"],
-      MemorySize=json_parser()["provisioners"]["mem_size"],
-      VpcConfig=vpc_config,
-      Runtime='%s' % json_parser()["provisioners"]["runtime"],
-      Environment={
-          'Variables': env_vars
-        },
-      DeadLetterConfig=target_arn,
-      TracingConfig=trace_type
-      )
-    if update_configuration['ResponseMetadata']['HTTPStatusCode'] == 200:
-      return True
-    else:
-      return False
-  except ClientError as error:
-    print(color.RED + error.response['Error']['Message'] + color.END)
 
 def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
@@ -391,8 +274,20 @@ def main():
 
       elif ARGS.action == "update-config":
         if check(json_parser()['initializers']['name']):
-          if update_config():
 
+          lambda_name = json_parser()['initializers']['name']
+          runtime = json_parser()['provisioners']['runtime']
+          role = json_parser()['initializers']['role']
+          handler = json_parser()['initializers']['handler']
+          description = json_parser()['initializers']['description']
+          timeout = json_parser()['provisioners']['timeout']
+          mem_size = json_parser()['provisioners']['mem_size']
+          vpc_setting = True
+          config_vpc_name = json_parser()['vpc_setting']['vpc_name']
+          config_security_groups = json_parser()['vpc_setting']['security_group_ids']
+          tags = json_parser()['tags']
+
+          if update_config(lambda_name=lambda_name, handler=handler, description=description, timeout=timeout, mem_size=mem_size, role=role, runtime=runtime, vpc_setting=vpc_setting, config_vpc_name=config_vpc_name, config_security_groups=config_security_groups, new_tags=tags):
             if ARGS.delete_trigger:
               if delete_trigger(lambda_name=json_parser()['initializers']['name'], trigger=True, alias=json_parser()['initializers']['alias'], invoke_source=json_parser()['trigger']['source']):
                 return 0
