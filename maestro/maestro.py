@@ -24,6 +24,7 @@ from maestro.dlq import get_sqs_arn
 #Core actions
 from maestro.create_lambda import create
 from maestro.publish_lambda import publish
+from maestro.delete_lambda import delete
 
 #Everything else
 from maestro.security_groups import security_groups as security_groups_method
@@ -239,67 +240,6 @@ def update_config():
       return False
   except ClientError as error:
     print(color.RED + error.response['Error']['Message'] + color.END)
-
-def delete():
-  lambda_name = json_parser()["initializers"]["name"]
-
-  if ARGS.dry_run:
-    try:
-      print(color.PURPLE + "***Dry run option enabled, dry running a deletion***" + color.END)
-      alias = client.list_aliases(
-                      FunctionName='%s' % lambda_name,
-                      )
-
-      dump_json = json.dumps(alias, indent=4) 
-      load = json.loads(dump_json)
-
-      aliases = []
-
-      for names in load['Aliases']:    
-        aliases.append(names['Name'])
-
-      print(color.PURPLE + "Would delete:" + color.END)
-      print(color.PURPLE + "Lambda: %s" % lambda_name + color.END)
-      for item in aliases:
-        print(color.PURPLE + "Alias: %s" % item + color.END)
-
-      versions = client.list_versions_by_function(
-                  FunctionName='%s' % lambda_name,
-                )
-
-      version_json = json.dumps(versions, indent=4)
-      load_json = json.loads(version_json)
-      versions = load_json['Versions']
-      avail_versions = []
-
-      for version in versions:
-        avail_versions.append(version['Version'])
-
-      for vers in avail_versions:
-        print(color.PURPLE + "Version: %s" % vers + color.END)
-    except ClientError as error:
-      print(color.RED + error.response['Error']['Message'] + color.END)
-  else:
-    double_check = input("Are you SURE you want to delete this lambda (y/n)? ")
-    lowered_checked = double_check.lower()
-
-    if lowered_checked == 'y':
-      try:
-        delete = client.delete_function(
-          FunctionName='%s' % lambda_name
-          )
-        if check(json_parser()['initializers']['name']):
-          print(color.RED + "Failed to delete Lambda" + color.END)
-          return False
-        else:
-          print(color.CYAN + "Lambda %s deleted successfully" % lambda_name + color.END)
-          return True
-      except ClientError as error:
-        print(color.RED + error.response['Error']['Message'] + color.END)
-        sys.exit(1)
-    else:
-      print(color.RED + "Exiting" + color.END)
-      sys.exit(1)
 
 def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
@@ -539,7 +479,7 @@ def main():
 
       elif ARGS.action == "delete":
         if check(json_parser()['initializers']['name']):
-          if delete():
+          if delete(json_parser()['initializers']['name']):
             return 0
         else:
           print("No lambda was found.. looks like you have nothing to delete")

@@ -6,6 +6,7 @@ import os
 from botocore.exceptions import ClientError
 
 #Our modules
+import maestro.lambda_config as lambda_config
 from maestro.role_arn import get_arn
 from maestro.vpc_location import main as vpc_location
 from maestro.security_groups import security_groups
@@ -15,6 +16,9 @@ from maestro.zip_function import zip_function
 
 #Establish our boto resources
 client = boto3.client('lambda')
+
+#Establish easy to read variables for stuff from config file
+TRACING_TYPES = lambda_config.TRACE_TYPES
 
 #This is only here for printing pretty colors
 class color:
