@@ -1,15 +1,20 @@
+#External libs
 import os
 import sys
 
+#Get relevant modules
 from maestro.providers.aws.alias import alias_creation
-from maestro.providers.aws.create_lambda import create
 from maestro.providers.aws.check_existence import check
 from maestro.providers.aws.cloudwatchsub import cloudwatchSubscription
-from maestro.providers.aws.triggers import main as triggers
+from maestro.providers.aws.create_lambda import create
+from maestro.providers.aws.triggers import create_trigger
+from maestro.providers.aws.s3_backup import main as s3_backup
 
-def create_action(name, region, role, trigger=False, alias=False, dry_run=False, publish=False, variables=False, 
-                    logging=False, dead_letter_config=False, dlq_type=False, dlq_name=False, dest_lambda=False, 
-                    dest_alias=False, event_type=False, tags=False, tracing_mode=False, bucket_name=False):
+def create_action(name, runtime, region, role, handler, description, timeout, mem_size, trigger=False, alias=False, 
+                    vpc_setting=False, config_vpc_name=False, config_security_groups=False, dry_run=False, publish=False, 
+                    variables=False, logging=False, dead_letter_config=False, dlq_type=False, dlq_name=False, 
+                    dest_lambda=False, dest_alias=False, event_type=False, tags=False, tracing_mode=False, 
+                    bucket_name=False):
     '''
     Creates a lambda function, first checks to see if it exists, if yes, exit, else, create lambda
     '''
@@ -21,7 +26,7 @@ def create_action(name, region, role, trigger=False, alias=False, dry_run=False,
     else:
         #The core action of this function
         create_function = create(
-                                lambda_name=lambda_name, 
+                                lambda_name=name, 
                                 runtime=runtime, 
                                 role=role, 
                                 handler=handler, 
