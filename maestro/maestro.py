@@ -21,6 +21,10 @@ from maestro.triggers import remove_invoke_action as delete_trigger
 from maestro.dlq import get_sns_arn
 from maestro.dlq import get_sqs_arn
 
+#Core actions
+from maestro.create_lambda import create
+from maestro.publish_lambda import publish
+
 #Everything else
 from maestro.security_groups import security_groups as security_groups_method
 from maestro.s3_backup import main as s3_backup
@@ -30,7 +34,6 @@ from maestro.config_validator import validation
 from maestro.zip_function import zip_function
 from maestro.check_existence import check
 from maestro.role_arn import get_arn
-from maestro.create_lambda import create
 
 import maestro.vpc_location as vpc_location
 import maestro.lambda_config as lambda_config
@@ -298,30 +301,6 @@ def delete():
       print(color.RED + "Exiting" + color.END)
       sys.exit(1)
 
-def publish():
-  lambda_name = json_parser()["initializers"]["name"]
-  
-  try:
-    if ARGS.version_description:
-      version_descript = ARGS.version_description
-      print("Descript: %s" % version_descript)
-    else:
-      version_descript = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-      print("Descript: %s" % version_descript)
-
-    publish = client.publish_version(
-      FunctionName='%s' % lambda_name,
-      Description=version_descript
-      )
-    if publish['ResponseMetadata']['HTTPStatusCode'] == 201:
-      print(color.CYAN + "Successfully published %s version %s" % (lambda_name, publish['Version']) + color.END)
-      return 0
-    else:
-      return False    
-  except ClientError as error:
-    print(color.RED + error.response['Error']['Message'] + color.END)
-    sys.exit(1)
-
 def main():
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
       if ARGS.action == 'create':
@@ -567,7 +546,7 @@ def main():
 
       elif ARGS.action == "publish":
         if check(json_parser()['initializers']['name']):
-          if publish():
+          if publish(json_parser()['initializers']['name']):
             return 0
         else:
           print("No lambda was found.. Check your settings")
