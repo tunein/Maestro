@@ -14,7 +14,9 @@ from maestro.providers.aws.vpc_location import main as vpc_location
 from maestro.providers.aws.security_groups import security_groups
 from maestro.providers.aws.dlq import get_sns_arn
 from maestro.providers.aws.dlq import get_sqs_arn
-from maestro.providers.aws.zip_function import zip_function
+
+#Get zip helper function
+from maestro.helpers.zip_function import zip_function
 
 #Establish our boto resources
 client = boto3.client('lambda')

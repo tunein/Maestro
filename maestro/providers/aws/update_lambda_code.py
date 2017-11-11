@@ -9,12 +9,14 @@ from botocore.exceptions import ClientError
 import maestro.config.lambda_config as lambda_config
 
 #Get other necessary AWS modules
-from maestro.role_arn import get_arn
-from maestro.vpc_location import main as vpc_location
-from maestro.security_groups import security_groups
-from maestro.dlq import get_sns_arn
-from maestro.dlq import get_sqs_arn
-from maestro.zip_function import zip_function
+from maestro.providers.aws.role_arn import get_arn
+from maestro.providers.aws.vpc_location import main as vpc_location
+from maestro.providers.aws.security_groups import security_groups
+from maestro.providers.aws.dlq import get_sns_arn
+from maestro.providers.aws.dlq import get_sqs_arn
+
+#Get zip helper function
+from maestro.helpers.zip_function import zip_function
 
 #Establish our boto resources
 client = boto3.client('lambda')
