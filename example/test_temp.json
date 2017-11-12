@@ -1,6 +1,6 @@
 {
  "initializers": {
-    "name": "example",
+    "name": "example-2",
     "description": "example description",
     "region": "us-west-2",
     "role": "lambda_role",

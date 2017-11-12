@@ -96,6 +96,9 @@ def main():
 
     #Get the boolean response of dry run cli arg
     dry_run = config.get_dry_run()
+
+    print(publish)
+
     '''
     Now that we've retrieved all over our actions let's run things for real
     '''
@@ -110,19 +113,19 @@ def main():
                     invoke_source=func_trigger_source)
 
     elif action == 'create-alias':
-        create_alias_action(args, it, needs, here)
+        create_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
 
     elif action == 'delete':
         delete_action(args, it, needs, here)
 
     elif action == 'delete-alias':
-        delete_alias_action(args, it, needs, here)
+        delete_alias_action(name=name, alias=alias, dry_run=dry_run)
 
     elif action == 'invoke':
         invoke_action(args, it, needs, here)
 
     elif action == 'publish':
-        publish_action(args, it, needs, here)
+        publish_action(name=name, version_description=version_description)
 
     elif action == 'update-code':
         update_code_action(args, it, needs, here)
@@ -131,7 +134,10 @@ def main():
         update_config_action(args, it, needs, here)
         
     elif action == 'update-alias':
-        update_alias_action(args, it, needs, here)
+        update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
+    else:
+        print('No valid action found, exiting')
+        sys.exit(1)
 
 ############## Do the main thing BABY ##########
 if __name__ == '__main__':

@@ -203,6 +203,8 @@ class ConfigReturn(ConfigParser):
         '''
         publish = self.cli_args.publish
 
+        return publish
+
     def get_no_publish(self):
         '''
         return status of no pub cli arg

@@ -206,7 +206,7 @@
               return 0
         else:
           print("No lambda was found.. please create using action 'create'")
-
+      
       elif ARGS.action == "update-config":
         if check(json_parser()['initializers']['name']):
 
@@ -264,7 +264,7 @@
             return 0
         else:
           print("No lambda was found.. Check your settings")
-
+      
       elif ARGS.action == "create-alias":
         if check(json_parser()['initializers']['name']):
           if alias_creation(json_parser()['initializers']['name'], json_parser()['initializers']['alias'], ARGS.dry_run, ARGS.publish):
@@ -272,7 +272,7 @@
           else:
             print("Alias creation failed..")
             return 1
-
+      
       elif ARGS.action == "delete-alias":
         if check(json_parser()['initializers']['name']):
           if alias_destroy(json_parser()['initializers']['name'], ARGS.alias, ARGS.dry_run):

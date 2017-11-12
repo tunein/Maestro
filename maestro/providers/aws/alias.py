@@ -182,7 +182,7 @@ def alias_destroy(lambda_name, del_alias=False, dry_run=False):
     else:
         print("No aliases found..")
 
-def alias_update(lambda_name, new_alias=False, dry_run=False, publish=False):
+def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
     '''
     Updates an existing alias to use a new version of code
     This can be called by itself or if the user tries to create an alias and it already exists, this will get called
@@ -229,8 +229,8 @@ def alias_update(lambda_name, new_alias=False, dry_run=False, publish=False):
     print("\n")
 
     if len(aliases) != 0:
-        if new_alias:
-            alias_name = new_alias
+        if update_alias:
+            alias_name = update_alias
         else:
             alias_name = input("What alias would you like to update? ")
 
