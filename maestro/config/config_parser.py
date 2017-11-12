@@ -193,9 +193,10 @@ class ConfigReturn(ConfigParser):
         '''
         invoke_type = self.cli_args.invoke_type
         invoke_version = self.cli_args.version
+        invoke_alias = self.cli_args.alias
         invoke_payload = self.cli_args.payload
 
-        return invoke_type, invoke_version, invoke_payload
+        return invoke_type, invoke_version, invoke_alias, invoke_payload
 
     def get_publish(self):
         '''

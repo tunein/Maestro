@@ -77,13 +77,13 @@ def main():
     func_trigger_method, func_trigger_source, func_trigger_event_type = config.get_triggers()
 
     #Logging information
-    func_log_forwarding, func_logging_dest ,func_dest_alias = config.get_logging()
+    func_log_forwarding, func_logging_dest, func_dest_alias = config.get_logging()
 
     #Backup info
     backup_bucket = config.get_backup()
 
     #Invoke information
-    invoke_type, invoke_version, invoke_payload = config.get_invoke()
+    invoke_type, invoke_version, invoke_alias, invoke_payload = config.get_invoke()
 
     #Do they want to publish?
     publish = config.get_publish()
@@ -120,7 +120,7 @@ def main():
         delete_alias_action(name=name, alias=alias, dry_run=dry_run)
 
     elif action == 'invoke':
-        invoke_action(args, it, needs, here)
+        invoke_action(name=name, invoke_type=invoke_type, version=invoke_version, alias=invoke_alias, payload=invoke_payload)
 
     elif action == 'publish':
         publish_action(name=name, version_description=version_description)

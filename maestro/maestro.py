@@ -206,7 +206,7 @@
               return 0
         else:
           print("No lambda was found.. please create using action 'create'")
-      
+      '''
       elif ARGS.action == "update-config":
         if check(json_parser()['initializers']['name']):
 
@@ -250,7 +250,7 @@
             return 1
         print("Check failed, please check settings")
         return 1
-
+      '''
       elif ARGS.action == "delete":
         if check(json_parser()['initializers']['name']):
           if delete(json_parser()['initializers']['name']):
