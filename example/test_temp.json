@@ -33,6 +33,10 @@
     "method": "sns",
     "source": "test-topic-lambda"
  },
+ "logging": {
+    "destination_lambda": "log_processor",
+    "destination_alias": "live-1"
+ },
  "backup": {
     "bucket_name": "mm-img-bucket-test"
  }

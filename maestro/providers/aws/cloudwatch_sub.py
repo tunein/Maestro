@@ -133,7 +133,7 @@ def getRoleArn(role):
     '''
     print('Gathering role arn')
     try:
-        role = iam.Role('name')
+        role = iam.Role(role)
 
         return role.arn
     except ClientError as error:
