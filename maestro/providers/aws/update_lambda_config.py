@@ -54,7 +54,8 @@ def get_lambda_arn(lambda_name):
         print(color.RED + error.response['Error']['Message'] + color.END)
 
 def update_config(lambda_name, handler, description, timeout, mem_size, runtime, role, vpc_setting=False, config_vpc_name=False, 
-                 config_security_groups=False, new_tags=False, variables=False, dead_letter_config=False, tracing_mode=False):
+                 config_security_groups=False, new_tags=False, variables=False, dead_letter_config=False, dlq_type=False,
+                 dlq_name=False, tracing_mode=False):
     '''
     Updates the configuration of the specified lambda. It does NOT update the code but updates the core
     configuration of the lambda, if you are pushing a major code change it's recommended to run this first

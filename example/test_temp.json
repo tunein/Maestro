@@ -1,7 +1,7 @@
 {
  "initializers": {
-    "name": "example-2",
-    "description": "example description",
+    "name": "example-3",
+    "description": "new description",
     "region": "us-west-2",
     "role": "lambda_role",
     "handler": "example.main",
@@ -10,8 +10,8 @@
   },
  "provisioners": {
     "runtime": "python3.6",
-    "timeout": 150,
-    "mem_size": 128
+    "timeout": 300,
+    "mem_size": 256
  },
  "vpc_setting": {
     "vpc_name": "Stock_VPC",
@@ -19,7 +19,8 @@
  },
  "variables": {
     "backend_url": "http://exampleenvyourbackend.com",
-    "api_token": "thisisanapitoken--aasdc///dyq"
+    "api_token": "thisisanapitoken--aasdc///dyq",
+    "additional": "additional-variable"
  },
  "dead_letter_config": {
     "type": "sns",
@@ -27,11 +28,12 @@
  },
  "tags": {
     "name": "test lambda",
-    "environment": "test"
+    "environment": "test",
+    "day": "sunday"
  },
  "trigger": {
-    "method": "sns",
-    "source": "test-topic-lambda"
+    "method": "s3",
+    "source": "mm-img-bucket-test"
  },
  "logging": {
     "destination_lambda": "log_processor",

@@ -141,8 +141,6 @@ def add_invoke_permission(lambda_name, invoke_method=False, invoke_source=False,
         invoke_method = input("Enter an invocation method (s3/sns/cloudwatch): ")
         invoke_source = input("Enter an invocation source (bucket name/topic name/event name: ")
 
-    print(invoke_method, invoke_source)
-
     if invoke_method in principals:
         if invoke_method == 's3':
             if check_s3(invoke_source):
@@ -194,7 +192,7 @@ def add_invoke_permission(lambda_name, invoke_method=False, invoke_source=False,
                 except ClientError as error:
                     print(error.response['Error']['Message'])
 
-def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=False, alias=False, event_type=False, dry_run=False):
+def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=False, alias=False, new_event_type=False, dry_run=False):
     '''
     Adds a subscription/notifier/event to the requested resource (sns, s3, cloudwatch)
     This is the 'important' piece, without this you will only have a policy on the lambda 
@@ -229,13 +227,8 @@ def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=Fa
             try:
                 e_type = "ObjectCreated"
 
-                if trigger:
-                    if event_type:
-                        event_type = event_type
-                    else:
-                        event_type = e_type
-                elif event_type:
-                    event_type = event_type
+                if new_event_type:
+                    event_type = new_event_type
                 else:
                     event_type = e_type
 
@@ -261,7 +254,6 @@ def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=Fa
                     return True
             except ClientError as error:
                 print(json.dumps(error.response, indent=4))
-                return False
 
     if invoke_method == 'sns':
         topic_arn = get_sns_arn(invoke_source)
@@ -285,7 +277,6 @@ def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=Fa
                     return True
             except ClientError as Error:
                 print(error.response['Error']['Message'])
-                sys.exit[1]
 
     if invoke_method == 'cloudwatch':
         rule = invoke_source
@@ -328,15 +319,16 @@ def create_trigger(lambda_name, invoke_method, invoke_source, alias, event_type,
     '''
     if add_invoke_permission(lambda_name, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias):
         arn = get_lambda_arn(lambda_name)
-        if invoke_action(lambda_name=lambda_name, lambda_arn=arn, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias, event_type=event_type):    
+        
+        if invoke_action(lambda_name=lambda_name, lambda_arn=arn, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias, new_event_type=event_type):    
             return True
         else:
-            if remove_invoke_action(lambda_name, alias=alias, invoke_source=invoke_source):
+            if remove_trigger(lambda_name, alias=alias, invoke_source=invoke_source):
                 return False 
     else:
         print("Permissions not granted, see error code")
 
-def remove_invoke_action(lambda_name, alias=False, invoke_source=False):
+def remove_trigger(lambda_name, alias=False, invoke_source=False):
     '''
     Removes ability for external resource to trigger the specified lambda
 

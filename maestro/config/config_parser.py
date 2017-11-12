@@ -151,15 +151,17 @@ class ConfigReturn(ConfigParser):
         Check to see if they're using triggers, if they aren't in the config they default to CLI args
         '''
         if super().get_section('trigger'):
+            func_create_trigger = self.cli_args.create_trigger
             func_trigger_method = super().get_section_item('trigger', 'method')
             func_trigger_source = super().get_section_item('trigger', 'source')
             func_trigger_event_type =super().get_section_item('trigger', 'event_type')
         else:
+            func_create_trigger = self.cli_args.create_trigger
             func_trigger_method = self.cli_args.invoke_method
             func_trigger_source = self.cli_args.invoke_source
             func_trigger_event_type = self.cli_args.event_type
 
-        return func_trigger_method, func_trigger_source, func_trigger_event_type
+        return func_create_trigger, func_trigger_method, func_trigger_source, func_trigger_event_type
 
     def get_logging(self):
         '''
@@ -221,6 +223,14 @@ class ConfigReturn(ConfigParser):
         version_description = self.cli_args.version_description
 
         return version_description
+
+    def get_delete_trigger(self):
+        '''
+        gets the boolean response of --delete_trigger
+        '''
+        remove_trigger = self.cli_args.delete_trigger
+
+        return remove_trigger
 
     def get_dry_run(self):
         '''

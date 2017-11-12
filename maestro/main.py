@@ -74,7 +74,10 @@ def main():
     tags = config.get_tags()
 
     #Triggers, if applicable
-    func_trigger_method, func_trigger_source, func_trigger_event_type = config.get_triggers()
+    func_create_trigger, func_trigger_method, func_trigger_source, func_trigger_event_type = config.get_triggers()
+
+    #Remove trigger
+    func_remove_trigger = config.get_delete_trigger()
 
     #Logging information
     func_log_forwarding, func_logging_dest, func_dest_alias = config.get_logging()
@@ -107,7 +110,7 @@ def main():
                     config_security_groups=vpc_security_group_ids, dry_run=dry_run, publish=publish, variables=variables, 
                     logging=func_log_forwarding, dead_letter_config=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
                     dest_lambda=func_logging_dest, dest_alias=func_dest_alias, event_type=func_trigger_event_type, tags=tags, 
-                    tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method= func_trigger_method,
+                    tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method=func_trigger_method,
                     invoke_source=func_trigger_source)
 
     elif action == 'create-alias':
@@ -126,10 +129,15 @@ def main():
         publish_action(name=name, version_description=version_description)
 
     elif action == 'update-code':
-        update_code_action(args, it, needs, here)
+        update_code_action(name=name, dry_run=dry_run, publish=publish, no_pub=no_pub, bucket_name=backup_bucket)
 
     elif action == 'update-config':
-        update_config_action(args, it, needs, here)
+        update_config_action(name=name, handler=handler, description=desc, timeout=timeout, mem_size=memsize, runtime=runtime, 
+                            role=role, vpc_setting=vpc_setting, vpc_name=vpc_name, vpc_security_groups=vpc_security_group_ids, 
+                            tags=tags, variables=variables, dlq=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
+                            tracing_mode=trace_mode, create_trigger_bool=func_create_trigger, remove_trigger_bool=func_remove_trigger,
+                            invoke_method=func_trigger_method, invoke_source=func_trigger_source, alias=alias, 
+                            event_type=func_trigger_event_type, dry_run=dry_run)
         
     elif action == 'update-alias':
         update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)

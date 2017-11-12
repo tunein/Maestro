@@ -1,6 +1,8 @@
+#External libs
 import os
 import sys
 
+#Get relevant modules
 from maestro.providers.aws.check_existence import check
 from maestro.providers.aws.publish_lambda import publish
 
