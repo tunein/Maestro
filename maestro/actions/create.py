@@ -16,6 +16,9 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
                     dest_lambda=False, dest_alias=False, event_type=False, tags=False, tracing_mode=False, bucket_name=False):
     '''
     Creates a lambda function, first checks to see if it exists, if yes, exit, else, create lambda
+
+    args:
+        too many to list, but everything we collect gets passed into this
     '''
     print("Checking to see if lambda already exists")
     if check(name):

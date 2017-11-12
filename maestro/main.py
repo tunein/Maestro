@@ -97,8 +97,6 @@ def main():
     #Get the boolean response of dry run cli arg
     dry_run = config.get_dry_run()
 
-    print(publish)
-
     '''
     Now that we've retrieved all over our actions let's run things for real
     '''
@@ -116,7 +114,7 @@ def main():
         create_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
 
     elif action == 'delete':
-        delete_action(args, it, needs, here)
+        delete_action(name=name, dry_run=dry_run)
 
     elif action == 'delete-alias':
         delete_alias_action(name=name, alias=alias, dry_run=dry_run)
