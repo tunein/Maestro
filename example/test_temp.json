@@ -5,7 +5,8 @@
     "region": "us-west-2",
     "role": "lambda_role",
     "handler": "example.main",
-    "alias": "live"
+    "alias": "live",
+    "tracing_mode": "active"
   },
  "provisioners": {
     "runtime": "python3.6",
@@ -16,13 +17,21 @@
     "vpc_name": "Stock_VPC",
     "security_group_ids": ["MMTest"]
  },
- "trigger": {
-    "method": "sns",
-    "source": "test-topic-lambda"
+ "variables": {
+    "backend_url": "http://exampleenvyourbackend.com",
+    "api_token": "thisisanapitoken--aasdc///dyq"
+ },
+ "dead_letter_config": {
+    "type": "sns",
+    "target_name": "test-topic-lambda"
  },
  "tags": {
     "name": "test lambda",
     "environment": "test"
+ },
+ "trigger": {
+    "method": "sns",
+    "source": "test-topic-lambda"
  },
  "backup": {
     "bucket_name": "mm-img-bucket-test"

@@ -18,7 +18,7 @@ setup(
     packages=['maestro', 'maestro.actions', 'maestro.config', 'maestro.helpers', 'maestro.providers', 'maestro.providers.aws'],
     entry_points = {
         'console_scripts': [
-            'maestro=maestro.maestro:main',
+            'maestro=maestro.main:main',
         ],
     },
     include_package_data=True,

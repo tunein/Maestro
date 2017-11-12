@@ -122,7 +122,7 @@ def get_lambda_arn(lambda_name):
     except ClientError as error:
         print(color.RED + error.response['Error']['Message'] + color.END)
 
-def add_invoke_permission(lambda_name, trigger=False, invoke_method=False, invoke_source=False, alias=False, dry_run=False):
+def add_invoke_permission(lambda_name, invoke_method=False, invoke_source=False, alias=False, dry_run=False):
     '''
     Creates a policy on the lambda that grants the invoker (sns, s3, cloudwatch) access to invoke
     This must be done before you add the "invoke action" or it will return an error saying you don't have permission
@@ -134,7 +134,7 @@ def add_invoke_permission(lambda_name, trigger=False, invoke_method=False, invok
         invoke_source: the NAME of the resource, specified by config or CLI arg
         alias: alias you're assigning the trigger to, if you're using one, else defaults to $LATEST
     '''
-    if trigger:
+    if invoke_method:
         invoke_method = invoke_method
         invoke_source = invoke_source
     else:
@@ -194,7 +194,7 @@ def add_invoke_permission(lambda_name, trigger=False, invoke_method=False, invok
                 except ClientError as error:
                     print(error.response['Error']['Message'])
 
-def invoke_action(lambda_name, lambda_arn, trigger=False, invoke_method=False, invoke_source=False, alias=False, event_type=False, dry_run=False):
+def invoke_action(lambda_name, lambda_arn, invoke_method=False, invoke_source=False, alias=False, event_type=False, dry_run=False):
     '''
     Adds a subscription/notifier/event to the requested resource (sns, s3, cloudwatch)
     This is the 'important' piece, without this you will only have a policy on the lambda 
@@ -207,7 +207,7 @@ def invoke_action(lambda_name, lambda_arn, trigger=False, invoke_method=False, i
     else:
         alias = ''
 
-    if trigger:
+    if invoke_method:
         invoke_method = invoke_method
         invoke_source = invoke_source
     else:
@@ -315,7 +315,7 @@ def invoke_action(lambda_name, lambda_arn, trigger=False, invoke_method=False, i
                 print(error.response['Error']['Message'])
 
 ################ Main Actions ##################
-def create_trigger(lambda_name, trigger, invoke_method, invoke_source, alias, event_type, dry_run):
+def create_trigger(lambda_name, invoke_method, invoke_source, alias, event_type, dry_run):
     '''
     The main entrypoint for the creation action, executes the above functions in the proper order
 
@@ -326,17 +326,17 @@ def create_trigger(lambda_name, trigger, invoke_method, invoke_source, alias, ev
         alias: alias you're assigning the trigger to, retrieved from config or CLI args
         event_type: this is only for s3, but includes all the generic s3 actions 
     '''
-    if add_invoke_permission(lambda_name, trigger=trigger, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias):
+    if add_invoke_permission(lambda_name, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias):
         arn = get_lambda_arn(lambda_name)
-        if invoke_action(lambda_name=lambda_name, lambda_arn=arn, trigger=trigger, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias, event_type=event_type):    
+        if invoke_action(lambda_name=lambda_name, lambda_arn=arn, invoke_method=invoke_method, invoke_source=invoke_source, alias=alias, event_type=event_type):    
             return True
         else:
-            if remove_invoke_action(lambda_name, trigger=True, alias=alias, invoke_source=invoke_source):
+            if remove_invoke_action(lambda_name, alias=alias, invoke_source=invoke_source):
                 return False 
     else:
         print("Permissions not granted, see error code")
 
-def remove_invoke_action(lambda_name, trigger=False, alias=False, invoke_source=False):
+def remove_invoke_action(lambda_name, alias=False, invoke_source=False):
     '''
     Removes ability for external resource to trigger the specified lambda
 
@@ -346,7 +346,7 @@ def remove_invoke_action(lambda_name, trigger=False, alias=False, invoke_source=
         alias: alias you want to remove the trigger from
         invoke_source: the NAME of the resource you want to drop from being able to invoke
     '''
-    if trigger:
+    if invoke_source:
         invoke_source = invoke_source
 
     if alias:

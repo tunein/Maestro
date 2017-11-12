@@ -38,7 +38,7 @@ class color:
         END = '\033[0m'
 
 def create(lambda_name, runtime, role, handler, description, timeout, mem_size, vpc_setting=False, config_vpc_name=False, 
-            config_security_groups=False, tags=False, publish=False, variables=False, dead_letter_config=False, dlq_type=False, 
+            config_security_groups=False, user_tags=False, publish=False, variables=False, dead_letter_config=False, dlq_type=False, 
             dlq_name=False, tracing_mode=False, dry_run=False):
     '''
     The main create function, this handles the creation of lambdas
@@ -82,8 +82,8 @@ def create(lambda_name, runtime, role, handler, description, timeout, mem_size, 
     tags = {}
 
     #Copy the tags dictionary from the config file
-    if tags:
-        tags.update(tags)
+    if user_tags:
+        tags.update(user_tags)
     else:
         pass
 

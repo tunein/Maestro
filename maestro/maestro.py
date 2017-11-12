@@ -1,9 +1,8 @@
-
 #Our modules
 #from maestro.main import main
 
 
-def main():
+#def main():
   '''
   if validation(DOC, current_action=ARGS.action, config_runtime=json_parser()['provisioners']['runtime'], role=json_parser()['initializers']['role'], timeout=json_parser()['provisioners']['timeout']):
       if ARGS.action == 'create':
@@ -183,7 +182,7 @@ def main():
           else:
             print("Lambda creation failed.. Check your settings")             
             return 1
-      '''
+      
       elif ARGS.action == 'update-code':
         if check(json_parser()['initializers']['name']):
           if update_code(json_parser()['initializers']['name'], dry_run=ARGS.dry_run, publish=ARGS.publish, no_pub=ARGS.no_pub):
@@ -303,3 +302,4 @@ def main():
 
 if __name__ == "__main__":
   main()
+'''

@@ -4,7 +4,7 @@ import os
 import sys
 
 #Get CLI Args
-from cli import ARGS
+from maestro.cli import ARGS
 
 #Configuration module
 from maestro.config.config_parser import ConfigReturn
@@ -36,7 +36,7 @@ def main():
     we need from CLI args and json config, then we'll move on to the good stuff
     '''
     #Validate the filetype, should end with '.json'
-    validate_file_type = validate_file_type(ARGS.filename)
+    validate_file_check = validate_file_type(ARGS.filename)
 
     #initializing the config class, then let's assign all our variables
     config = ConfigReturn(ARGS)
@@ -45,15 +45,15 @@ def main():
     action = config.get_action()
 
     #validate the action
-    validate_action = validate_action(action)
+    validate_action_check = validate_action(action)
     
     #Get all of our hard requirements and set them as variables
     name, desc, region, role, handler, runtime, timeout, memsize = config.get_required()
     
     #Validate runtime, role, and timeout
-    validate_runtime = validate_runtime(runtime)
-    validate_role = validate_role(role)
-    validate_timeout = validate_timeout(timeout)
+    validate_runtime_check = validate_runtime(runtime)
+    validate_role_check = validate_role(role)
+    validate_timeout_check = validate_timeout(timeout)
 
     #Get the alias if applicable
     alias = config.get_alias()
@@ -96,12 +96,18 @@ def main():
 
     #Get the boolean response of dry run cli arg
     dry_run = config.get_dry_run()
-
     '''
     Now that we've retrieved all over our actions let's run things for real
     '''
     if action == 'create':
-        create_action(args, it, needs, here)
+        print('Attempting to create')
+        create_action(name=name, runtime=runtime, region=region, role=role, handler=handler, description=desc, 
+                    timeout=timeout, mem_size=memsize, alias=alias, vpc_setting=vpc_setting, config_vpc_name=vpc_name, 
+                    config_security_groups=vpc_security_group_ids, dry_run=dry_run, publish=publish, variables=variables, 
+                    logging=func_log_forwarding, dead_letter_config=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
+                    dest_lambda=func_logging_dest, dest_alias=func_dest_alias, event_type=func_trigger_event_type, tags=tags, 
+                    tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method= func_trigger_method,
+                    invoke_source=func_trigger_source)
 
     elif action == 'create-alias':
         create_alias_action(args, it, needs, here)

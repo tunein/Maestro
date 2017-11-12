@@ -5,22 +5,20 @@ import sys
 #Get relevant modules
 from maestro.providers.aws.alias import alias_creation
 from maestro.providers.aws.check_existence import check
-from maestro.providers.aws.cloudwatchsub import cloudwatchSubscription
+from maestro.providers.aws.cloudwatch_sub import cloudwatchSubscription
 from maestro.providers.aws.create_lambda import create
 from maestro.providers.aws.triggers import create_trigger
 from maestro.providers.aws.s3_backup import main as s3_backup
 
-def create_action(name, runtime, region, role, handler, description, timeout, mem_size, trigger=False, alias=False, 
-                    vpc_setting=False, config_vpc_name=False, config_security_groups=False, dry_run=False, publish=False, 
-                    variables=False, logging=False, dead_letter_config=False, dlq_type=False, dlq_name=False, 
-                    dest_lambda=False, dest_alias=False, event_type=False, tags=False, tracing_mode=False, 
-                    bucket_name=False):
+def create_action(name, runtime, region, role, handler, description, timeout, mem_size, invoke_method=False, invoke_source=False, 
+                    alias=False, vpc_setting=False, config_vpc_name=False, config_security_groups=False, dry_run=False, 
+                    publish=False, variables=False, logging=False, dead_letter_config=False, dlq_type=False, dlq_name=False, 
+                    dest_lambda=False, dest_alias=False, event_type=False, tags=False, tracing_mode=False, bucket_name=False):
     '''
     Creates a lambda function, first checks to see if it exists, if yes, exit, else, create lambda
     '''
     print("Checking to see if lambda already exists")
     if check(name):
-
       print("This function already exists, please use action 'update'")
       sys.exit(1)
     else:
@@ -36,7 +34,7 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
                                 vpc_setting=vpc_setting, 
                                 config_vpc_name=config_vpc_name, 
                                 config_security_groups=config_security_groups,
-                                tags=tags,
+                                user_tags=tags,
                                 publish=publish,
                                 variables=variables,
                                 dead_letter_config=dead_letter_config,
@@ -58,10 +56,9 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
             pass
 
         #Check to see if they have any triggers set up 
-        if trigger:
+        if invoke_method:
             create_trigger(
-                            lambda_name=name, 
-                            trigger=trigger, 
+                            lambda_name=name,  
                             invoke_method=invoke_method, 
                             invoke_source=invoke_source, 
                             alias=alias, 
@@ -92,4 +89,3 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
                     )
         else:
             pass
-

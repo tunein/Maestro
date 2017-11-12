@@ -7,7 +7,7 @@ from time import gmtime, strftime
 from botocore.exceptions import ClientError
 
 #Our modules
-import maestro.lambda_config as lambda_config
+import maestro.config.lambda_config as lambda_config
 
 #This is only here for printing pretty colors
 class color:

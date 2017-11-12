@@ -4,7 +4,7 @@ import json
 from botocore.exceptions import ClientError
 
 #Our modules
-from maestro.check_existence import check
+from maestro.providers.aws.check_existence import check
 
 #Establish our boto resources
 client = boto3.client('lambda')
