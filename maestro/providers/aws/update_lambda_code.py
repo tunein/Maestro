@@ -60,28 +60,21 @@ def update_code(lambda_name, dry_run=False, publish=False, no_pub=False):
             run = False
 
         if publish:
-            if dry_run:
-                answer = False
-            else:
-                answer = True
+            answer = True
+        elif no_pub:
+            answer = False
         else:
-            if dry_run:
-                answer = False
-            else:
-                if no_pub:
-                    answer = False
-                else:
-                    publish_answer = input("Would you like to publish this update? ('y/n'): ")
+            publish_answer = input("Would you like to publish this update? ('y/n'): ")
 
-                    if publish_answer.lower() in ACCEPTED_PROMPT_ACTIONS:
-                        if publish_answer == 'y':
-                            answer = True
-                            print(color.CYAN + "Publishing update" + color.END)
-                        if publish_answer == 'n':
-                            answer = False
-                            print(color.CYAN + "Updating lambda without publishing" + color.END)
-                    else:
-                        print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
+            if publish_answer.lower() in ACCEPTED_PROMPT_ACTIONS:
+                if publish_answer == 'y':
+                    answer = True
+                    print(color.CYAN + "Publishing update" + color.END)
+                if publish_answer == 'n':
+                    answer = False
+                    print(color.CYAN + "Updating lambda without publishing" + color.END)
+            else:
+                print(color.RED + "Please respond with 'y' for yes or 'n' for no!" + color.END)
 
         try:
             update = client.update_function_code(
