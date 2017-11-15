@@ -178,6 +178,17 @@ class ConfigReturn(ConfigParser):
 
         return func_log_forwarding, func_logging_dest, func_dest_alias
 
+    def get_logging_expiration(self):
+        '''
+        Check to see if they're setting up a log expiration policy
+        '''
+        if super().get_section('log_expiration'):
+            func_log_expiration = super().get_section_item('log_expiration', 'age')
+        else:
+            func_log_expiration = False
+
+        return func_log_expiration
+
     def get_backup(self):
         '''
         Check to see if they're backing their deploys up to s3
