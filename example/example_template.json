@@ -37,6 +37,9 @@
     "destination_lambda": "name of processing lambda",
     "destination_alias": "some-alias"
  },
+ "log_expiration": {
+    "age": 120
+ }
  "backup": {
     "bucket_name": "your-backup-bucket-name"
  }

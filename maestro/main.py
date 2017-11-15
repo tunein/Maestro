@@ -18,6 +18,7 @@ from maestro.config.config_validator import validate_action
 from maestro.config.config_validator import validate_runtime
 from maestro.config.config_validator import validate_role
 from maestro.config.config_validator import validate_timeout
+from maestro.config.config_validator import validate_expiration
 
 #Core actions
 from maestro.actions.create import create_action
@@ -82,6 +83,15 @@ def main():
     #Logging information
     func_log_forwarding, func_logging_dest, func_dest_alias = config.get_logging()
 
+    #Cloudwatch log expiration age
+    func_log_expire = config.get_logging_expiration()
+
+    #Check if the age is expired, but only if the user is using it 
+    if func_log_expire:
+        validate_exp = validate_expiration(func_log_expire)
+    else:
+        pass
+
     #Backup info
     backup_bucket = config.get_backup()
 
@@ -111,7 +121,7 @@ def main():
                     logging=func_log_forwarding, dead_letter_config=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
                     dest_lambda=func_logging_dest, dest_alias=func_dest_alias, event_type=func_trigger_event_type, tags=tags, 
                     tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method=func_trigger_method,
-                    invoke_source=func_trigger_source)
+                    invoke_source=func_trigger_source, log_expire=func_log_expire)
 
     elif action == 'create-alias':
         create_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)

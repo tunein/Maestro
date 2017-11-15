@@ -29,6 +29,7 @@ roles = boto3.client('iam')
 #Establish easy to read variables for stuff from config file
 AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
 AVAIL_ACTIONS = lambda_config.AVAIL_ACTIONS
+ACCEPTED_LOG_EXPIRATION = lambda_config.ACCEPTED_LOG_EXPIRATION
 
 def validate_file_type(doc):
     '''
@@ -85,7 +86,6 @@ def validate_role(role):
     else:
         print(color.RED + "invalid role" + color.END)
         sys.exit(1)
-      
 
 def validate_timeout(timeout):
     '''
@@ -99,4 +99,15 @@ def validate_timeout(timeout):
         return True
     else:
         print(color.RED + "Timeout should between between 1 and 300 seconds, please adjust" + color.END)
+        sys.exit(1)
+
+def validate_expiration(age):
+    '''
+    Validates that the expiration age is within AWS accepted ages
+    '''
+    print("Validating expiraton age")
+    if age in ACCEPTED_LOG_EXPIRATION:
+        return True
+    else:
+        print(color.RED + "Invalid log expiration, please pick an integer (in days)in thelist of valid ages" + color.END)
         sys.exit(1)
