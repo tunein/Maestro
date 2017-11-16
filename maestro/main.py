@@ -147,7 +147,7 @@ def main():
                             tags=tags, variables=variables, dlq=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
                             tracing_mode=trace_mode, create_trigger_bool=func_create_trigger, remove_trigger_bool=func_remove_trigger,
                             invoke_method=func_trigger_method, invoke_source=func_trigger_source, alias=alias, 
-                            event_type=func_trigger_event_type, dry_run=dry_run)
+                            event_type=func_trigger_event_type, dry_run=dry_run, log_expire=func_log_expire)
         
     elif action == 'update-alias':
         update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
