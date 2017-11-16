@@ -88,6 +88,8 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
         #Check to see if they're setting an expiration on their logs
         if log_expire:
             set_cloudwatch_log_expiration(name=name, retention_time=log_expire)
+        else:
+            pass
 
 
         #Check to see if they want to backup
