@@ -133,11 +133,10 @@ Folder Hierarchy:
 ---
 
 **Current roadmap:**  
-- Add API Gateway integration and command line flags  
-- Add letsencrypt/certbot integration for https  
-- Add route53 integration for dns  
-- Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream  
-- Version deletion (automatically & intelligently)  
+- Add API Gateway trigger Support  
+- Add IoT Trigger Support  
+- Add CodeCommit Trigger Support  
+- Add Cognito Sync Trigger Support  
 
 ---
 
