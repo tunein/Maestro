@@ -4,7 +4,7 @@ Created by M. Moon/Perilune Inc Copyright 2017
 
 ![](http://pixel.nymag.com/imgs/daily/vulture/2015/gifs/epic-conductor-valery-gergiev.w529.h352.gif)  
 
-Current State: v0.1.4
+Current State: v0.1.5
 
 ***Maestro is a command line tool for managing Lambdas for Amazon Web Services***  
 - It takes a json document as an input to fill out all the information necessary for creating a lambda  
@@ -59,17 +59,15 @@ Current State: v0.1.4
 **It is also possible to string actions together**  
 
 Example 1:  
- - maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json  
+```maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json```  
 
 This will:  
 - publish updated code  
 - reallocate the alias 'dev' to the new version  
 - add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator  
 
--
-
 Example 2:   
-- maestro update-code --alias prod --publish example_template.json  
+```maestro update-code --alias prod --publish example_template.json```  
 
 This will:   
 - Publish a new version of your lambda and then assign it the alias of "prod"  
@@ -90,7 +88,7 @@ This will:
 #### Action "invoke" specific notes: 
 
 Example 1:  
-- maestro invoke example_template.json  
+```maestro invoke example_template.json```  
 
 This will:  
 - Return a list of available aliases to invoke, prompt the user to pick one  
@@ -100,14 +98,16 @@ This will:
 - Presently only 'RequestResponse' returns logs to the console  
 
 Example 2:  
-- maestro invoke example_template.json --payload test_payload.json --alias dev --invoke_type RequestResponse  
+```maestro invoke example_template.json --payload test_payload.json --alias dev --invoke_type RequestResponse```  
 
 This will:  
 - Do everything stated above without user prompts
 
 #### Action "init" specific notes:  
 
-Running "maestro init yourfilename.json" will do the following:  
+```maestro init yourfilename.json```
+
+Will do the following:  
 - Walks you through all the steps of creating a config file 
 - Uses filename argument to name file  
 - Puts a json configuration document in a file in your PWD  
@@ -117,7 +117,10 @@ Running "maestro init yourfilename.json" will do the following:
 
 To use:  
 - cd into the directory where your code is:
-- command: maestro create function_name.json
+
+```maestro create function_name.json```
+
+---
 
 Folder Hierarchy:  
 
