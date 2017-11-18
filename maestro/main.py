@@ -26,6 +26,7 @@ from maestro.actions.create_alias import create_alias_action
 from maestro.actions.delete import delete_action
 from maestro.actions.delete_alias import delete_alias_action
 from maestro.actions.invoke import invoke_action
+from maestro.actions.initialize import initialize
 from maestro.actions.publish import publish_action
 from maestro.actions.update_alias import update_alias_action
 from maestro.actions.update_code import update_code_action
@@ -36,8 +37,6 @@ def main():
     The main entry point for the whole application, first we start out with collection all of the info
     we need from CLI args and json config, then we'll move on to the good stuff
     '''
-    #Validate the filetype, should end with '.json'
-    validate_file_check = validate_file_type(ARGS.filename)
 
     #initializing the config class, then let's assign all our variables
     config = ConfigReturn(ARGS)
@@ -47,7 +46,16 @@ def main():
 
     #validate the action
     validate_action_check = validate_action(action)
-    
+
+    #Check for init action way up here, this is because everything else requires a config file
+    if action == 'init':
+        initialize(ARGS.filename)
+    else:
+        pass
+
+    #Validate the filetype, should end with '.json'
+    validate_file_check = validate_file_type(ARGS.filename)
+
     #Get all of our hard requirements and set them as variables
     name, desc, region, role, handler, runtime, timeout, memsize = config.get_required()
     

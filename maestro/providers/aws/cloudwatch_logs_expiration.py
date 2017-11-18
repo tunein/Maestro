@@ -20,7 +20,7 @@ def invokeFunction(name):
     '''
     print('Creating log group')
     try:
-        invoke = lambdaClient.invoke(FunctionName=name, InvocationType='DryRun')
+        invoke = lambdaClient.invoke(FunctionName=name)
     except ClientError as error:
         print(error)
 
