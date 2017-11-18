@@ -6,12 +6,15 @@ import sys
 #Our modules
 import maestro.config.lambda_config as lambda_config
 
+#Set up easy to use variables
 REGIONS = lambda_config.REGIONS
 AVAIL_RUNTIMES = lambda_config.AVAIL_RUNTIMES
 ACCEPTED_PROMPT_ACTIONS = lambda_config.ACCEPTED_PROMPT_ACTIONS
 DLQ_TYPES = lambda_config.DLQ_TYPES
 PRINCIPALS = lambda_config.PRINCIPALS
 ACCEPTED_LOG_EXPIRATION = lambda_config.ACCEPTED_LOG_EXPIRATION
+EVENT_STREAM_TYPES = lambda_config.EVENT_STREAM_TYPES
+EVENT_START_TIMES = lambda_config.EVENT_START_TIMES
 
 def region_helper(region):
     while region not in REGIONS:
@@ -248,6 +251,71 @@ def trigger_helper(triggered):
         else:
             pass
 
+def event_decider(decided):
+    while not decided:
+        get_method = input("Enter your stream source (kinesis/dynamodb): ")
+
+        if get_method in EVENT_STREAM_TYPES:
+            get_source = input("Enter the resource name of your stream: ")
+
+            return get_method, get_source
+            decided = True
+        else:
+            pass
+
+def event_enabled(enabled):
+    while not enabled:
+        get_enable = input("Would you like to enable this event? (y/n): ")
+
+        if get_enable in ACCEPTED_PROMPT_ACTIONS:
+            if get_enable == 'y':
+                enabled = "True"
+            else:
+                enabled = "False"
+
+            return enabled
+        else:
+            pass
+
+def event_position_helper(positioned):
+    while not positioned:
+        get_position = input("Enter your start position (LATEST/TRIM_HORIZON/AT_TIMESTAMP): ")
+
+        if get_position in EVENT_START_TIMES:
+            return get_position
+        else:
+            pass
+
+def event_helper(event):
+    event_dict = {"type": "", "source": "", "batch_size": "", "enabled": "", "start_position": ""}
+
+    while not event:
+        user_event = input("Do you want to set up an event stream map for a trigger? (y/n): ")
+
+        if user_event in ACCEPTED_PROMPT_ACTIONS:
+            if user_event == 'y':
+                method, source = event_decider(False)
+
+                batch_size = input("Enter a batch size: ")
+
+                enabled = event_enabled(False)
+
+                start_position = event_position_helper(False)
+
+                #Assign them to the dictionary 
+                event_dict['type'] = method
+                event_dict['source'] = source
+                event_dict['batch_size'] = int(batch_size)
+                event_dict['enabled'] = enabled
+                event_dict['start_position'] = start_position
+
+                return event_dict
+                event = True
+            else:
+                return False
+        else:
+            pass
+
 def log_helper(helped):
     log_forward_dict = {"destination_lambda": "", "destination_alias": ""}
 
@@ -436,6 +504,14 @@ def initialize(filename):
 
     if trig_help:
         empty_dict.update({"trigger": trig_help})
+    else:
+        pass
+
+    #Event Stream Mapping
+    event_help = event_helper(False)
+
+    if event_help:
+        empty_dict.update({"event_stream": event_help})
     else:
         pass
 
