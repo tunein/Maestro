@@ -88,6 +88,9 @@ def main():
     #Remove trigger
     func_remove_trigger = config.get_delete_trigger()
 
+    #Event source mapping
+    func_event_source, func_event_source_name, func_event_batch_size, func_event_enable_status, func_event_start_position = config.get_event_mapping()
+
     #Logging information
     func_log_forwarding, func_logging_dest, func_dest_alias = config.get_logging()
 
@@ -129,7 +132,9 @@ def main():
                     logging=func_log_forwarding, dead_letter_config=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
                     dest_lambda=func_logging_dest, dest_alias=func_dest_alias, event_type=func_trigger_event_type, tags=tags, 
                     tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method=func_trigger_method,
-                    invoke_source=func_trigger_source, log_expire=func_log_expire)
+                    invoke_source=func_trigger_source, log_expire=func_log_expire, event_source=func_event_source, 
+                    event_source_name=func_event_source_name, event_batch_size=func_event_batch_size, 
+                    event_enabled_status=func_event_enable_status, event_start_position=func_event_start_position)
 
     elif action == 'create-alias':
         create_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
@@ -155,7 +160,10 @@ def main():
                             tags=tags, variables=variables, dlq=dlq, dlq_type=dlq_type, dlq_name=dlq_target_name, 
                             tracing_mode=trace_mode, create_trigger_bool=func_create_trigger, remove_trigger_bool=func_remove_trigger,
                             invoke_method=func_trigger_method, invoke_source=func_trigger_source, alias=alias, 
-                            event_type=func_trigger_event_type, dry_run=dry_run, log_expire=func_log_expire)
+                            event_type=func_trigger_event_type, dry_run=dry_run, log_expire=func_log_expire, 
+                            event_source=func_event_source, event_source_name=func_event_source_name, 
+                            event_batch_size=func_event_batch_size, event_enabled_status=func_event_enable_status, 
+                            event_start_position=func_event_start_position)
         
     elif action == 'update-alias':
         update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
