@@ -123,13 +123,33 @@ Folder Hierarchy:
 
 /function_name  
 ---function_name.json  
----/lambda
+---/dist
 ------function_name.py (or any other compatible language)  
 ------/dependency-1  
 --------stuff.txt  
 ------/dependency-2  
 ------/dependency-etc  
-  
+
+Notes:  
+- The expectation of Maestro is that your code (or binary) and all necessary libs are in a folder called "dist" that is at the same directory level as your configuration file. THIS IS A MUST.
+
+---  
+
+**Docker**
+
+Usage of docker is recommended for use in CICD pipelines to reduce dependency management on build agents  
+
+- Example  
+
+docker run --rm -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) -e AWS_DEFAULT_REGION=$YOURREGION -v `pwd`:/app maestro-builder $YOURACTION $YOURFILENAME.json  
+
+Example notes:  
+- I've tagged the container "maestro-builder" (docker build -t maestro-builder . from the repo's root directory)  
+- I'm using 'aws configure get', to fill in the keys, you can replace this directly with your keys  
+- I've replaced the default region with 'YOURREGION', place a valid region (ie: us-west-2) in place of this  
+- I'm mount my $PWD to the /app directory of the container (your /dist folder and config file should be at this level)  
+- Actions and config file name come AFTER the container name (maestro is the entrypoint, you don't need to specify that)  
+
 ---
 
 **Current roadmap:**  
@@ -137,15 +157,3 @@ Folder Hierarchy:
 - Add IoT Trigger Support  
 - Add CodeCommit Trigger Support  
 - Add Cognito Sync Trigger Support  
-
----
-
-**Current known issues:**
-1. If you try to re-add or change an invocation source to an alias after it's created it will return an error  
-
-
-2. For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)  
-
-3. Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists  
-
-4.  You cannot currently assign a trigger to the $LATEST version  
