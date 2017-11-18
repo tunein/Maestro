@@ -8,7 +8,7 @@ Current State: v0.1.5
 
 ***Maestro is a command line tool for managing Lambdas for Amazon Web Services***  
 - It takes a json document as an input to fill out all the information necessary for creating a lambda  
-- In the directory you're working in it looks for a directory called "lambda" and packages the contents into a zip  
+- In the directory you're working in it looks for a directory called "dist" and packages the contents into a zip  
 - Once complete it uploads your package into lambda with all of the settings you provided  
 
 ---
