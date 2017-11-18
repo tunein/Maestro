@@ -36,6 +36,7 @@ Current State: v0.1.4
 - maestro update-alias function_name.json  
 - maestro delete-alias function_name.json  
 - maestro invoke function_name.json  
+- maestro init function_name.json
 
 
 ---
@@ -103,6 +104,13 @@ Example 2:
 
 This will:  
 - Do everything stated above without user prompts
+
+#### Action "init" specific notes:  
+
+Running "maestro init yourfilename.json" will do the following:  
+- Walks you through all the steps of creating a config file 
+- Uses filename argument to name file  
+- Puts a json configuration document in a file in your PWD  
 
 ----
 **Usage**
