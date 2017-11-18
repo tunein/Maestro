@@ -141,7 +141,7 @@ Usage of docker is recommended for use in CICD pipelines to reduce dependency ma
 
 - Example  
 
-docker run --rm -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) -e AWS_DEFAULT_REGION=$YOURREGION -v `pwd`:/app maestro-builder $YOURACTION $YOURFILENAME.json  
+```docker run --rm -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) -e AWS_DEFAULT_REGION=$YOURREGION -v `pwd`:/app maestro-builder $YOURACTION $YOURFILENAME.json```   
 
 Example notes:  
 - I've tagged the container "maestro-builder" (docker build -t maestro-builder . from the repo's root directory)  
