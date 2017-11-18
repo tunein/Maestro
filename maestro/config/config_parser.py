@@ -163,6 +163,30 @@ class ConfigReturn(ConfigParser):
 
         return func_create_trigger, func_trigger_method, func_trigger_source, func_trigger_event_type
 
+    def get_event_mapping(self):
+        '''
+        Check to see if they're using event streams
+        '''
+        if super().get_section('event_stream'):
+            func_event_source = super().get_section_item('event_stream', 'type')
+            func_event_source_name = super().get_section_item('event_stream', 'source')
+            func_event_batch_size = super().get_section_item('event_stream', 'batch_size')
+            func_event_enable_status = super().get_section_item('event_stream', 'enabled')
+            func_event_start_position = super().get_section_item('event_stream', 'start_position')
+
+            if func_event_enable_status.lower() == "true":
+                func_event_enable_status = True
+            else:
+                func_event_enable_status = False
+        else:
+            func_event_source = False
+            func_event_source_name = False
+            func_event_batch_size = False
+            func_event_enable_status = False
+            func_event_start_position = False
+
+        return func_event_source, func_event_source_name, func_event_batch_size, func_event_enable_status, func_event_start_position
+
     def get_logging(self):
         '''
         Check to see if they're forwarding their cloudwatch logs to a processing lambda

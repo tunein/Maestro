@@ -8,6 +8,7 @@ from maestro.providers.aws.check_existence import check
 from maestro.providers.aws.cloudwatch_sub import cloudwatchSubscription
 from maestro.providers.aws.cloudwatch_logs_expiration import set_cloudwatch_log_expiration
 from maestro.providers.aws.create_lambda import create
+from maestro.providers.aws.event_stream_trigger import create_event_source
 from maestro.providers.aws.triggers import create_trigger
 from maestro.providers.aws.s3_backup import main as s3_backup
 
@@ -15,7 +16,8 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
                     alias=False, vpc_setting=False, config_vpc_name=False, config_security_groups=False, dry_run=False, 
                     publish=False, variables=False, logging=False, dead_letter_config=False, dlq_type=False, dlq_name=False, 
                     dest_lambda=False, dest_alias=False, event_type=False, tags=False, tracing_mode=False, bucket_name=False, 
-                    log_expire=False):
+                    log_expire=False, event_source=False, event_source_name=False, event_batch_size=False, event_enabled_status=False,
+                    event_start_position=False):
     '''
     Creates a lambda function, first checks to see if it exists, if yes, exit, else, create lambda
 
@@ -70,6 +72,20 @@ def create_action(name, runtime, region, role, handler, description, timeout, me
                             event_type=event_type, 
                             dry_run=dry_run
                         )
+        else:
+            pass
+
+        #Check to see if they're creating an event source mapping
+        if event_source:
+            create_event_source(
+                                source_type=event_source, 
+                                source_name=event_source_name, 
+                                lambda_name=name, 
+                                batch_size=event_batch_size, 
+                                enabled=event_enabled_status, 
+                                starting_position=event_start_position,
+                                alias=alias
+                                )
         else:
             pass
 

@@ -39,7 +39,14 @@
  },
  "log_expiration": {
     "age": 120
- }
+ },
+ "event_stream": {
+    "type": "kinesis",
+    "source": "test-stream",
+    "batch_size": 100,
+    "enabled": "True",
+    "start_position": "TRIM_HORIZON"
+ },
  "backup": {
     "bucket_name": "your-backup-bucket-name"
  }

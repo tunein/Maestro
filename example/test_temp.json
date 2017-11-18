@@ -1,6 +1,6 @@
 {
  "initializers": {
-    "name": "example-3",
+    "name": "sns-lambda",
     "description": "new description",
     "region": "us-west-2",
     "role": "lambda_role",
@@ -32,16 +32,12 @@
     "day": "sunday"
  },
  "trigger": {
-    "method": "s3",
-    "source": "mm-img-bucket-test"
- },
- "logging": {
-    "destination_lambda": "log_processor",
-    "destination_alias": "live-1"
+    "method": "sns",
+    "source": "test-topic-lambda"
  },
  "log_expiration": {
     "age": 120
- }
+ },
  "backup": {
     "bucket_name": "mm-img-bucket-test"
  }
