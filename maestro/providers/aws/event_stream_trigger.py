@@ -79,6 +79,39 @@ def create_event_source_trigger(lambda_name=None, event_source=None, enabled=Fal
     except ClientError as error:
         print(error.response)
 
-#stream = get_dynamo_stream('maestro-test-table')
-stream = get_kinesis_stream('maestro-test-stream')
-create = create_event_source_trigger(lambda_name='trigger-test', event_source=stream, enabled=True, batch_size=100, starting_position='TRIM_HORIZON')
+############## Main Entry Point ##############
+def create_event_source(source_type=None, source_name=None, lambda_name=None, batch_size=None, enabled=False, starting_position= False):
+    '''
+    Entrypoint for adding an event source as the lambda invocator 
+
+    args:
+        source_type: kinesis or dynamodb
+        source_name: the name of the resource 
+        lambda_name: name of the lambda we're going to be triggering
+        enabled: boolean, False by default
+        starting_position: Choice of 'TRIM_HORIZON', 'LATEST', 'AT_TIMESTAMP'
+    '''
+
+    #Get the source type and assign the value of stream accordingly 
+    if source_type == 'kinesis':
+        stream = get_kinesis_stream(source_name)
+    elif source_type == 'dynamodb':
+        stream = get_dynamo_stream(source_name)
+    else:
+        print("No valid source type found, please use 'kinesis', or 'dynamodb'")
+        sys.exit(1)
+
+    #Create the mapping
+    create = create_event_source_trigger(lambda_name=lambda_name, event_source=stream, enabled=enabled, batch_size=batch_size, starting_position=starting_position)
+
+    if create:
+        print("Event source created successfully")
+        return True
+
+create_event_source(source_type='dynamodb', source_name='maestro-test-table', lambda_name='trigger-test', batch_size=100, enabled=True, starting_position='TRIM_HORIZON')
+
+def update_event_source():
+    pass
+
+def event_source_checker():
+    pass
