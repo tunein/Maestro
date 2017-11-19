@@ -48,6 +48,7 @@ Another common use of this action is to update the code (say you've already test
 Example commands:  
 `maestro update-code --no_pub example.json`  
 `maestro update-code --publish example.json`  
+`maestro update-code --publish --alias dev example.json`  
 
 ---
 
@@ -57,8 +58,13 @@ The update-config action is used to update the lambda configuration. This action
 
 The most common use case of this action is to update your lambda configuration (VPC, tags, variables, DLQ, trigger) before pushing a code update. It allows you to change virtually every configuration setting, as if you were creating a lambda from scratch, except for the code.  
 
+If they are not specified in the config file you can use the `--create_trigger` or `--delete_trigger` to either create or delete a trigger. If you're using the `--create_trigger` you must specify `--invoke_method` and `--invoke_source` to specify the method and source for the trigger.  
+
+If you are addressing your triggers in your config file those triggers will be used over the triggers specified in the config file.  
+
 Example commands:  
 `maestro update-config example.json`  
+`maestro update-config --create_trigger --invoke_method s3 --invoke_source bucket_name`  
 
 ---
 

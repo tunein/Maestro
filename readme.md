@@ -43,7 +43,6 @@ Want to learn how to use it? Check out the docs in the repo!
 - maestro invoke function_name.json  
 - maestro init function_name.json
 
-
 ---
 
 **Command line flags**  
@@ -60,24 +59,6 @@ Want to learn how to use it? Check out the docs in the repo!
 - --version_description *this is used for the "publish" action to pass a version description in, default is current date/time in UTC*  
 
 ---
-
-**It is also possible to string actions together**  
-
-Example 1:  
-```maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json```  
-
-This will:  
-- publish updated code  
-- reallocate the alias 'dev' to the new version  
-- add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator  
-
-Example 2:   
-```maestro update-code --alias prod --publish example_template.json```  
-
-This will:   
-- Publish a new version of your lambda and then assign it the alias of "prod"  
-
----
 **Notes**  
   
 #### "--dry-run" is vailable on the following Actions:
@@ -88,42 +69,6 @@ This will:
 - update-alias  
 - delete-alias  
 - create-trigger (and by proxy: invoke_method & invoke_source)  
-
-
-#### Action "invoke" specific notes: 
-
-Example 1:  
-```maestro invoke example_template.json```  
-
-This will:  
-- Return a list of available aliases to invoke, prompt the user to pick one  
-- Prompt the user for an invocation type (Event, RequestResponse, DryRun)  
-- Ask for a payload file (it expects that the file is in the current working directory)  
-- Invoke!  
-- Presently only 'RequestResponse' returns logs to the console  
-
-Example 2:  
-```maestro invoke example_template.json --payload test_payload.json --alias dev --invoke_type RequestResponse```  
-
-This will:  
-- Do everything stated above without user prompts
-
-#### Action "init" specific notes:  
-
-```maestro init yourfilename.json```
-
-Will do the following:  
-- Walks you through all the steps of creating a config file 
-- Uses filename argument to name file  
-- Puts a json configuration document in a file in your PWD  
-
-----
-**Usage**
-
-To use:  
-- cd into the directory where your code is:
-
-```maestro create function_name.json```
 
 ---
 
