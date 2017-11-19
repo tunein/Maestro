@@ -1,4 +1,5 @@
 notes.txt
 *.pyc
-lambda/*
+dist/*
 *.zip
+__pycache__/*
