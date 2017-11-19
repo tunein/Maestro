@@ -30,7 +30,7 @@ You can also use the `--dry_run` command to see if you have the valid permission
 Example commands:  
 `maestro create example.json`  
 `maestro create --publish example.json`  
-`maestro create --dru_run example.json`  
+`maestro create --dry_run example.json`  
 
 ---
 
@@ -119,7 +119,7 @@ This is used to delete the alias specified in either the config file or from the
 
 This isn't used very often, but is useful if you've created a new alias to test a breaking change, then need to drop it.  
 
-Example commands: 
+Example commands:  
 `maestro delete-alias example.json`  
 `maestro delete-alias --alias dev example.json`  
 
