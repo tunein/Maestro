@@ -76,7 +76,7 @@ Folder Hierarchy:
 
 /function_name  
 ---function_name.json  
----/dist
+---/dist  
 ------function_name.py (or any other compatible language)  
 ------/dependency-1  
 --------stuff.txt  
