@@ -14,7 +14,7 @@ Current State: v0.1.5
 - Creates a repeatable way to create and deploy changes to Lambdas  
 - Handles your lambdas relationships with other AWS resources so you don't have to
 
-Want to learn how to use it? Check out the docs in the repo!  
+Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon1919/Maestro/tree/develop/docs)!  
 
 ---
 
