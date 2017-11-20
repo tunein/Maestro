@@ -72,7 +72,7 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 
 ---
 
-Folder Hierarchy:  
+**Folder Hierarchy**:  
 
 /function_name  
 ---function_name.json  
