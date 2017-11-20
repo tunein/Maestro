@@ -102,3 +102,30 @@ Folder Hierarchy:
 ------/dependency-2  
 ------/dependency-etc  
 
+Notes:  
+- The expectation of Maestro is that your code (or binary) and all necessary libs are in a folder called "dist" that is at the same directory level as your configuration file. THIS IS A MUST.
+
+---  
+
+**Docker**
+
+Usage of docker is recommended for use in CICD pipelines to reduce dependency management on build agents  
+
+- Example  
+
+```docker run --rm -e AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id) -e AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key) -e AWS_DEFAULT_REGION=$YOURREGION -v `pwd`:/app maestro-builder $YOURACTION $YOURFILENAME.json```   
+
+Example notes:  
+- I've tagged the container "maestro-builder" (docker build -t maestro-builder . from the repo's root directory)  
+- I'm using 'aws configure get', to fill in the keys, you can replace this directly with your keys  
+- I've replaced the default region with 'YOURREGION', place a valid region (ie: us-west-2) in place of this  
+- I'm mount my $PWD to the /app directory of the container (your /dist folder and config file should be at this level)  
+- Actions and config file name come AFTER the container name (maestro is the entrypoint, you don't need to specify that)  
+
+---
+
+**Current roadmap:**  
+- Add API Gateway trigger Support  
+- Add IoT Trigger Support  
+- Add CodeCommit Trigger Support  
+- Add Cognito Sync Trigger Support  
