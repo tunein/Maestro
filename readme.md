@@ -101,12 +101,4 @@ Folder Hierarchy:
 --------stuff.txt  
 ------/dependency-2  
 ------/dependency-etc  
-  
----
 
-**Current roadmap:**  
-- Add API Gateway integration and command line flags  
-- Add letsencrypt/certbot integration for https  
-- Add route53 integration for dns  
-- Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream  
-- Version deletion (automatically & intelligently)  
