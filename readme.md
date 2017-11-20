@@ -54,24 +54,6 @@ Current State: v0.1.4
 - --version_description *this is used for the "publish" action to pass a version description in, default is current date/time in UTC*  
 
 ---
-
-**It is also possible to string actions together**  
-
-Example 1:  
- - maestro update-code --alias dev --publish --create_trigger --invoke_method s3 --invoke_source maestro-test-trigger-dev example_template.json  
-
-This will:  
-- publish updated code  
-- reallocate the alias 'dev' to the new version  
-- add "PUT" events for the s3 bucket 'maestro-test-trigger-dev' as the lambda invocator  
-
-Example 2:   
-- maestro update-code --alias prod --publish example_template.json  
-
-This will:   
-- Publish a new version of your lambda and then assign it the alias of "prod"  
-
----
 **Notes**  
   
 #### "--dry-run" is vailable on the following Actions:
@@ -128,15 +110,3 @@ Folder Hierarchy:
 - Add route53 integration for dns  
 - Add in support for Event Source Mapping to work with DynamoDB and Kinesis Stream  
 - Version deletion (automatically & intelligently)  
-
----
-
-**Current known issues:**
-1. If you try to re-add or change an invocation source to an alias after it's created it will return an error  
-
-
-2. For changing sources I need to move the statement-ID to a command line arg by doing so this will make deleting the source a manual step (from the CLI still)  
-
-3. Since this is the last action run and does not impact code updates or changes but will return an error saying the statement id already exists  
-
-4.  You cannot currently assign a trigger to the $LATEST version  
