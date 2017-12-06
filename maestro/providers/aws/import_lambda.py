@@ -126,18 +126,15 @@ def import_triggers(lambda_name, alias=False):
                             FunctionName=lambda_name,
                             Qualifier=alias
                         ) 
-
+    except ClientError as error:
+        print("No policy found")
+        principal = ''
+        resource = ''
+    else:
         policy = ast.literal_eval(get_lambda_policy['Policy'])
         statement_dict = policy['Statement'][0]
-    except ClientError as error:
-        print(error.response)
-    else:
-        if len(statement_dict) != 0:
-            principal = statement_dict['Principal']['Service'].split('.')[0]
-            resource = statement_dict['Condition']['ArnLike']['AWS:SourceArn'].split(":")[-1]
-        else:
-            principal = ''
-            resource = ''
+        principal = statement_dict['Principal']['Service'].split('.')[0]
+        resource = statement_dict['Condition']['ArnLike']['AWS:SourceArn'].split(":")[-1]
     finally:
         return principal, resource
 
@@ -218,9 +215,10 @@ def import_lambda(lambda_name, alias=None):
         config_dict['vpc_setting']['security_group_ids'] = get_sg_name(config_dict['vpc_setting']['security_group_ids'])
 
     trigger_method, trigger_source = import_triggers(lambda_name='music-log-processing-lambda')
-
-    config_dict['trigger'] = {"method": trigger_method, "source": trigger_source}
-
+    
+    if len(trigger_method) != 0:
+        config_dict['trigger'] = {"method": trigger_method, "source": trigger_source}
+    
     print(json.dumps(config_dict, indent=4))
 
 import_lambda(lambda_name='music-log-processing-lambda')
