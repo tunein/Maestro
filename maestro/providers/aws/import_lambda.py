@@ -21,6 +21,7 @@ def import_config(lambda_name, alias=False):
         lambda_name: the name of the lambda you want to import
         alias: the alias, defaults to $LATEST if not present
     '''
+    print('Attempting to import configuration')
     #Create an empty config dict, start with the bare minimum
     config_dict = { 
                     "initializers": {
@@ -53,6 +54,7 @@ def import_config(lambda_name, alias=False):
         config = lambda_config['Configuration']
     except ClientError as error:
         print(error.response)
+        sys.exit(1)
     else:
         #Check to make sure there is a config there
         #print(json.dumps(config, indent=4))
@@ -116,6 +118,7 @@ def import_triggers(lambda_name, alias=False):
         lambda_name: 
         alias: 
     '''
+    print("Attempting to retrieve lambda triggers")
     try:
         if not alias:
             get_lambda_policy = client.get_policy(
@@ -146,14 +149,17 @@ def get_sg_name(sg_id):
     args:
         sg_id: the id of the security group, returned from import_config
     '''
+    print('Attempting to retrieve security group names')
     try:
         sg_info = ec2Client.describe_security_groups(
                     GroupIds=sg_id
                 )
         group_info = sg_info['SecurityGroups'][0]
     except ClientError as error:
-        print(error)
+        print(error.response)
+        sys.exit(1)
     finally:
+        print("Retrieved name for groups %" % group_info['GroupName'])
         return group_info['GroupName']
 
 def get_vpc_name(vpc_id):
@@ -163,6 +169,7 @@ def get_vpc_name(vpc_id):
     args:
         vpc_id: the id the VPC, returned from import_config
     '''
+    print('Attempting to retrieve VPC name')
     try:
         vpc_info = ec2Client.describe_vpcs(
                         VpcIds=[vpc_id]
@@ -170,6 +177,7 @@ def get_vpc_name(vpc_id):
         vpc_info = vpc_info['Vpcs'][0]
     except ClientError as error:
         print(error.response)
+        sys.exit(1)
     else:
         tags = vpc_info['Tags'][0]
         
@@ -179,6 +187,7 @@ def get_vpc_name(vpc_id):
             print("No VPC found, make sure your VPC is tagged 'Key': 'Name', 'Value': 'Your-VPC'")
             sys.exit(1)
     finally:
+        print('Retrieved VPC name %s' % name)
         return name
 
 def get_tags(lambda_arn):
@@ -188,11 +197,13 @@ def get_tags(lambda_arn):
     args:
         lambda_arn: the arn returned from the import config function
     '''
+    print('Attempting to retrieve tags')
     try:
         tags = client.list_tags(Resource=lambda_arn)
         tags = tags['Tags']
     except ClientError as error:
         print(error.response)
+        sys.exit(1)
     finally:
         return tags
 
@@ -219,6 +230,4 @@ def import_lambda(lambda_name, alias=None):
     if len(trigger_method) != 0:
         config_dict['trigger'] = {"method": trigger_method, "source": trigger_source}
     
-    print(json.dumps(config_dict, indent=4))
-
-import_lambda(lambda_name='music-log-processing-lambda')
+    return config_dict
