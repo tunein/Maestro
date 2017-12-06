@@ -1,4 +1,5 @@
 #External libs
+import ast
 import boto3
 import json
 import sys
@@ -115,7 +116,30 @@ def import_triggers(lambda_name, alias=False):
         lambda_name: 
         alias: 
     '''
-    pass
+    try:
+        if not alias:
+            get_lambda_policy = client.get_policy(
+                        FunctionName=lambda_name
+                    )
+        else:
+            get_lambda_policy = client.get_policy(
+                            FunctionName=lambda_name,
+                            Qualifier=alias
+                        ) 
+
+        policy = ast.literal_eval(get_lambda_policy['Policy'])
+        statement_dict = policy['Statement'][0]
+    except ClientError as error:
+        print(error.response)
+    else:
+        if len(statement_dict) != 0:
+            principal = statement_dict['Principal']['Service'].split('.')[0]
+            resource = statement_dict['Condition']['ArnLike']['AWS:SourceArn'].split(":")[-1]
+        else:
+            principal = ''
+            resource = ''
+    finally:
+        return principal, resource
 
 def get_sg_name(sg_id):
     '''
@@ -192,6 +216,10 @@ def import_lambda(lambda_name, alias=None):
     if 'vpc_setting' in config_dict:
         config_dict['vpc_setting']['vpc_name'] = get_vpc_name(config_dict['vpc_setting']['vpc_name'])
         config_dict['vpc_setting']['security_group_ids'] = get_sg_name(config_dict['vpc_setting']['security_group_ids'])
+
+    trigger_method, trigger_source = import_triggers(lambda_name='music-log-processing-lambda')
+
+    config_dict['trigger'] = {"method": trigger_method, "source": trigger_source}
 
     print(json.dumps(config_dict, indent=4))
 
