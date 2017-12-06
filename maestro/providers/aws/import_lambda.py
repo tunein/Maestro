@@ -127,8 +127,13 @@ def get_sg_name(sg_id):
     '''
     try:
         sg_info = ec2Client.describe_security_groups(
-                    
+                    GroupIds=sg_id
                 )
+        group_info = sg_info['SecurityGroups'][0]
+    except ClientError as error:
+        print(error)
+    finally:
+        return group_info['GroupName']
 
 def get_vpc_name(vpc_id):
     '''
@@ -186,6 +191,7 @@ def import_lambda(lambda_name, alias=None):
 
     if 'vpc_setting' in config_dict:
         config_dict['vpc_setting']['vpc_name'] = get_vpc_name(config_dict['vpc_setting']['vpc_name'])
+        config_dict['vpc_setting']['security_group_ids'] = get_sg_name(config_dict['vpc_setting']['security_group_ids'])
 
     print(json.dumps(config_dict, indent=4))
 
