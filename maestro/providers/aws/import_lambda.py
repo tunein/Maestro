@@ -101,6 +101,12 @@ def import_config(lambda_name, alias=False):
             else:
                 pass
 
+            #Write the alias if needed
+            if alias:
+                config_dict['initializers']['alias'] = alias
+            else:
+                pass
+
             #Set a variable for the ARN
             true_arn = config['FunctionArn'].split(':')[:7]
             function_arn = ":".join(true_arn)
@@ -159,7 +165,7 @@ def get_sg_name(sg_id):
         print(error.response)
         sys.exit(1)
     finally:
-        print("Retrieved name for groups %" % group_info['GroupName'])
+        print("Retrieved name for groups %s" % group_info['GroupName'])
         return group_info['GroupName']
 
 def get_vpc_name(vpc_id):
@@ -208,7 +214,7 @@ def get_tags(lambda_arn):
         return tags
 
 ########### Entrypoint ###########
-def import_lambda(lambda_name, alias=None):
+def import_lambda(lambda_name, alias=False):
     '''
     The main entry point of the module
 
@@ -216,7 +222,7 @@ def import_lambda(lambda_name, alias=None):
         lambda_name: the name of the lambda
         alias: alias of the lambda
     '''
-    config_dict, lambda_arn = import_config(lambda_name='music-log-processing-lambda')
+    config_dict, lambda_arn = import_config(lambda_name=lambda_name)
     tag_dict = get_tags(lambda_arn)
 
     if len(tag_dict) != 0:
@@ -226,7 +232,7 @@ def import_lambda(lambda_name, alias=None):
         config_dict['vpc_setting']['vpc_name'] = get_vpc_name(config_dict['vpc_setting']['vpc_name'])
         config_dict['vpc_setting']['security_group_ids'] = get_sg_name(config_dict['vpc_setting']['security_group_ids'])
 
-    trigger_method, trigger_source = import_triggers(lambda_name='music-log-processing-lambda')
+    trigger_method, trigger_source = import_triggers(lambda_name=lambda_name, alias=alias)
     
     if len(trigger_method) != 0:
         config_dict['trigger'] = {"method": trigger_method, "source": trigger_source}

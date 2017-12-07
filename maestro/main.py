@@ -27,7 +27,7 @@ from maestro.actions.delete import delete_action
 from maestro.actions.delete_alias import delete_alias_action
 from maestro.actions.invoke import invoke_action
 from maestro.actions.initialize import initialize
-from maestro.actions.import import import_action
+from maestro.actions.import_action import import_action
 from maestro.actions.publish import publish_action
 from maestro.actions.update_alias import update_alias_action
 from maestro.actions.update_code import update_code_action

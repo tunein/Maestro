@@ -33,12 +33,12 @@ def import_action(filename):
         sys.exit(1)
 
     #to do: add check to make sure lambda and alias exist prior to attempting to import
-    check = check_existence(lambda_name)
+    check_exist = check(lambda_name)
 
-    if alias:
-        alias_check = check_alias(lambda_name, alias)
-    else:
-        pass
+    #if alias:
+    #    alias_check = check_alias(lambda_name, alias)
+    #else:
+    #    pass
 
     if check:
         #Call the import function
@@ -54,4 +54,11 @@ def import_action(filename):
         f.close()
     else:
         print("No lambda found, please check the name you're using and try again")
+        sys.exit(1)
+
+    if os.path.exists(full_path):
+        print("Import successful!")
+        sys.exit(0)
+    else:
+        print("Import unsuccessful! Exiting")
         sys.exit(1)
