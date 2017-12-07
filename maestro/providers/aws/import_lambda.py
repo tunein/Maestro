@@ -40,14 +40,14 @@ def import_config(lambda_name, alias=False):
 
     #If the user didn't pass an alias we want to use $LATEST
     if not alias:
-        alias = '$LATEST'
+        alias_used = '$LATEST'
     else:
-        alias = alias
+        alias_used = alias
 
     try:
         lambda_config = client.get_function(
                             FunctionName=lambda_name,
-                            Qualifier=alias
+                            Qualifier=alias_used
                         )
 
         #Set a variable to make things readable later
@@ -102,7 +102,7 @@ def import_config(lambda_name, alias=False):
                 pass
 
             #Write the alias if needed
-            if alias:
+            if alias_used != "$LATEST":
                 config_dict['initializers']['alias'] = alias
             else:
                 pass
@@ -214,7 +214,7 @@ def get_tags(lambda_arn):
         return tags
 
 ########### Entrypoint ###########
-def import_lambda(lambda_name, alias=False):
+def import_lambda(lambda_name, alias):
     '''
     The main entry point of the module
 
@@ -222,7 +222,7 @@ def import_lambda(lambda_name, alias=False):
         lambda_name: the name of the lambda
         alias: alias of the lambda
     '''
-    config_dict, lambda_arn = import_config(lambda_name=lambda_name)
+    config_dict, lambda_arn = import_config(lambda_name=lambda_name, alias=alias)
     tag_dict = get_tags(lambda_arn)
 
     if len(tag_dict) != 0:

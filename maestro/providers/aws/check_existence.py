@@ -56,7 +56,12 @@ def check_alias(lambda_name, alias):
         lambda_name: name of the lambda we're checking
         alias: name of the alias we're checking
     '''
-
-    #To do: implent!
-
-    pass
+    try:
+        alias = client.get_alias(FunctionName=lambda_name, Name=alias)
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+        sys.exit(1)
+    else:
+        print("Alias located successfully!")
+    finally:
+        return True

@@ -26,6 +26,7 @@ def import_action(filename):
     if alias_prompt in lambda_config.ACCEPTED_PROMPT_ACTIONS:
         if alias_prompt == 'y':
             alias = input("What alias would you like to import from? ")
+            print("Importing from alias %s" % alias)
         else:
             alias = False
     else:
@@ -35,10 +36,10 @@ def import_action(filename):
     #to do: add check to make sure lambda and alias exist prior to attempting to import
     check_exist = check(lambda_name)
 
-    #if alias:
-    #    alias_check = check_alias(lambda_name, alias)
-    #else:
-    #    pass
+    if alias:
+        alias_check = check_alias(lambda_name, alias)
+    else:
+        pass
 
     if check:
         #Call the import function
