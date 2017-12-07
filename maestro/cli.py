@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(
 	)
 parser.add_argument(
 	'action', 
-	choices=['init', 'create', 'update-code', 'update-config','delete', 'publish', 'create-alias', 'delete-alias', 'update-alias', 'invoke'],
+	choices=['init', 'import', 'create', 'update-code', 'update-config','delete', 'publish', 'create-alias', 'delete-alias', 'update-alias', 'invoke'],
 	help='Pick from one of the actions to start'
 	)
 parser.add_argument(

@@ -47,3 +47,21 @@ def check(lambda_name):
             return False
     except ClientError as error:
         print(error.response)
+
+def check_alias(lambda_name, alias):
+    '''
+    Checks our lambda to ensure the alias we want to import from exits
+    
+    args:
+        lambda_name: name of the lambda we're checking
+        alias: name of the alias we're checking
+    '''
+    try:
+        alias = client.get_alias(FunctionName=lambda_name, Name=alias)
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+        sys.exit(1)
+    else:
+        print("Alias located successfully!")
+    finally:
+        return True
