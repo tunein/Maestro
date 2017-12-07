@@ -207,6 +207,7 @@ def get_tags(lambda_arn):
     finally:
         return tags
 
+########### Entrypoint ###########
 def import_lambda(lambda_name, alias=None):
     '''
     The main entry point of the module

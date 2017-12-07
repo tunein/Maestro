@@ -27,6 +27,7 @@ from maestro.actions.delete import delete_action
 from maestro.actions.delete_alias import delete_alias_action
 from maestro.actions.invoke import invoke_action
 from maestro.actions.initialize import initialize
+from maestro.actions.import import import_action
 from maestro.actions.publish import publish_action
 from maestro.actions.update_alias import update_alias_action
 from maestro.actions.update_code import update_code_action
@@ -50,6 +51,16 @@ def main():
     #Check for init action way up here, this is because everything else requires a config file
     if action == 'init':
         initialize(ARGS.filename)
+    else:
+        pass
+
+    '''
+    Check to see if we're importing an existing lambda
+    This happens up here because we're initializing an empty file
+    We use the filename argument to name the config file we're creating
+    '''
+    if action == 'import':
+        import_action(ARGS.filename)
     else:
         pass
 
