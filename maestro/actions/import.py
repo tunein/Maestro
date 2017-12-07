@@ -4,6 +4,7 @@ import json
 import sys
 
 #Our modules
+from maestro.providers.aws.check_existence import check, check_alias
 from maestro.providers.aws.import_lambda import import_lambda
 
 #Get the config file that has our allowances 
@@ -32,15 +33,25 @@ def import_action(filename):
         sys.exit(1)
 
     #to do: add check to make sure lambda and alias exist prior to attempting to import
+    check = check_existence(lambda_name)
 
-    #Call the import function
-    configuration = import_lambda(lambda_name=lambda_name, alias=alias)
+    if alias:
+        alias_check = check_alias(lambda_name, alias)
+    else:
+        pass
 
-    #Create a file, we'll call it the name of the lambda
-    cwd = os.getcwd()
-    full_path = os.path.join(cwd, filename)
+    if check:
+        #Call the import function
+        configuration = import_lambda(lambda_name=lambda_name, alias=alias)
 
-    #Dump the config we retrieved from AWS into the file
-    f = open(full_path, 'w')
-    f.write(json.dumps(configuration, indent=4))
-    f.close()
+        #Create a file, we'll call it the name of the lambda
+        cwd = os.getcwd()
+        full_path = os.path.join(cwd, filename)
+
+        #Dump the config we retrieved from AWS into the file
+        f = open(full_path, 'w')
+        f.write(json.dumps(configuration, indent=4))
+        f.close()
+    else:
+        print("No lambda found, please check the name you're using and try again")
+        sys.exit(1)
