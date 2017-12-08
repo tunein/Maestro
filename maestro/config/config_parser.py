@@ -118,12 +118,11 @@ class ConfigReturn(ConfigParser):
         '''
         if super().get_section('variables'):
             func_variables = super().get_section('variables')
+            func_variables = variable_replacer(func_variables, self.cli_args.var)
         else:
             func_variables = False
 
-        replaced_variables = variable_replacer(func_variables, self.cli_args.var)
-
-        return replaced_variables
+        return func_variables
 
     def get_dlq(self):
         '''
