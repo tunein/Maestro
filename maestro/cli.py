@@ -63,4 +63,6 @@ parser.add_argument(
 parser.add_argument(
 	'--version_description',
 	help="Pass a description into the version")
+parser.add_argument(
+	'--var', nargs=2, action='append')
 ARGS = parser.parse_args()

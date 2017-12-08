@@ -3,6 +3,9 @@ import json
 import os
 import sys
 
+#Grab our variable replacer
+from maestro.config.variable_replacer import variable_replacer
+
 class ConfigParser(object):
     '''
     Provides a simple interface for retrieving items from config file, and the more complex ones from CLI
@@ -118,7 +121,9 @@ class ConfigReturn(ConfigParser):
         else:
             func_variables = False
 
-        return func_variables
+        replaced_variables = variable_replacer(func_variables, self.cli_args.var)
+
+        return replaced_variables
 
     def get_dlq(self):
         '''

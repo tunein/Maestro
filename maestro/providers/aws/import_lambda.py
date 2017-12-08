@@ -83,7 +83,7 @@ def import_config(lambda_name, alias=False):
             trace_config = config['TracingConfig']
 
             if trace_config['Mode'] != "PassThrough":
-                config_dict['initializers']['tracing_mode'] = trace_config['Mode']
+                config_dict['initializers']['tracing_mode'] = trace_config['Mode'].lower()
             else:
                 pass
 
