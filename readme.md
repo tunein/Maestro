@@ -4,7 +4,7 @@ Created by M. Moon/Perilune Inc Copyright 2017
 
 ![](http://pixel.nymag.com/imgs/daily/vulture/2015/gifs/epic-conductor-valery-gergiev.w529.h352.gif)  
 
-Current State: v0.1.5
+Current State: v0.1.6
 
 ***Maestro is a command line tool for creating, managing, and maintaining AWS Lambdas***  
 - It takes a json document as an input to fill out all the information necessary for creating a lambda  
