@@ -42,6 +42,7 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 - maestro delete-alias function_name.json  
 - maestro invoke function_name.json  
 - maestro init function_name.json
+- maestro import function_name.json
 
 ---
 

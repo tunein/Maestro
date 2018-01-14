@@ -153,4 +153,9 @@ The above command will create `example.json` in your PWD.
 
 ## How to use the 'import' action
 
-This action is used to import an existing lambda into being managed by Maestro/as infrastructure as code. When running this command you are prompted for the name of the lambda and if you'd like to import the configuration of a specific alias. Maestro checks to see if your lambda and alias exists then writes your configuration file for you.
+This action is used to import an existing lambda into being managed by Maestro/as infrastructure as code. When running this command you are prompted for the name of the lambda and if you'd like to import the configuration of a specific alias. Maestro checks to see if your lambda and alias exists then writes your configuration file for you. To kick off the command, first decide what you want to name your file then run the example command.
+
+Example commands:  
+`maestro import example.json`  
+
+The above command will create `example.json` in your PWD and dump the lambda's configuration into it.  
