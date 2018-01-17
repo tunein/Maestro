@@ -9,7 +9,20 @@ from botocore.exceptions import ClientError
 client = boto3.client('lambda')
 
 def putFunctionConcurrency(functionName=None, reservedCapacity=100):
-    pass
+    if functionName is not None:
+        try:
+            putConcurrency = client.put_function_concurrency(
+                                FunctionName=functionName,
+                                ReservedConcurrentExecutions=reservedCapacity
+                            )
+        except ClientError as error:
+            print(error)
+            sys.exit(1)
+        finally:
+            if putConcurrency['ResponseMetadata']['HTTPStatusCode'] == 201:
+                return True
+    else:
+        raise RuntimeError('Must supply a valid function name')
 
 def removeFunctionConcurrency(functionName=None):
     if functionName is not None:
@@ -22,5 +35,4 @@ def removeFunctionConcurrency(functionName=None):
         finally:
             return True
     else:
-        print('Must supply function name')
-        sys.exit(1)
+        raise RuntimeError('Must supply a valid function name')
