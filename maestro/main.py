@@ -117,6 +117,9 @@ def main():
     #Backup info
     backup_bucket = config.get_backup()
 
+    #Concurrency info
+    func_concurrency_setting = config.get_concurrency()
+
     #Invoke information
     invoke_type, invoke_version, invoke_alias, invoke_payload = config.get_invoke()
 
@@ -145,7 +148,8 @@ def main():
                     tracing_mode=trace_mode, bucket_name=backup_bucket, invoke_method=func_trigger_method,
                     invoke_source=func_trigger_source, log_expire=func_log_expire, event_source=func_event_source, 
                     event_source_name=func_event_source_name, event_batch_size=func_event_batch_size, 
-                    event_enabled_status=func_event_enable_status, event_start_position=func_event_start_position)
+                    event_enabled_status=func_event_enable_status, event_start_position=func_event_start_position,
+                    concurrency_setting=func_concurrency_setting)
 
     elif action == 'create-alias':
         create_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
@@ -174,7 +178,7 @@ def main():
                             event_type=func_trigger_event_type, dry_run=dry_run, log_expire=func_log_expire, 
                             event_source=func_event_source, event_source_name=func_event_source_name, 
                             event_batch_size=func_event_batch_size, event_enabled_status=func_event_enable_status, 
-                            event_start_position=func_event_start_position)
+                            event_start_position=func_event_start_position, concurrency_setting=func_concurrency_setting)
         
     elif action == 'update-alias':
         update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)

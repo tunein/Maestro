@@ -228,6 +228,17 @@ class ConfigReturn(ConfigParser):
 
         return func_backup_bucket
 
+    def get_concurrency(self):
+        '''
+        Check to see if they want to set up concurrent executions
+        '''
+        if super().get_section('concurrency'):
+            func_concurrency_limit = super().get_section_item('concurrency', 'reserved_concurrent_executions')
+        else:
+            func_concurrency_limit = False
+
+        return func_concurrency_limit
+
     def get_invoke(self):
         '''
         Invoke specific variables
