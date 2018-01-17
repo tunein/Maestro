@@ -184,6 +184,7 @@ def create(lambda_name, runtime, role, handler, description, timeout, mem_size, 
                     Tags=tags
                 )
                 if create['ResponseMetadata']['HTTPStatusCode'] == 201:
+                    print('Lambda created successfully!')
                     return True
                 else:
                     return False

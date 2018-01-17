@@ -8,7 +8,7 @@ except ImportError:
 
 setup(
     name='maestro',
-    version='0.1.5',
+    version='0.1.6',
     license='Apache License, Version 2.0',
     description='AWS Lambda tool for creating, updating, deleting, and publishing Lambdas',
     author="Max Moon, Perilune Industries",
