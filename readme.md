@@ -109,7 +109,7 @@ Example notes:
 **Current roadmap:**  
 - Alias weighting
 - Profile support
-- Event stream suppor for `import` action
+- Event stream support for `import` action
 - Add API Gateway trigger Support  
 - Add IoT Trigger Support  
 - Add CodeCommit Trigger Support  
