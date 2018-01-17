@@ -71,6 +71,9 @@ Config file template
     "enabled": "True/False", \\ True or False, you must use double quotes
     "start_position": "TRIM_HORIZON/LATEST/AT_TIMESTAMP" \\ your choice of TRIM_HORIZON/LATEST/AT_TIMESTAMP, caps count
  },
+ "concurrency": { \\ optional
+    "reserved_concurrent_executions": int \\ count from 1-1000 (the default account limit) for reserved concurrent executions
+  },
  "backup": { \\ optional
     "bucket_name": "string" \\ The name of an s3 bucket you want to back up your ZIP'd lambda code to
  }
@@ -244,6 +247,21 @@ enabled:
 
 start_position:  
 - Choice of TRIM_HORIZON, LATEST, or AT_TIMESTAMP, read AWS docs if you are not familiar  
+
+---
+
+## How to use 'concurrency' in the config file  
+
+This is used to identify the amount of concurrent exectuions you'd like to reserve, if it doesn't exist in the config file it defaults to 100 (the aws standard)  
+
+Fields:  
+
+reserved_concurrent_executions:  
+- A number from 1-1000 (or whatever your account limit is), defaults to 100  
+
+Tips:
+
+- This portion of the config file only is accessed in the `create` and `update-config` actions. If you have set up your lambda with a custom amount of concurrent executions and would like it to return to default simply remove this portion of the config file and run `maestro update-config your_file.json` and it will return to the standard 100.  
 
 ---
 

@@ -3,3 +3,4 @@ notes.txt
 dist/*
 *.zip
 __pycache__/*
+example/quick_temp.json

@@ -12,12 +12,14 @@ from maestro.providers.aws.get_policy import get_lambda_policy
 from maestro.providers.aws.triggers import create_trigger
 from maestro.providers.aws.triggers import remove_trigger
 from maestro.providers.aws.update_lambda_config import update_config
+from maestro.providers.aws.function_concurrency import putFunctionConcurrency
 
 def update_config_action(name, handler, description, timeout, mem_size, runtime, role, alias=False, vpc_setting=False, vpc_name=False, 
                         vpc_security_groups=False, tags=False, variables=False, dlq=False, dlq_type=False, dlq_name=False, 
                         tracing_mode=False, create_trigger_bool=False, remove_trigger_bool=False, invoke_method=False, 
                         invoke_source=False, event_type=False, dry_run=False, log_expire=False, event_source=False,
-                        event_source_name=False, event_batch_size=False, event_enabled_status=False, event_start_position=False):
+                        event_source_name=False, event_batch_size=False, event_enabled_status=False, event_start_position=False,
+                        concurrency_setting=False):
     '''
     Updates the configuration of the given lambda, this has all the same parameters as the create function with the
     exception of updating code. Every single parameter (except code) can be changed using this. 
@@ -74,3 +76,11 @@ def update_config_action(name, handler, description, timeout, mem_size, runtime,
                                     alias=alias)
         else:
             pass
+
+        #Check to see if they're setting up custom concurrency limits
+        if concurrency_setting:
+            putFunctionConcurrency(functionName=name, reservedCapacity=concurrency_setting)
+        else:
+            putFunctionConcurrency(functionName=name)
+
+        print('Function configuration update complete!')
