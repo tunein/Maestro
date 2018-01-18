@@ -21,28 +21,29 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 **To install**  
 - Clone this directory  
 - CD into the main directory containing setup.py  
-- Issue the following command: "pip install ."  
+- Install the requirements: `pip install -r requirements.txt`  
+- Issue the following command: `pip install .`  
 
 **Required Packages**  
 - python 3.*  
 - pip  
 - AWS CLI Tools  
-- Boto3  
+- Boto3
 
 ---
 
 **Current Core Available actions**  
-- maestro create function_name.json  
-- maestro update-code function_name.json  
-- maestro update-config function_name.json  
-- maestro publish function_name.json  
-- maestro delete function_name.json  
-- maestro create-alias function_name.json  
-- maestro update-alias function_name.json  
-- maestro delete-alias function_name.json  
-- maestro invoke function_name.json  
-- maestro init function_name.json
-- maestro import function_name.json
+- `maestro create function_name.json`  
+- `maestro update-code function_name.json`  
+- `maestro update-config function_name.json`  
+- `maestro publish function_name.json`  
+- `maestro delete function_name.json`  
+- `maestro create-alias function_name.json`  
+- `maestro update-alias function_name.json`  
+- `maestro delete-alias function_name.json`  
+- `maestro invoke function_name.json`  
+- `maestro init function_name.json`
+- `maestro import function_name.json`
 
 ---
 
