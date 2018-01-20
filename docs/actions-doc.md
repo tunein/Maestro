@@ -106,11 +106,16 @@ This is used to update the alias specified in either the config file or from the
 
 The most common use case of this is updating your alias to a newly published version (from the 'publish' action)  
 
+As of Maestro v 0.1.7 this command supports a the `--weight` flag. This allows you to weight a percentage of traffic across two versions of code. If present this action keeps your lambda locked on it's present version and points the additional traffic to whatever the newest publish version of your lambda is. If not present this action points your alias to the newest published version of your lambda. Examples below.  
+
 Example commands:  
 `maestro update-alias example.json`  
 `maestro update-alias --alias dev example.json`  
+`maestro update-alias --weight 20 --publish example.json` 
 
-In the second command we're updating the alias 'dev'. The alias MUST exist. 
+In the second command we're updating the alias 'dev'. The alias MUST exist.  
+
+In the third example you see an implementation of the `--weight <integer>` flag. This locks your alias to it's current version, and points the a percentage of traffic (specified as an integer) to the newest publish version of your lambda. When you're ready to push all traffic to that version, remove the weight flag.  
 
 ---
 

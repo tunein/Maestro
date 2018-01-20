@@ -135,6 +135,9 @@ def main():
     #Get the boolean response of dry run cli arg
     dry_run = config.get_dry_run()
 
+    #Get the weight
+    weight = config.get_weight()
+
     '''
     Now that we've retrieved all over our actions let's run things for real
     '''
@@ -181,7 +184,7 @@ def main():
                             event_start_position=func_event_start_position, concurrency_setting=func_concurrency_setting)
         
     elif action == 'update-alias':
-        update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish)
+        update_alias_action(name=name, alias=alias, dry_run=dry_run, publish=publish, weight=weight)
     else:
         print('No valid action found, exiting')
         sys.exit(1)
