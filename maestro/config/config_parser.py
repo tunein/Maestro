@@ -289,3 +289,11 @@ class ConfigReturn(ConfigParser):
         dry_run = self.cli_args.dry_run
 
         return dry_run
+
+    def get_weight(self):
+        '''
+        Grabs the weight, the percentage of traffic towards the newest version
+        '''
+        weight = self.cli_args.weight
+
+        return weight

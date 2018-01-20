@@ -182,7 +182,39 @@ def alias_destroy(lambda_name, del_alias=False, dry_run=False):
     else:
         print("No aliases found..")
 
-def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
+def get_current_alias_version(lambda_name, alias=None):
+    '''
+    Retrieves current version the specified alias is using
+    This is used to keep a lambda at the desired version while weighting traffic across other versions
+    
+    Example, version 1 is retrieving prod traffic, you push version 2, weight traffic and discover a bug..
+    so you push version 3, this keeps the majority of traffic on version 1
+
+    args:
+        lambda_name: name of the lambda we're working with
+        alias: name of the alias we're working with
+    '''
+    if alias is not None:
+        try:
+            config = client.get_alias(
+                                FunctionName=lambda_name,
+                                Name=alias
+                        )
+        except ClientError as error:
+            print(error)
+            sys.exit(1)
+        else:
+            if config['FunctionVersion']:
+                version = config['FunctionVersion']
+            else:
+                print('Error! Could not find requested aliases function version!')
+                sys.exit(1)
+        finally:
+            return version
+    else:
+        raise ValueError('You must supply an alias!')
+
+def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False, weight=False):
     '''
     Updates an existing alias to use a new version of code
     This can be called by itself or if the user tries to create an alias and it already exists, this will get called
@@ -193,20 +225,19 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
         dry_run: CLI arg to denote the user only wants to see what would happen
         publish: CLI arg to pass over all prompts, this defaults the alias to the newest version (denoted by highest version number)
     '''
-
     # Create a list of available versions, $LATEST == 0
     versions = client.list_versions_by_function(
                                         FunctionName='%s' % lambda_name,
                                     )
 
-    version_json = json.dumps(versions, indent=4)
-    load_json = json.loads(version_json)
-    versions = load_json['Versions']
+    versions = versions['Versions']
+
     avail_versions = []
 
     for version in versions:
         if version['Version'] != 0:
             version = version['Version']
+        
             if version == "$LATEST":
                 version = 0
                 avail_versions.append(version)
@@ -218,12 +249,9 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
         FunctionName='%s' % lambda_name,
         )
 
-    dump_json = json.dumps(alias, indent=4) 
-    load = json.loads(dump_json)
-
     aliases = []
 
-    for names in load['Aliases']:
+    for names in alias['Aliases']:
         print("Function Version: '%s' has alias: '%s'" % (names['FunctionVersion'], names['Name']))     
         aliases.append(names['Name'])
     print("\n")
@@ -240,10 +268,7 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
             to use the highest available version integer (the newest version of code)
             '''
             largest = max(avail_versions, key=int)
-            if largest == 0:
-                version_update = '$LATEST'
-            else:
-                version_update = largest
+            version_update = largest
         else:
             for version in avail_versions:
                 print("Version: " + str(version))
@@ -252,30 +277,47 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False):
 
         #This is the main action, first we validate alias and version, then we do it for real 
         if alias_name in aliases:
-            if version_update in avail_versions:
-                if version_update == 0:
-                    version_update == "$LATEST"
-                else:
-                    pass
-                if dry_run:
-                    print(color.PURPLE + "***Dry run option enabled***" + color.END)
-                    print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
-                    return True
-                else:
-                    try:
-                        update_alias = client.update_alias(
-                                                        FunctionName='%s' % lambda_name,
-                                                        Name='%s' % alias_name,
-                                                        FunctionVersion='%s' % version_update,
-                                                    )
-                        if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
-                            print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
-                            return True
-                        else:
-                            return False
-                    except ClientError as error:
-                        print(error.response['Error']['Message'])
+
+            # Convert version 0 back to latest
+            if version_update == 0:
+                version_2_update = "$LATEST"
+                weight_version_update = "$LATEST"
             else:
-                print("Version not found..")
+                # Check if we're weighting a new version 
+                if weight:
+                    weight = int(weight) / 100
+                    weight_version_update = version_update
+
+                    # Grab the current function version
+                    version_2_update = get_current_alias_version(lambda_name, alias=alias_name)
+                    print('Weighting version %s to receive %0.2f of traffic, version %s recieves remaining traffic' % (weight_version_update, float(weight * 100), version_2_update))
+                else:
+                    weight = 0
+                    version_2_update = version_update
+                    weight_version_update = avail_versions[-2]
+
+            if dry_run:
+                print(color.PURPLE + "***Dry run option enabled***" + color.END)
+                print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
+                return True
+            else:
+                try:
+                    update_alias = client.update_alias(
+                                                    FunctionName='%s' % lambda_name,
+                                                    Name='%s' % alias_name,
+                                                    FunctionVersion='%s' % version_2_update,
+                                                    RoutingConfig={
+                                                        'AdditionalVersionWeights': {
+                                                            weight_version_update: weight
+                                                        }
+                                                    }
+                                                )
+                    if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+                        print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
+                        return True
+                    else:
+                        return False
+                except ClientError as error:
+                    print(error.response['Error']['Message'])
         else:
             print("No aliases found...")

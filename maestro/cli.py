@@ -64,5 +64,8 @@ parser.add_argument(
 	'--version_description',
 	help="Pass a description into the version")
 parser.add_argument(
+	'--weight',
+	help="Percentage of traffic getting sent to newest published version")
+parser.add_argument(
 	'--var', nargs=2, action='append')
 ARGS = parser.parse_args()
