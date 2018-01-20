@@ -215,6 +215,14 @@ def get_current_alias_version(lambda_name, alias=None):
         raise ValueError('You must supply an alias!')
 
 def update_alias_non_weighted(lambda_name, alias=False, version=False):
+    '''
+    Updates an alias that doesn't have a weight, specifically for used because $LATEST cant split traffic
+
+    args:
+        lambda_name: name of the lambda
+        alias: name of the alias 
+        version: version number
+    '''
     try:
         update_alias = client.update_alias(
                                         FunctionName=lambda_name,
@@ -230,6 +238,16 @@ def update_alias_non_weighted(lambda_name, alias=False, version=False):
         print(error.response['Error']['Message'])
 
 def update_alias_weighted(lambda_name, alias=False, new_version=False, old_version=False, weight=False):
+    '''
+    Updates an alias for slowly bringing a new version, keeps the old alias as main, new as the "canary"
+    
+    args:
+        lambda_name: name of lambda
+        alias: alias
+        new_version: newest version of the lambda 
+        old_version: the present primary version with the majority of traffic
+        weight: float between 0.0 and 1.0
+    '''
     if weight:
         weight_new = weight
     else:
@@ -255,6 +273,16 @@ def update_alias_weighted(lambda_name, alias=False, new_version=False, old_versi
         print(error.response['Error']['Message'])
 
 def publish_alias_weighted(lambda_name, alias=False, new_version=False, old_version=False, weight=False):
+    '''
+    Updates an alias that has an existing weighted alias to have the newest version as primary
+
+    args:
+        lambda_name: name of lambda
+        alias: alias
+        new_version: newest version of the lambda 
+        old_version: the present primary version with the majority of traffic
+        weight: float between 0.0 and 1.0
+    '''
     if weight:
         weight_new = weight
     else:
@@ -372,6 +400,6 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False, 
                 print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
                 return True
             else:
-            '''          
+            '''        
         else:
             print("No aliases found...")
