@@ -73,7 +73,7 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 - delete-alias  
 - create-trigger (and by proxy: invoke_method & invoke_source)  
 
-`--weight` requires to published versions, and cannot be used with $LATEST  
+`--weight` requires two published versions, and cannot be used with $LATEST  
 
 ---
 
