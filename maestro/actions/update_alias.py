@@ -20,7 +20,7 @@ def update_alias_action(name, alias, dry_run=False, publish=False, weight=False)
     if check(name):
         print('Lambda found! Attempting to update alias %s' % alias)
 
-        #Run the destroy function
+        #Run the update function
         alias_update(lambda_name=name, update_alias=alias, dry_run=dry_run, publish=publish, weight=weight)
 
     else:

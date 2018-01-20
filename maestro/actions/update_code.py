@@ -30,3 +30,6 @@ def update_code_action(name, dry_run=False, publish=False, no_pub=False, bucket_
             s3_backup(lambda_name=name, bucket_name=bucket_name, dry_run=dry_run)
         else:
             pass
+    else:
+        print('Lambda not found!')
+        sys.exit(1)
