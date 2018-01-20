@@ -214,6 +214,71 @@ def get_current_alias_version(lambda_name, alias=None):
     else:
         raise ValueError('You must supply an alias!')
 
+def update_alias_non_weighted(lambda_name, alias=False, version=False):
+    try:
+        update_alias = client.update_alias(
+                                        FunctionName=lambda_name,
+                                        Name=alias,
+                                        FunctionVersion=version
+                                        )
+        if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print('Updated alias %s to version %s' % (alias, version))
+            return True
+        else:
+            return False
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+
+def update_alias_weighted(lambda_name, alias=False, new_version=False, old_version=False, weight=False):
+    if weight:
+        weight_new = weight
+    else:
+        weight_new = 0.0
+
+    try:
+        update_alias = client.update_alias(
+                                        FunctionName=lambda_name,
+                                        Name=alias,
+                                        FunctionVersion=old_version,
+                                        RoutingConfig={
+                                            'AdditionalVersionWeights': {
+                                                new_version: weight_new
+                                            }
+                                        }
+                                    )
+        if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print('Weighting version %s to receive %0.2f of traffic, version %s recieves remaining traffic' % (new_version, float(weight * 100), old_version))
+            return True
+        else:
+            return False
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+
+def publish_alias_weighted(lambda_name, alias=False, new_version=False, old_version=False, weight=False):
+    if weight:
+        weight_new = weight
+    else:
+        weight_new = 0.0
+
+    try:
+        update_alias = client.update_alias(
+                                        FunctionName=lambda_name,
+                                        Name=alias,
+                                        FunctionVersion=new_version,
+                                        RoutingConfig={
+                                            'AdditionalVersionWeights': {
+                                                old_version: weight_new
+                                            }
+                                        }
+                                    )
+        if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
+            print('Updated alias %s to version %s' % (alias, new_version))
+            return True
+        else:
+            return False
+    except ClientError as error:
+        print(error.response['Error']['Message'])
+
 def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False, weight=False):
     '''
     Updates an existing alias to use a new version of code
@@ -278,46 +343,35 @@ def alias_update(lambda_name, update_alias=False, dry_run=False, publish=False, 
         #This is the main action, first we validate alias and version, then we do it for real 
         if alias_name in aliases:
 
-            # Convert version 0 back to latest
-            if version_update == 0:
-                version_2_update = "$LATEST"
-                weight_version_update = "$LATEST"
-            else:
-                # Check if we're weighting a new version 
-                if weight:
-                    weight = int(weight) / 100
-                    weight_version_update = version_update
+            # Check if we're weighting a new version 
+            if weight:
+                weight = int(weight) / 100
+                weight_version_update = version_update
 
-                    # Grab the current function version
-                    version_2_update = get_current_alias_version(lambda_name, alias=alias_name)
-                    print('Weighting version %s to receive %0.2f of traffic, version %s recieves remaining traffic' % (weight_version_update, float(weight * 100), version_2_update))
+                # Grab the current function version
+                version_2_update = get_current_alias_version(lambda_name, alias=alias_name)
+
+                if version_2_update == "$LATEST":
+                    print("Can't split traffic between version $LATEST and new version, updating alias to point to %s" % weight_version_update)
+                    update_alias_non_weighted(lambda_name, alias=alias_name, version=version_update)
                 else:
-                    weight = 0
-                    version_2_update = version_update
-                    weight_version_update = avail_versions[-2]
+                    update_alias_weighted(lambda_name, alias=alias_name, new_version=version_update, old_version=version_2_update, weight=weight)
 
+            else:
+                if version_update == 0:
+                    version_2_update = "$LATEST"
+                    update_alias_non_weighted(lambda_name, alias=alias_name, version=version_2_update)
+                elif avail_versions[-2] == 0:
+                    update_alias_non_weighted(lambda_name, alias=alias_name, version=version_update)
+                else:
+                    old_version = avail_versions[-2]
+                    publish_alias_weighted(lambda_name, alias=alias_name, new_version=version_update, old_version=old_version)                
+            '''
             if dry_run:
                 print(color.PURPLE + "***Dry run option enabled***" + color.END)
                 print(color.PURPLE + "Would have updated update alias '%s' on version '%s' on lambda '%s'" % (alias_name, version_update, lambda_name) + color.END)
                 return True
             else:
-                try:
-                    update_alias = client.update_alias(
-                                                    FunctionName='%s' % lambda_name,
-                                                    Name='%s' % alias_name,
-                                                    FunctionVersion='%s' % version_2_update,
-                                                    RoutingConfig={
-                                                        'AdditionalVersionWeights': {
-                                                            weight_version_update: weight
-                                                        }
-                                                    }
-                                                )
-                    if update_alias['ResponseMetadata']['HTTPStatusCode'] == 200:
-                        print("Lamda '%s' version '%s' alias '%s' has been updated!" % (lambda_name, version_update, alias_name))
-                        return True
-                    else:
-                        return False
-                except ClientError as error:
-                    print(error.response['Error']['Message'])
+            '''          
         else:
             print("No aliases found...")
