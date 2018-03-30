@@ -1,4 +1,4 @@
-# Maestro 
+# Maestro
 
 Created by M. Moon/Perilune Inc Copyright 2017  
 
@@ -25,10 +25,10 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 - Issue the following command: `pip install .`  
 
 **Required Packages**  
-- python 3.*  
-- pip  
-- AWS CLI Tools  
-- Boto3
+- [python 3.*](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/stable/installing/)
+- [AWS CLI Tools](https://docs.aws.amazon.com/cli/latest/userguide/installing.html)  
+- [Boto3](http://boto3.readthedocs.io/en/latest/guide/quickstart.html)
 
 ---
 
@@ -63,7 +63,7 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 
 ---
 **Notes**  
-  
+
 #### `--dry-run` is available on the following Actions:
 - create  
 - update-code  
