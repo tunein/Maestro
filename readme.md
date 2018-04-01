@@ -1,6 +1,6 @@
 # Maestro
 
-Created by M. Moon/Perilune Inc Copyright 2017  
+Created by M. Moon/Perilune Inc Copyright 2018  
 
 ![](http://pixel.nymag.com/imgs/daily/vulture/2015/gifs/epic-conductor-valery-gergiev.w529.h352.gif)  
 
@@ -88,6 +88,8 @@ Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon191
 ------/dependency-2  
 ------/dependency-etc  
 
+[Example Here](https://github.com/MoonMoon1919/Maestro/tree/develop/example)
+
 Notes:  
 - The expectation of Maestro is that your code (or binary) and all necessary libs are in a folder called "dist" that is at the same directory level as your configuration file. THIS IS A MUST.
 
@@ -110,10 +112,4 @@ Example notes:
 
 ---
 
-**Current roadmap:**  
-- Profile support
-- Event stream support for `import` action
-- Add API Gateway trigger Support  
-- Add IoT Trigger Support  
-- Add CodeCommit Trigger Support  
-- Add Cognito Sync Trigger Support  
+The roadmap is being worked on regularly. Please see [Roadmap Items](https://github.com/MoonMoon1919/Maestro/labels/Roadmap) under issues! 
