@@ -1,10 +1,7 @@
 # Maestro
 
-Created by M. Moon/Perilune Inc Copyright 2018  
-
-![](http://pixel.nymag.com/imgs/daily/vulture/2015/gifs/epic-conductor-valery-gergiev.w529.h352.gif)  
-
 Current State: v0.1.7
+Authors: M.Moon/TuneIn DevOps
 
 ***Maestro is a command line tool for creating, managing, and maintaining AWS Lambdas***  
 - It takes a json document as an input to fill out all the information necessary for creating a lambda  
@@ -95,7 +92,7 @@ Notes:
 
 ---  
 
-**Docker**
+**Using Docker**
 
 Usage of docker is recommended for use in CICD pipelines to reduce dependency management on build agents  
 
@@ -109,7 +106,3 @@ Example notes:
 - I've replaced the default region with 'YOURREGION', place a valid region (ie: us-west-2) in place of this  
 - I'm mount my $PWD to the /app directory of the container (your /dist folder and config file should be at this level)  
 - Actions and config file name come AFTER the container name (maestro is the entrypoint, you don't need to specify that)  
-
----
-
-The roadmap is being worked on regularly. Please see [Roadmap Items](https://github.com/MoonMoon1919/Maestro/labels/Roadmap) under issues! 
