@@ -1,6 +1,6 @@
 # Maestro
 
-Current State: v0.1.7
+Current State: v0.2.0
 Authors: M.Moon/TuneIn DevOps
 
 ***Maestro is a command line tool for creating, managing, and maintaining AWS Lambdas***  
