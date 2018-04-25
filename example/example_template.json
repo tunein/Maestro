@@ -1,0 +1,53 @@
+{
+ "initializers": {
+    "name": "example",
+    "description": "example description",
+    "region": "us-west-2",
+    "role": "example-role",
+    "handler": "example.main",
+    "alias": "example-env",
+    "tracing_mode": "active"
+  },
+ "provisioners": {
+    "runtime": "python3.6",
+    "timeout": 150,
+    "mem_size": 128,
+ },
+ "vpc_setting": {
+    "vpc_name": "example-vpc",
+    "security_group_ids": ["example-sg"]
+ },
+ "variables": {
+    "backend-url": "example-env.your-backend.com",
+    "api_token": "thisisanapitoken"
+ },
+ "dead_letter_config": {
+    "type": "sns",
+    "target_name": "example-sns-target"
+ },
+  "tags": {
+    "Name": "example",
+    "environment": "example-env"
+ },
+  "trigger": {
+    "method": "cloudwatch",
+    "source": "example-10-min-cron"
+ },
+ "logging": {
+    "destination_lambda": "name of processing lambda",
+    "destination_alias": "some-alias"
+ },
+ "log_expiration": {
+    "age": 120
+ },
+ "event_stream": {
+    "type": "kinesis",
+    "source": "test-stream",
+    "batch_size": 100,
+    "enabled": "True",
+    "start_position": "TRIM_HORIZON"
+ },
+ "backup": {
+    "bucket_name": "your-backup-bucket-name"
+ }
+}

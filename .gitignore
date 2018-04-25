@@ -1,0 +1,6 @@
+notes.txt
+*.pyc
+dist/*
+*.zip
+__pycache__/*
+example/quick_temp.json
