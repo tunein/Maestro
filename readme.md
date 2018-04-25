@@ -11,7 +11,7 @@ Authors: M.Moon/TuneIn DevOps
 - Creates a repeatable way to create and deploy changes to Lambdas  
 - Handles your lambdas relationships with other AWS resources so you don't have to
 
-Want to learn how to use it? [Check out the docs](https://github.com/MoonMoon1919/Maestro/tree/develop/docs)!  
+Want to learn how to use it? [Check out the docs](https://github.com/tunein/Maestro/tree/development/docs)!  
 
 ---
 
