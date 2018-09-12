@@ -33,6 +33,12 @@ def get_vpc_id(vpc_name):
     '''
     filters = [{'Name': 'tag:Name', 'Values': ['%s' % vpc_name]}]
     vpcs = list(ec2.vpcs.filter(Filters=filters))
+
+    if not vpcs:
+        print(color.RED + "Couldn't find the ID for your vpc, vpc_name: " + vpc_name + ", check the name and try again"
+              + color.END)
+        return False
+
     for vpc in vpcs:
         try:
             response = client.describe_vpcs(
@@ -44,7 +50,8 @@ def get_vpc_id(vpc_name):
             if len(vpc_id)!=0:
                 return vpc_id
             else:
-                print(color.RED + "Couldn't find the ID for your vpc, check the name and try again" + color.END)
+                print(color.RED + "Couldn't find the ID for your vpc, vpc_name: " + vpc_name
+                      + ", check the name and try again" + color.END)
                 return False
         except ClientError as error:
             print(color.RED + error.response['Error']['Message'] + color.END)  
