@@ -8,7 +8,9 @@ from botocore.exceptions import ClientError
 #Establish our boto resources
 client = boto3.client('lambda')
 
-def putFunctionConcurrency(functionName=None, reservedCapacity=100):
+def putFunctionConcurrency(functionName=None, reservedCapacity=0):
+    if reservedCapacity == 0:
+        return
     if functionName is not None:
         print('Checking function concurrency setting')
         try:
