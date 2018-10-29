@@ -116,19 +116,7 @@ def alias_creation(lambda_name, new_alias=False, dry_run=False, publish=False):
 
     #This is the actual action, creates an alias for the specific version, first we validate the version exists
     if function_version in avail_versions: 
-        try:
-            add_alias = client.create_alias(
-                FunctionName='%s' % lambda_name,
-                Name='%s' % alias_name,
-                FunctionVersion='%s' % function_version,
-            )
-            if add_alias['ResponseMetadata']['HTTPStatusCode'] == 201:
-                print("Adding alias '%s' to lambda '%s' version '%s'" % (alias_name, lambda_name, function_version))
-                return True
-            else:
-                return False
-        except ClientError as error:
-            print(error.response['Error']['Message'])
+        return True
     else:
         print("I can't find that version, check list and find again")
 
