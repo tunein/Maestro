@@ -42,6 +42,7 @@ def alias_creation(lambda_name, new_alias=False, dry_run=False, publish=False):
     load = json.loads(dump_json)
 
     aliases = []
+    alias_name = ""
 
     for names in load['Aliases']:    
         aliases.append(names['Name'])
