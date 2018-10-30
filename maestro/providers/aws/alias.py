@@ -115,7 +115,7 @@ def alias_creation(lambda_name, new_alias=False, dry_run=False, publish=False):
         pass
 
     #This is the actual action, creates an alias for the specific version, first we validate the version exists
-    if function_version in avail_versions: 
+    if function_version in avail_versions and alias_name != "": 
         try:
             add_alias = client.create_alias(
                 FunctionName='%s' % lambda_name,
