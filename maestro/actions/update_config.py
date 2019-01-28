@@ -84,3 +84,6 @@ def update_config_action(name, handler, description, timeout, mem_size, runtime,
             putFunctionConcurrency(functionName=name)
 
         print('Function configuration update complete!')
+    else:
+        print('Lambda "%s" not found!' % name)
+        sys.exit(1)

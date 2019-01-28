@@ -21,6 +21,7 @@ class color:
     UNDERLINE = '\033[4m'
     END = '\033[0m'
 
+
 def check(lambda_name):
     '''
     Checks to see if the lambda exists already, if it does, the user will be prompted to use 'update-code' action
@@ -29,24 +30,14 @@ def check(lambda_name):
         lambda_name: name of the lambda, retrieved from config file
     '''
     try:
-        existing_functions = client.list_functions()
-
-        parse = json.dumps(existing_functions)
-        load = json.loads(parse) 
-        functions = load["Functions"]
-
-        current_functions = []
-
-        for function in functions:
-            names = function['FunctionName']
-            append = current_functions.append(names)
-
-        if lambda_name in current_functions:
+        function = client.get_function(FunctionName=lambda_name)
+        if len(function) > 0:
             return True
         else:
             return False
     except ClientError as error:
         print(error.response)
+
 
 def check_alias(lambda_name, alias):
     '''
