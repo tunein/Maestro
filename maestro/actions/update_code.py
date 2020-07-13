@@ -7,7 +7,7 @@ from maestro.providers.aws.check_existence import check
 from maestro.providers.aws.update_lambda_code import update_code
 from maestro.providers.aws.s3_backup import main as s3_backup
 
-def update_code_action(name, dry_run=False, publish=False, no_pub=False, bucket_name=False):
+def update_code_action(name, dry_run=False, publish=False, no_pub=False, bucket_name=False, source_bucket=None):
     '''
     Updates the code of a given lambda function, options to dry run, publish a version, or NOT publish a version
     First thing we do is check to see if the lambda is there..
@@ -23,7 +23,7 @@ def update_code_action(name, dry_run=False, publish=False, no_pub=False, bucket_
     if check(name):
         print('Found lambda %s! Attempting to update code' % name)
         
-        update = update_code(lambda_name=name, dry_run=dry_run, publish=publish, no_pub=no_pub)
+        update = update_code(lambda_name=name, dry_run=dry_run, publish=publish, no_pub=no_pub, source_bucket=source_bucket)
         
         #Check to see if they want to backup
         if bucket_name:

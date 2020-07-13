@@ -68,4 +68,7 @@ parser.add_argument(
 	help="Percentage of traffic getting sent to newest published version")
 parser.add_argument(
 	'--var', nargs=2, action='append')
+parser.add_argument(
+	'--source_bucket',
+	help="S3 bucket name where deployment package can be uploaded")
 ARGS = parser.parse_args()

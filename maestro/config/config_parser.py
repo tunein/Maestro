@@ -297,3 +297,11 @@ class ConfigReturn(ConfigParser):
         weight = self.cli_args.weight
 
         return weight
+
+    def get_source_bucket(self):
+        '''
+        S3 bucket name where deployment package can be uploaded
+        '''
+        source_bucket = self.cli_args.source_bucket
+
+        return source_bucket

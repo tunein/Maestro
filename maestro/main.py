@@ -138,6 +138,9 @@ def main():
     #Get the weight
     weight = config.get_weight()
 
+    #Get S3 bucket where deployment package can be uploaded
+    source_bucket = config.get_source_bucket()
+
     '''
     Now that we've retrieved all over our actions let's run things for real
     '''
@@ -170,7 +173,8 @@ def main():
         publish_action(name=name, version_description=version_description)
 
     elif action == 'update-code':
-        update_code_action(name=name, dry_run=dry_run, publish=publish, no_pub=no_pub, bucket_name=backup_bucket)
+        update_code_action(name=name, dry_run=dry_run, publish=publish, no_pub=no_pub, bucket_name=backup_bucket,
+                           source_bucket=source_bucket)
 
     elif action == 'update-config':
         update_config_action(name=name, handler=handler, description=desc, timeout=timeout, mem_size=memsize, runtime=runtime, 
