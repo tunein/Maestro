@@ -62,7 +62,7 @@ def update_funcion_code_s3(lambda_name, source_bucket, archive_name, answer, run
 
 def upload_deployment_package_to_s3(bucket, file_name):
     try:
-        print('Uploading lambda deployment package to bucket %s with name %s' % bucket, file_name)
+        print('Uploading lambda deployment package to bucket %s with name %s' % (bucket, file_name))
         s3.upload_file(file_name, bucket, file_name)
     except ClientError as error:
         print(color.RED + error.response['Error']['Message'] + color.END)
