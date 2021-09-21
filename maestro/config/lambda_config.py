@@ -1,4 +1,4 @@
-AVAIL_RUNTIMES = ['nodejs4.3', 'nodejs6.10', 'java8', 'python2.7', 'python3.6', 'dotnetcore1.0', 'dotnetcore2.0', 'dotnetcore2.1', 'dotnetcore2.2', 'nodejs4.3-edge', 'go1.x', 'nodejs10.x', 'nodejs8.10']
+AVAIL_RUNTIMES = ['nodejs4.3', 'nodejs6.10', 'java8', 'python2.7', 'python3.6', 'dotnetcore1.0', 'dotnetcore2.0', 'dotnetcore2.1', 'dotnetcore2.2', 'dotnetcore3.1', 'nodejs4.3-edge', 'go1.x', 'nodejs10.x', 'nodejs8.10']
 AVAIL_ACTIONS = ['init', 'import', 'create', 'update-code', 'update-config','delete', 'publish', 'create-alias', 'delete-alias', 'update-alias', 'invoke']
 REGIONS = ['eu-west-1', 'us-west-1', 'us-west-2', 'ap-south-1', 'ap-southeast-1', 'ap-southeast-2','ap-northeast-1', 'sa-east-1', 'cn-north-1', 'eu-central-1']
 ACL_ANSWERS = ['private', 'public-read', 'public-read-write', 'authenticated-read']
